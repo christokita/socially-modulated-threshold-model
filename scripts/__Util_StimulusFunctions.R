@@ -8,11 +8,11 @@
 ####################
 # Seed Stimuls
 ####################
-seedStimuls <- function(InitialSVector, RateVector, gens) {
+seedStimuls <- function(InitialSVector, gens) {
   # Calculate number of blank spots to make
-  repLength <- (length(InitialSVector) + length(RateVector)) * gens #intiial row does not count as gen
+  repLength <- (length(InitialSVector)) * gens #intiial row does not count as gen
   # Build matrix
-  stim <- matrix(data = c(InitialSVector, RateVector, rep(NA, repLength)),
+  stim <- matrix(data = c(InitialSVector, rep(NA, repLength)),
                  byrow = TRUE, 
                  nrow = (gens + 1))
   # Fix Names

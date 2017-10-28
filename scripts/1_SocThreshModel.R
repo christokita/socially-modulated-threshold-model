@@ -12,9 +12,9 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(2, 16, 32) #vector of number of individuals to simulate
+Ns             <- c(20) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
+gens           <- 400 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
@@ -22,7 +22,7 @@ reps           <- 1 #number of replications per simulation (for ensemble)
 ThreshM        <- c(100, 100) #population threshold means 
 ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
 InitialStim    <- c(0, 0) #intital vector of stimuli
-StimRates      <- c(0.6, 0.6) #vector of stimuli increase rates  
+deltas         <- c(0.6, 0.6) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
@@ -70,7 +70,6 @@ for (i in 1:length(Ns)) {
     
     # Seed task (external) stimuli
     stimMat <- seedStimuls(InitialSVector = InitialStim, 
-                           RateVector = StimRates, 
                            gens = gens)
     
     # Seed internal thresholds
@@ -103,15 +102,13 @@ for (i in 1:length(Ns)) {
     # Run simulation
     for (t in 1:gens) {
       # Update stimuli
-      for (j in 1:(ncol(stimMat)/2)) {
+      for (j in 1:ncol(stimMat)) {
         # update stim
         stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
-                                              delta = stimMat[t, j + m], 
+                                              delta = deltas[j], 
                                               alpha = alpha, 
                                               Ni = sum(X_g[ , j]), 
                                               n = n)
-        # shift down delta (rate increases)
-        stimMat[t + 1, j + m] <- stimMat[t, j + m]
       }
       # Update social network
       g_adj <- temporalNetwork(X_sub_g = X_g,
@@ -119,10 +116,9 @@ for (i in 1:length(Ns)) {
                                bias = q)
       g_tot <- g_tot + g_adj
       # Calculate task demand based on global stimuli
-      P_g <- calcThresholdProbMat(TimeStep = t + 1, # first row is generation 0
-                                  ThresholdMatrix = threshMat, 
-                                  StimulusMatrix = stimMat, 
-                                  nSlope = threshSlope)
+      P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
+                                    ThresholdMatrix = threshMat, 
+                                    StimulusMatrix = stimMat)
       # Update task performance
       X_g <- updateTaskPerformance(P_sub_g    = P_g,
                                    TaskMat    = X_g,
@@ -222,21 +218,3 @@ for (i in 1:length(Ns)) {
 if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
-
-
-g_tot <- g_tot / gens
-g <- graph_from_adjacency_matrix(g_tot, weighted = TRUE, mode = "directed")
-edgelist <- get.edgelist(g)
-edgelist <- edgelist %>% 
-  as.data.frame() %>% 
-  rename(Source = V1, Target = V2) %>% 
-  mutate(Weight = E(g)$weight)
-nodelist <- threshMat %>% 
-  as.data.frame() %>% 
-  mutate(TaskThreshBias = Thresh1 - Thresh2,
-         Id = paste0("v-", 1:n))
-write.csv(edgelist, file = "output/TestEdge.csv", row.names = FALSE)
-write.csv(nodelist, file = "output/TestNode.csv", row.names = FALSE)
-
-library(GGally)
-ggnet2(g_tot, edge.size = E(g)$weight/max(E(g)$weight)*2)

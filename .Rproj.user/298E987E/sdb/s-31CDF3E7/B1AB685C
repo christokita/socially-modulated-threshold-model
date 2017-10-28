@@ -1,19 +1,19 @@
 {
     "collab_server" : "",
     "contents" : "##################################################\n#\n# Task performance/state functions\n#\n##################################################\n\n\n####################\n# Choose task probabilistically \n####################\nupdateTaskPerformance <- function(P_sub_g, TaskMat, QuitProb) {\n      # Create possible task space\n      tasks <- seq(1:ncol(P_sub_g))\n      # Loop through individuals\n      for(row in 1:nrow(TaskMat)) {\n        # Inactive workers randomly sample one stimulus\n        if (sum(TaskMat[row, ]) == 0) {\n          # Sample task probability\n          tasks_order <- sample(x = tasks, size = length(tasks), replace = FALSE)\n          # Loop through tasks and go with first one that results in activity\n          for (task in tasks_order) {\n            prob <- P_sub_g[row, task]\n            activity <- sample(x = c(0, 1), size = 1, prob = c(1 - prob, prob))\n            if (activity == 1) {\n              TaskMat[row, task] <- activity\n              break\n            }\n          }\n        } else { #active workers quit with certain probability\n          quitNow <- sample(x = c(\"yes\", \"no\"), size = 1, prob = c(QuitProb, (1 - QuitProb)))\n          if (quitNow == \"yes\") {\n            TaskMat[row, ] <- 0\n          }\n        }\n      }\n  # Return\n  colnames(TaskMat) <- paste0(\"Task\", 1:ncol(P_sub_g))\n  rownames(TaskMat) <- paste0(\"v-\", 1:nrow(P_sub_g))\n  return(TaskMat) \n}\n\n\n",
-    "created" : 1509227731057.000,
+    "created" : 1509228926773.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "3617656217",
-    "id" : "2E850332",
+    "id" : "B1AB685C",
     "lastKnownWriteTime" : 1509227830,
-    "last_content_update" : 1509227830866,
+    "last_content_update" : 1509227830,
     "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/__Util_TaskStateFunctions.R",
     "project_path" : "scripts/__Util_TaskStateFunctions.R",
     "properties" : {
     },
-    "relative_order" : 4,
+    "relative_order" : 7,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_source"
