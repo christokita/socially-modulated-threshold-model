@@ -27,6 +27,7 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
+eta            <- 0.1 #relative weighting of social interactions for modulating thresholds
 p              <- 0.1 #probability of interacting with individual in other states
 q              <- 2 #probability of interacting with individual in same state relative to others
 
