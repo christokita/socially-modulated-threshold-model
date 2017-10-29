@@ -47,3 +47,18 @@ temporalNetwork <- function(X_sub_g, p, bias) {
   return(g_adj)
 }
 
+
+####################
+# Calculate Number of Neighbors Performing Task 
+####################
+calcSocialInfo <- function(SocialNetwork, X_sub_g) {
+  # Calculate "sum" of task states/probs of neighbors
+  L <- SocialNetwork %*% X_sub_g
+  # Fix unconnected nodes
+  L[is.na(L)] <- 0
+  # Return
+  colnames(L) <- paste0("NeighborTask", 1:ncol(L))
+  rownames(L) <- paste0("v-", 1:nrow(L))
+  return(L)
+}
+

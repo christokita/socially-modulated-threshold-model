@@ -54,6 +54,38 @@ calcThresholdDetermMat <- function(TimeStep, ThresholdMatrix, StimulusMatrix) {
   return(thresholdP)
 }
 
+####################
+# Deterministic Threshold with social information
+####################
+calcThresholdDetermSocial <- function(TimeStep, ThresholdMatrix, StimulusMatrix, epsilon, SocialInfoMatrix) {
+  # select proper stimulus for this time step
+  stimulusThisStep <- StimulusMatrix[TimeStep, ]
+  # calculate threshold probabilities for one individual
+  thresholdP <- lapply(1:nrow(ThresholdMatrix), function(i) {
+    # select row for individual in threshold matrix
+    indThresh <- ThresholdMatrix[i, ]
+    indSocial <- SocialInfoMatrix[i, ]
+    # create task vector to be output and bound
+    taskThresh <- rep(0, length(indThresh))
+    # loop through each task within individual
+    for (j in 1:length(taskThresh)) {
+      stim <- stimulusThisStep[j]
+      thresh <- indThresh[j] - (epsilon * indSocial[j])
+      if (stim > thresh) {
+        taskThresh[j] <- 1
+      }
+    }
+    return(taskThresh)
+  })
+  # bind and return
+  thresholdP <- do.call("rbind", thresholdP)
+  colnames(thresholdP) <- paste0("ThreshProb", 1:ncol(thresholdP))
+  rownames(thresholdP) <- paste0("v-", 1:nrow(thresholdP))
+  return(thresholdP)
+}
+
+
+
 
 
 

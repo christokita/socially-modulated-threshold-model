@@ -14,7 +14,7 @@ source("scripts/__Util__MASTER.R")
 # Base parameters
 Ns             <- c(20) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 400 #number of generations to run simulation 
+gens           <- 4000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
@@ -27,9 +27,9 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-eta            <- 0.1 #relative weighting of social interactions for modulating thresholds
-p              <- 0.1 #probability of interacting with individual in other states
-q              <- 2 #probability of interacting with individual in same state relative to others
+epsilon        <- 2 #relative weighting of social interactions for modulating thresholds
+p              <- 0.6 #probability of interacting with individual in other states
+q              <- 1 #probability of interacting with individual in same state relative to others
 
 
 
@@ -116,10 +116,15 @@ for (i in 1:length(Ns)) {
                                p = p,
                                bias = q)
       g_tot <- g_tot + g_adj
+      # Calculate information on neighbors performing tasks
+      L_g <- calcSocialInfo(SocialNetwork = g_adj,
+                            X_sub_g = X_g)
       # Calculate task demand based on global stimuli
-      P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
-                                    ThresholdMatrix = threshMat, 
-                                    StimulusMatrix = stimMat)
+      P_g <- calcThresholdDetermSocial(TimeStep = t + 1, # first row is generation 0
+                                       ThresholdMatrix = threshMat, 
+                                       StimulusMatrix = stimMat,
+                                       epsilon = epsilon,
+                                       SocialInfoMatrix = L_g)
       # Update task performance
       X_g <- updateTaskPerformance(P_sub_g    = P_g,
                                    TaskMat    = X_g,
