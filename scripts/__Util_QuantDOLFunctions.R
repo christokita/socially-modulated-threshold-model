@@ -20,11 +20,19 @@ mutualEntropy <- function(TotalStateMat) {
   H_x <- apply(normMat, MARGIN = 1, function(ind) {
     p_x <- sum(ind) / total
     h_x <- p_x * log2(p_x)
+    if(is.na(h_x)) {
+      h_x <- 0
+    }
+    return(h_x)
   })
   # Shannon's entropy of tasks H(Y)
   H_y <- apply(normMat, MARGIN = 2, function(task) {
     p_y <- sum(task) / total
     h_y <- p_y * log2(p_y)
+    if(is.na(h_y)) {
+      h_y <- 0
+    }
+    return(h_y)
   })
   # Mutual entropy I(X,Y)
   I_xy <- lapply(1:n, function(ind) {

@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1509331085030.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "EFA9B2F5",
+    "lastKnownWriteTime" : 4433985424,
+    "last_content_update" : 1509331085030,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "6F00ED1D",
+        "caption" : "metrics",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=metrics&cache_key=6F00ED1D",
+        "displayedObservations" : 8000,
+        "environment" : "",
+        "object" : "metrics",
+        "preview" : 0,
+        "totalObservations" : 8000,
+        "variables" : 5
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
