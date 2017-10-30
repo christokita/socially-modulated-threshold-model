@@ -48,10 +48,10 @@ taskSpec <- groups_specialization %>%
 ####################
 # Bind
 metrics <- merge(taskCorrTot, entropy)
-metrics <- merge(metrics, taskSpec)
 
 # Summarise
 metrics <- metrics %>% 
+  select(-Task1, - Task2) %>% 
   melt(., id.vars = c("n", "replicate", "set"))
 
 names(metrics) <- c("n", "replicate", "set", "metric", "value")
@@ -81,7 +81,7 @@ gg_metric <- ggplot(data = metrics, aes(x = n, y = Mean, group = metric)) +
   theme_classic() +
   xlab("Group Size") +
   ylab("Value") +
-  scale_y_continuous(limits = c(-0.05, 0.65),
+  scale_y_continuous(limits = c(0, 1),
                      breaks = seq(0, 1, 0.2)) +
   scale_x_continuous(breaks = unique(metrics$n)) +
   scale_fill_manual(name = "Metric",
@@ -105,7 +105,7 @@ gg_metric <- ggplot(data = metrics, aes(x = n, y = Mean, group = metric)) +
 
 gg_metric
 
-ggsave(gg_metric, file = "output/SpecializationMetrics/Plots/AllMetricsComparison_TEST.png", height = 2.1, width = 5, units = "in", dpi = 800)
+ggsave(gg_metric, file = "output/SpecializationPlots/Sigma01Epsilon1p06.png", height = 2.1, width = 4, units = "in", dpi = 800)
 
 
 ####################

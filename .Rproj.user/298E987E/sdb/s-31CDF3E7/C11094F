@@ -12,15 +12,15 @@
     "path" : null,
     "project_path" : null,
     "properties" : {
-        "cacheKey" : "FF6561F8",
+        "cacheKey" : "48F51389",
         "caption" : "entropy",
-        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=entropy&cache_key=FF6561F8",
-        "displayedObservations" : 100,
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=entropy&cache_key=48F51389",
+        "displayedObservations" : "100",
         "environment" : "",
         "object" : "entropy",
-        "preview" : 0,
-        "totalObservations" : 100,
-        "variables" : 4
+        "preview" : "0",
+        "totalObservations" : "100",
+        "variables" : "4"
     },
     "relative_order" : 8,
     "source_on_save" : false,
