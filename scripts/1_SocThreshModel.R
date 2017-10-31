@@ -16,7 +16,7 @@ Ns             <- c(2, 10, 20, 50, 100) #vector of number of individuals to simu
 m              <- 2 #number of tasks
 gens           <- 4000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 20 #number of replications per simulation (for ensemble)
+reps           <- 10 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- c(100, 100) #population threshold means 
@@ -28,7 +28,7 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 epsilon        <- 1 #relative weighting of social interactions for modulating thresholds
-p              <- 0.6 #probability of interacting with individual in other states
+p              <- 0.2 #probability of interacting with individual in other states
 q              <- 1 #probability of interacting with individual in same state relative to others
 
 
@@ -225,8 +225,8 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma01-Eps1-ConnectP06"
+filename <- "Sigma01-Eps1-ConnectP02"
 
-save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, 
+save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
      groups_taskStep, groups_taskTally,
-     file = paste0("output/", filename, "100reps.Rdata"))
+     file = paste0("output/", filename, ".Rdata"))
