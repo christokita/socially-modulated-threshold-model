@@ -16,7 +16,7 @@ Ns             <- c(2, 10, 20, 50) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 4000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 2 #number of replications per simulation (for ensemble)
+reps           <- 10 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- c(100, 100) #population threshold means 
@@ -142,6 +142,7 @@ for (i in 1:length(Ns)) {
         taskPerf[i] <- task
       }
       colnames(taskPerf) <- row.names(X_g)
+      taskOverTime <- rbind(taskOverTime, taskPerf)
       
       # Capture current task performance tally
       tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)
@@ -240,6 +241,9 @@ for (i in 1:length(Ns)) {
   runCorrs <- lapply(ens_taskCorr, function(x) {
     # Unlist
     runs <- do.call("rbind", x)
+    replicate <- runs[nrow(runs), ]
+    replicate <- unique(replicate)
+    runs <- runs[-nrow(runs), ]
     # Calculate mean
     runMean <- matrix(data = rep(NA, m), ncol =  m)
     for (column in 1:m) {
@@ -270,6 +274,6 @@ if(1 %in% Ns) {
 
 filename <- "Sigma01-Eps1-ConnectP02"
 
-save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
-     groups_taskStep, groups_taskTally, groups_specialization,
-     file = paste0("output/", filename, ".Rdata"))
+# save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
+#      groups_taskStep, groups_taskTally, groups_specialization,
+#      file = paste0("output/", filename, ".Rdata"))

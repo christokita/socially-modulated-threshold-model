@@ -39,7 +39,7 @@ taskCorrTot <- taskCorrTot %>%
 ####################
 taskSpec <- groups_specialization %>%
   group_by(n, replicate) %>%
-  summarise(SpecMean = mean(TransSpec))  %>%
+  summarise(SpecMean = mean(TransSpec, na.rm = TRUE))  %>% # need to figure out how to deal with inactivity (NA values)
   mutate(set = paste(n, replicate, sep = "-"))
 
 
@@ -48,10 +48,10 @@ taskSpec <- groups_specialization %>%
 ####################
 # Bind
 metrics <- merge(taskCorrTot, entropy)
+metrics <- merge(metrics, taskSpec)
 
 # Summarise
 metrics <- metrics %>% 
-  select(-Task1, - Task2) %>% 
   melt(., id.vars = c("n", "replicate", "set"))
 
 names(metrics) <- c("n", "replicate", "set", "metric", "value")
@@ -63,7 +63,7 @@ metrics <- metrics %>%
 
 names(metrics) <- c("n", "metric", "Mean", "SE")
 
-levels(metrics$metric) <-c("Rank Correlation", "Task Entropy")
+levels(metrics$metric) <-c("Rank Correlation", "Task Entropy", "Task Specialization")
 
 ####################
 # Plot
