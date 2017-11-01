@@ -181,6 +181,9 @@ for (i in 1:length(Ns)) {
     # Create tasktally table
     stimMat <- transform(stimMat, n = n, replicate = sim)
     
+    # Create tasktally table
+    taskCorr <- transform(taskCorr, replicate = sim)
+    
     # Add total task distributions, entropy values, and graphs to lists
     ens_taskDist[[sim]]  <- totalTaskDist
     ens_entropy[[sim]]   <- entropy

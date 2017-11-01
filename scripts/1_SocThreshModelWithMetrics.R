@@ -12,27 +12,25 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(32, 100) #vector of number of individuals to simulate
+Ns             <- c(2, 10, 20, 50) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
+gens           <- 4000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 100 #number of replications per simulation (for ensemble) !!Change!!
+reps           <- 2 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- c(10, 10) #population threshold means 
-ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations !!Change!!
+ThreshM        <- c(100, 100) #population threshold means 
+ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
 InitialStim    <- c(0, 0) #intital vector of stimuli
-StimRates      <- c(0.6, 0.6) #vector of stimuli increase rates  
-threshSlope    <- 7 #exponent parameter for threshold curve shape  
+deltas         <- c(0.6, 0.6) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 0 #probability of interacting with individual in other states
+epsilon        <- 1 #relative weighting of social interactions for modulating thresholds
+p              <- 0.3 #probability of interacting with individual in other states
 q              <- 1 #probability of interacting with individual in same state relative to others
 
-
-filename <- "FixedDelta06Sigma01Eta7LargerSizes"
 
 
 ####################
@@ -45,6 +43,7 @@ groups_taskStep  <- list()
 groups_taskTally <- list()
 groups_stim      <- list()
 groups_entropy   <- list()
+groups_graphs    <- list()
 groups_specialization <- data.frame(NULL)
 
 # Loop through group sizes
@@ -59,6 +58,7 @@ for (i in 1:length(Ns)) {
   ens_taskTally <- list()
   ens_entropy   <- list()
   ens_stim      <- list()
+  ens_graphs    <- list()
   
   # Run Simulations
   for (sim in 1:reps) {
@@ -68,11 +68,10 @@ for (i in 1:length(Ns)) {
     ####################
 
     # Set initial probability matrix (P_g)
-    P_g <- initiateProbMatrix(n = n, m = m)
+    P_g <- matrix(data = rep(0, n * m), ncol = m)
     
     # Seed task (external) stimuli
     stimMat <- seedStimuls(InitialSVector = InitialStim, 
-                           RateVector = StimRates, 
                            gens = gens)
     
     # Seed internal thresholds
@@ -86,6 +85,11 @@ for (i in 1:length(Ns)) {
     
     # Create cumulative task performance matrix
     X_tot <- X_g
+    
+    # Create cumulative adjacency matrix
+    g_tot <-  matrix(data = rep(0, n * n), ncol = n)
+    colnames(g_tot) <- paste0("v-", 1:n)
+    rownames(g_tot) <- paste0("v-", 1:n)
     
     # Prep correlation step matrix
     X_prev <- matrix(data = rep(0, n * m), ncol = m)
@@ -101,29 +105,33 @@ for (i in 1:length(Ns)) {
     # Run simulation
     for (t in 1:gens) {
       # Update stimuli
-      for (j in 1:(ncol(stimMat)/2)) {
+      for (j in 1:ncol(stimMat)) {
         # update stim
         stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
-                                              delta = stimMat[t, j + m], 
+                                              delta = deltas[j], 
                                               alpha = alpha, 
                                               Ni = sum(X_g[ , j]), 
                                               n = n)
-        # shift down delta (rate increases)
-        stimMat[t + 1, j + m] <- stimMat[t, j + m]
       }
       # Update social network
-      # g_adj <- temporalNetwork(X_sub_g = X_g,
-      #                          p = p, 
-      #                          bias = q)
+      g_adj <- temporalNetwork(X_sub_g = X_g,
+                               p = p,
+                               bias = q)
+      g_tot <- g_tot + g_adj
+      # Calculate information on neighbors performing tasks
+      L_g <- calcSocialInfo(SocialNetwork = g_adj,
+                            X_sub_g = X_g)
       # Calculate task demand based on global stimuli
-      P_g <- calcThresholdProbMat(TimeStep = t + 1, # first row is generation 0
-                                  ThresholdMatrix = threshMat, 
-                                  StimulusMatrix = stimMat, 
-                                  nSlope = threshSlope)
+      P_g <- calcThresholdDetermSocial(TimeStep = t + 1, # first row is generation 0
+                                       ThresholdMatrix = threshMat, 
+                                       StimulusMatrix = stimMat,
+                                       epsilon = epsilon,
+                                       SocialInfoMatrix = L_g)
       # Update task performance
       X_g <- updateTaskPerformance(P_sub_g    = P_g,
                                    TaskMat    = X_g,
                                    QuitProb   = quitP)
+      
       # Note which task is being peformed
       taskPerf <- matrix(nrow = 1, ncol = n)
       for (i in 1:nrow(X_g)) {
@@ -134,7 +142,6 @@ for (i in 1:length(Ns)) {
         taskPerf[i] <- task
       }
       colnames(taskPerf) <- row.names(X_g)
-      taskOverTime <- rbind(taskOverTime, taskPerf)
       
       # Capture current task performance tally
       tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)
@@ -197,7 +204,7 @@ for (i in 1:length(Ns)) {
                               TransSpec = F_i)
       groups_specialization <- rbind(groups_specialization, to_return)
     }
-  
+    
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     entropy <- transform(entropy, n = n, replicate = sim)
@@ -206,7 +213,6 @@ for (i in 1:length(Ns)) {
     # totalTaskDist <- X_tot / rowSums(X_tot)
     totalTaskDist <- X_tot / gens
     totalTaskDist <- transform(totalTaskDist, Inactive = gens - rowSums(X_tot), n = n, replicate = sim)
-    totalTaskDist$individual <- paste0("v-", 1:nrow(totalTaskDist))
     
     # Create tasktally table
     taskTally <- do.call("rbind", taskTally)
@@ -224,6 +230,7 @@ for (i in 1:length(Ns)) {
     ens_taskTally[[sim]] <- taskTally
     ens_taskStep[[sim]]  <- taskStep
     ens_stim[[sim]]      <- stimMat
+    ens_graphs[[sim]]    <- g_tot / gens
     
     # Print simulation completed
     print(paste0("DONE: N = ", n, ", Simulation ", sim))
@@ -233,9 +240,6 @@ for (i in 1:length(Ns)) {
   runCorrs <- lapply(ens_taskCorr, function(x) {
     # Unlist
     runs <- do.call("rbind", x)
-    replicate <- runs[nrow(runs), ]
-    replicate <- unique(replicate)
-    runs <- runs[-nrow(runs), ]
     # Calculate mean
     runMean <- matrix(data = rep(NA, m), ncol =  m)
     for (column in 1:m) {
@@ -255,6 +259,7 @@ for (i in 1:length(Ns)) {
   groups_taskTally[[i]] <- ens_taskTally
   groups_stim[[i]]      <- ens_stim
   groups_entropy[[i]]   <- ens_entropy
+  groups_graphs[[i]]    <- ens_graphs
   
 }
 
@@ -263,12 +268,8 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
+filename <- "Sigma01-Eps1-ConnectP02"
 
-####################
-# Save all
-####################
-save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, 
+save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
      groups_taskStep, groups_taskTally, groups_specialization,
-     file = paste0("output/SpecializationMetrics/Rdata/", filename, "100reps.Rdata"))
-
-
+     file = paste0("output/", filename, ".Rdata"))

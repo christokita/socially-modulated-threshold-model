@@ -10,7 +10,7 @@ source("scripts/3A_PrepPlotExperimentData.R")
 library(RColorBrewer)
 library(scales)
 
-load("output/SpecializationMetrics/Rdata/FixedDelta06Sigma01Eta7100reps.Rdata")
+# load("output/SpecializationMetrics/Rdata/FixedDelta06Sigma01Eta7100reps.Rdata")
 
 ####################
 # Compare entropies
@@ -37,10 +37,10 @@ taskCorrTot <- taskCorrTot %>%
 ####################
 # Task Performance Specialization
 ####################
-taskSpec <- groups_specialization %>% 
-  group_by(n, replicate) %>% 
-  summarise(SpecMean = mean(TransSpec))  %>% 
-  mutate(set = paste(n, replicate, sep = "-")) 
+taskSpec <- groups_specialization %>%
+  group_by(n, replicate) %>%
+  summarise(SpecMean = mean(TransSpec))  %>%
+  mutate(set = paste(n, replicate, sep = "-"))
 
 
 ####################
