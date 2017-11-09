@@ -84,7 +84,24 @@ calcThresholdDetermSocial <- function(TimeStep, ThresholdMatrix, StimulusMatrix,
   return(thresholdP)
 }
 
-
+####################
+# Deterministic Threshold with social information
+####################
+adjustThresholdsSocial <- function(SocialNetwork, ThresholdMatrix, X_sub_g, epsilon, phi) {
+  # Calculate "sum" of task states/probs of neighbors
+  NeighborSums <- SocialNetwork %*% X_sub_g
+  # Loop through individuals
+  for (i in 1:nrow(X_sub_g)) {
+    for (j in 1:ncol(X_sub_g)) {
+      adjust <- phi - epsilon * NeighborSums[i, j]
+      ThresholdMatrix[i, j] <- ThresholdMatrix[i, j] + adjust
+      if (ThresholdMatrix[i, j] < 0) {
+        ThresholdMatrix[i, j] <- 0
+      } 
+    }
+  }
+  return(ThresholdMatrix)
+}
 
 
 

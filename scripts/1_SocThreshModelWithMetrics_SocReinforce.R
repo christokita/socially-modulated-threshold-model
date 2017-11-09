@@ -12,24 +12,25 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(2, 10, 20, 50) #vector of number of individuals to simulate
-m              <- 2 #number of tasks
+Ns             <- c(50) #vector of number of individuals to simulate
+m              <- 3 #number of tasks
 gens           <- 4000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 10 #number of replications per simulation (for ensemble)
+reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- c(100, 100) #population threshold means 
-ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
-InitialStim    <- c(0, 0) #intital vector of stimuli
-deltas         <- c(0.6, 0.6) #vector of stimuli increase rates  
+ThreshM        <- rep(10, m) #population threshold means 
+ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
+InitialStim    <- rep(0, m) #intital vector of stimuli
+deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 1 #relative weighting of social interactions for modulating thresholds
+epsilon        <- 0.005 #relative weighting of social interactions for lowering thresholds
+phi            <- 0.005 #default forgetting rate of thresholds
 p              <- 0.2 #probability of interacting with individual in other states
-q              <- 2 #probability of interacting with individual in same state relative to others
+q              <- 1 #probability of interacting with individual in same state relative to others
 
 
 
@@ -122,16 +123,19 @@ for (i in 1:length(Ns)) {
       L_g <- calcSocialInfo(SocialNetwork = g_adj,
                             X_sub_g = X_g)
       # Calculate task demand based on global stimuli
-      P_g <- calcThresholdDetermSocial(TimeStep = t + 1, # first row is generation 0
-                                       ThresholdMatrix = threshMat, 
-                                       StimulusMatrix = stimMat,
-                                       epsilon = epsilon,
-                                       SocialInfoMatrix = L_g)
+      P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
+                                    ThresholdMatrix = threshMat, 
+                                    StimulusMatrix = stimMat)
       # Update task performance
       X_g <- updateTaskPerformance(P_sub_g    = P_g,
                                    TaskMat    = X_g,
                                    QuitProb   = quitP)
-      
+      # Adjust thresholds
+      threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
+                                          ThresholdMatrix = threshMat, 
+                                          X_sub_g = X_g, 
+                                          epsilon = epsilon, 
+                                          phi = phi)
       # Note which task is being peformed
       taskPerf <- matrix(nrow = 1, ncol = n)
       for (i in 1:nrow(X_g)) {
@@ -272,8 +276,8 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma01-Eps2-ConnectP03"
-
-save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
-     groups_taskStep, groups_taskTally, groups_specialization,
-     file = paste0("output/", filename, ".Rdata"))
+# filename <- "Sigma01-Eps2-ConnectP03"
+# 
+# save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
+#      groups_taskStep, groups_taskTally, groups_specialization,
+#      file = paste0("output/", filename, ".Rdata"))

@@ -61,11 +61,11 @@ mutualEntropy <- function(TotalStateMat) {
   H_y <- -sum(H_y)
   I_xy <- sum(unlist(I_xy))
   # Calcualte symmetrid division of labor D(x,y)
-  D_sym <- I_xy / sqrt(H_x * H_y)
-  D_yx <- I_xy / H_x
-  D_xy <- I_xy / H_y
+  D_sym  <- I_xy / sqrt(H_x * H_y)
+  D_task <- I_xy / H_x
+  D_ind  <- I_xy / H_y
   # Dataframe
-  D <- data.frame(Dsym = D_sym, Dyx = D_yx, Dxy = D_xy)
+  D <- data.frame(Dsym = D_sym, Dtask = D_task, Dind = D_ind)
   # Return 
   return(D)
 }
