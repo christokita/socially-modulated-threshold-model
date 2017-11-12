@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "##################################################\n#\n# Social Network Functions\n#\n##################################################\n\n####################\n# Form connections probabilistically\n####################\ntemporalNetwork <- function(X_sub_g, p, bias) {\n  dimension <- nrow(X_sub_g)\n  g_adj <- matrix(data = rep(NA, dimension*dimension), ncol = dimension)\n  # Loop through row individuals\n  for (i in 1:dimension) {\n    # get task performance of individual\n    task <- which(X_sub_g[i, ] == 1)\n    # loop through column individuals\n    # If inactive, all connections equal prob\n    if (length(task) == 0) {\n      for (j in 1:dimension) {\n        con <- sample(x = c(0, 1), size = 1, prob = c(1 - p, p))\n        g_adj[i, j] <- con\n        g_adj[j, i] <- con\n      }\n    }\n    # If active, biased towards individuals in same state\n    else {\n      for (j in i:dimension) {\n        same <- which(X_sub_g[ , task] == 1)\n        # if same, biased\n        if (j %in% same) {\n          con <- sample(x = c(0, 1), size = 1, prob = c(1 - bias * p, bias * p))\n          g_adj[i, j] <- con\n          g_adj[j, i] <- con\n        } else {\n          con <- sample(x = c(0, 1), size = 1, prob = c(1 - p, p))\n          g_adj[i, j] <- con\n          g_adj[j, i] <- con\n        }\n      }\n    }\n  }\n  # bind and name columns\n  diag(g_adj) <- 0 #remove self-connections\n  colnames(g_adj) <- paste0(\"v-\", 1:dimension)\n  rownames(g_adj) <- paste0(\"v-\", 1:dimension)\n  return(g_adj)\n}\n\n\n####################\n# Calculate Number of Neighbors Performing Task \n####################\ncalcSocialInfo <- function(SocialNetwork, X_sub_g) {\n  # Calculate \"sum\" of task states/probs of neighbors\n  L <- SocialNetwork %*% X_sub_g\n  # Fix unconnected nodes\n  L[is.na(L)] <- 0\n  # Return\n  colnames(L) <- paste0(\"NeighborTask\", 1:ncol(L))\n  rownames(L) <- paste0(\"v-\", 1:nrow(L))\n  return(L)\n}\n\n",
+    "created" : 1510439133609.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "320562090",
+    "id" : "13745F5B",
+    "lastKnownWriteTime" : 1510439169,
+    "last_content_update" : 1510439169776,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/__Util_SocialNetworkFunctions.R",
+    "project_path" : "scripts/__Util_SocialNetworkFunctions.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

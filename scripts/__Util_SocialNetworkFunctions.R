@@ -17,7 +17,7 @@ temporalNetwork <- function(X_sub_g, p, bias) {
     # loop through column individuals
     # If inactive, all connections equal prob
     if (length(task) == 0) {
-      for (j in i:dimension) {
+      for (j in 1:dimension) {
         con <- sample(x = c(0, 1), size = 1, prob = c(1 - p, p))
         g_adj[i, j] <- con
         g_adj[j, i] <- con
@@ -25,7 +25,7 @@ temporalNetwork <- function(X_sub_g, p, bias) {
     }
     # If active, biased towards individuals in same state
     else {
-      for (j in 1:dimension) {
+      for (j in i:dimension) {
         same <- which(X_sub_g[ , task] == 1)
         # if same, biased
         if (j %in% same) {

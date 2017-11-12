@@ -16,7 +16,7 @@ Ns             <- c(5, 10, 20, 50, 100) #vector of number of individuals to simu
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 1 #number of replications per simulation (for ensemble)
+reps           <- 30 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
@@ -45,7 +45,7 @@ groups_taskTally <- list()
 groups_stim      <- list()
 groups_entropy   <- list()
 groups_graphs    <- list()
-groups_specialization <- data.frame(NULL)
+
 
 # Loop through group sizes
 for (i in 1:length(Ns)) {
@@ -184,32 +184,6 @@ for (i in 1:length(Ns)) {
       }
     }
     
-    # Calculate specialization of task performance 
-    # from Gautrais et al. (2002)
-    for (col in 1:ncol(taskOverTime)) {
-      # Grab column of individual
-      t_prof <- taskOverTime[ , col ]
-      # Remove inactivity
-      t_prof <- paste(t_prof, collapse = "")
-      # Calculate transitions
-      t_prof <- gsub("1+", "1", t_prof)
-      t_prof <- gsub("2+", "2", t_prof)
-      t_prof <- gsub("0+", "", t_prof)
-      t_prof <- as.numeric(unlist(strsplit(as.character(t_prof), "")))
-      transitions <- lapply(2:length(t_prof), function(entry) {
-        a <- t_prof[entry] != t_prof[entry - 1]
-      })
-      C_i <- sum(unlist(transitions))
-      C_i <- C_i / (length(t_prof) - 1)
-      # Calulate specialization
-      F_i <- 1 - m * C_i
-      to_return <- data.frame(individual = paste0("v-", col), 
-                              n = n,
-                              replicate = sim,
-                              TransSpec = F_i)
-      groups_specialization <- rbind(groups_specialization, to_return)
-    }
-    
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     entropy <- transform(entropy, n = n, replicate = sim)
@@ -276,11 +250,11 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-# filename <- "Sigma01-Eps2-ConnectP03"
-# 
-# save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
-#      groups_taskStep, groups_taskTally, groups_specialization,
-#      file = paste0("output/", filename, ".Rdata"))
+filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1"
+
+save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
+     groups_taskStep, groups_taskTally, groups_specialization,
+     file = paste0("output/", filename, ".Rdata"))
 
 # qplot(threshMat[,1], threshMat[,2], col = threshMat[,3], size = 1/threshMat[,4]) + 
 #   scale_color_gradient2(low = "red", mid = "yellow", high = "blue", midpoint = (max(threshMat) + min(threshMat)) / 2) + 
@@ -290,10 +264,10 @@ if(1 %in% Ns) {
 #   scale_size(range = c(3, 8)) +
 #   theme_bw()
 
-qplot(threshMat[,1], threshMat[,2], col = threshMat[,3]) + 
-  scale_color_gradient2(low = "red", mid = "yellow", high = "blue", midpoint = (max(threshMat) + min(threshMat)) / 2) + 
-  theme_bw()
-qplot(X_tot[,1], X_tot[,2], col = X_tot[,3]) + 
-  scale_color_gradient2(low = "purple", mid = "grey", high = "green", midpoint = (max(X_tot) + min(X_tot)) / 2) + 
-  theme_bw()
-plot(stimMat[,1], type = "l")
+# qplot(threshMat[,1], threshMat[,2], col = threshMat[,3]) + 
+#   scale_color_gradient2(low = "red", mid = "yellow", high = "blue", midpoint = (max(threshMat) + min(threshMat)) / 2) + 
+#   theme_bw()
+# qplot(X_tot[,1], X_tot[,2], col = X_tot[,3]) + 
+#   scale_color_gradient2(low = "purple", mid = "grey", high = "green", midpoint = (max(X_tot) + min(X_tot)) / 2) + 
+#   theme_bw()
+# plot(stimMat[,1], type = "l")
