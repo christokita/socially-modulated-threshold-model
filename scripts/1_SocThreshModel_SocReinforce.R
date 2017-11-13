@@ -27,8 +27,8 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0.01 #default forgetting rate of thresholds
+epsilon        <- 0.00 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
+phi            <- 0.00 #default forgetting rate of thresholds
 p              <- 0.1 #probability of interacting with individual in other states
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
@@ -250,10 +250,10 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1"
+filename <- "Sigma001-Eps0-Phi0"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
-     groups_taskStep, groups_taskTally, groups_specialization,
+     groups_taskStep, groups_taskTally,
      file = paste0("output/", filename, ".Rdata"))
 
 # qplot(threshMat[,1], threshMat[,2], col = threshMat[,3], size = 1/threshMat[,4]) + 
