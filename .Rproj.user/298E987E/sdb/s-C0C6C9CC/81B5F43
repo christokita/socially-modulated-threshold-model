@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1510603656347.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "81B5F43",
+    "lastKnownWriteTime" : -2938789112024496971,
+    "last_content_update" : 1510603656347,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "48C9F2D9",
+        "caption" : "entropy",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=entropy&cache_key=48C9F2D9",
+        "displayedObservations" : "5",
+        "environment" : "",
+        "object" : "entropy",
+        "preview" : "0",
+        "totalObservations" : "5",
+        "variables" : "4"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

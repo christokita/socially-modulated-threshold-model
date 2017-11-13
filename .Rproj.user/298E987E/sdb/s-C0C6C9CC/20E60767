@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "################################################################################\n#\n# Bind together extra group sizes from same parameter combo\n#\n################################################################################\n\nload(\"output/Sigma001-Eps001-Phi001-ConnectP01-Bias1.1_EXTRA.Rdata.Rdata\")\n\ngroups_taskDist1  <- groups_taskDist\ngroups_taskCorr1  <- groups_taskCorr\ngroups_taskStep1  <- groups_taskStep\ngroups_taskTally1 <- groups_taskTally\ngroups_stim1      <- groups_stim\ngroups_entropy1   <- groups_entropy\ngroups_graphs1    <- groups_graphs\n\nload(\"output/Sigma001-Eps001-Phi001-ConnectP01-Bias1.1.Rdata\")\n\ngroups_taskDist  <- c(groups_taskDist, groups_taskDist1)\ngroups_taskCorr  <- c(groups_taskCorr, groups_taskCorr1)\ngroups_taskStep  <- c(groups_taskStep, groups_taskStep1)\ngroups_taskTally <- c(groups_taskTally, groups_taskTally1)\ngroups_stim      <- c(groups_stim, groups_stim1)\ngroups_entropy   <- c(groups_entropy, groups_entropy1)\ngroups_graphs    <- c(groups_graphs, groups_graphs1)",
+    "created" : 1510603793847.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1320323321",
+    "id" : "20E60767",
+    "lastKnownWriteTime" : 1510603501,
+    "last_content_update" : 1510603501,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/BindExtraRuns.R",
+    "project_path" : "scripts/BindExtraRuns.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
