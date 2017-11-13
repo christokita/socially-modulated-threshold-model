@@ -278,7 +278,7 @@ if(1 %in% Ns) {
 
 filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1"
 
-save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist,
+save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_specialization,
      file = paste0("output/", filename, ".Rdata"))
 
