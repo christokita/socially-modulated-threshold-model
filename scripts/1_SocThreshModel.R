@@ -19,7 +19,7 @@ corrStep       <- 200 #number of time steps for calculation of correlation
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(100, m) #population threshold means 
+ThreshM        <- rep(10, m) #population threshold means 
 ThreshSD       <- ThreshM * 0.01 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
