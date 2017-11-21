@@ -1,14 +1,14 @@
 {
     "collab_server" : "",
-    "contents" : "################################################################################\n#\n# Examine Network from last run\n#\n################################################################################\n\ng <- g_tot / gens\n\n# Drop edges below baseline interaction probability\ng[g < p] <- 0\n\n# Edgelist\ngraph <- graph.adjacency(g, weighted = T)\nedgelist <- get.edgelist(graph)\nedgelist <- as.data.frame(edgelist)\nnames(edgelist) <- c(\"Source\", \"Target\")\nedgelist$Weight <- E(graph)$weight \n\n# Nodelist\nnodelist <- data.frame(Id = rownames(threshMat))\nnodelist$Thresh1 <- threshMat[ , 1]\nnodelist$Thresh2 <- threshMat[ , 2]\nnodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])\n\nwrite.csv(edgelist, file = \"output/Networks/GroupSize70edgelist2.csv\", row.names = FALSE)\nwrite.csv(nodelist, file = \"output/Networks/GroupSize70nodelist2.csv\", row.names = FALSE)\n",
+    "contents" : "################################################################################\n#\n# Examine Network from last run\n#\n################################################################################\n\ng <- g_tot / gens\n\n# Drop edges below baseline interaction probability\ng[g < p] <- 0\n\n# Edgelist\ngraph <- graph.adjacency(g, weighted = T)\nedgelist <- get.edgelist(graph)\nedgelist <- as.data.frame(edgelist)\nnames(edgelist) <- c(\"Source\", \"Target\")\nedgelist$Weight <- E(graph)$weight \n\n# Nodelist\nnodelist <- data.frame(Id = rownames(threshMat))\nnodelist$Thresh1 <- threshMat[ , 1]\nnodelist$Thresh2 <- threshMat[ , 2]\nnodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])\n\nwrite.csv(edgelist, file = \"output/Networks/GroupSize70edgelistNoBias.csv\", row.names = FALSE)\nwrite.csv(nodelist, file = \"output/Networks/GroupSize70nodelistNoBias.csv\", row.names = FALSE)\n",
     "created" : 1510674417705.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1380613804",
+    "hash" : "3785216305",
     "id" : "3B959FAC",
-    "lastKnownWriteTime" : 1510780073,
-    "last_content_update" : 1510780073587,
+    "lastKnownWriteTime" : 1511198379,
+    "last_content_update" : 1511198379424,
     "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/ExampleNetworks.R",
     "project_path" : "scripts/ExampleNetworks.R",
     "properties" : {
