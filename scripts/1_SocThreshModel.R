@@ -12,7 +12,7 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20, 30, 50) #vector of number of individuals to simulate
+Ns             <- c(70) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
@@ -276,11 +276,11 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1_SmallerGroups"
+filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1_LargerGroups"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_specialization,
-     file = paste0("output/", filename, ".Rdata"))
+     file = paste0("output/Rdata/", filename, ".Rdata"))
 
 # qplot(threshMat[,1], threshMat[,2]) + 
 #   scale_color_gradient2(low = "red", mid = "yellow", high = "blue", midpoint = (max(threshMat) + min(threshMat)) / 2) + 
