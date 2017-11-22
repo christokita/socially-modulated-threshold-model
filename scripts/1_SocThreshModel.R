@@ -12,14 +12,14 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70, 100) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 30, 50) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 30 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(100, m) #population threshold means 
+ThreshM        <- rep(10, m) #population threshold means 
 ThreshSD       <- ThreshM * 0.01 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
@@ -276,7 +276,7 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1_LargerGroups"
+filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1_SmallerGroups"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_specialization,
