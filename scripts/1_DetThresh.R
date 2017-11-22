@@ -12,14 +12,14 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20, 50, 100) #vector of number of individuals to simulate
+Ns             <- c(20) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 30 #number of replications per simulation (for ensemble)
+reps           <- 10 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(10, m) #population threshold means 
+ThreshM        <- rep(100, m) #population threshold means 
 ThreshSD       <- ThreshM * 0.01 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
@@ -100,11 +100,19 @@ for (i in 1:length(Ns)) {
       # Update stimuli
       for (j in 1:ncol(stimMat)) {
         # update stim
-        stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
-                                              delta = deltas[j], 
-                                              alpha = alpha, 
-                                              Ni = sum(X_g[ , j]), 
-                                              n = n)
+        # stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
+        #                                       delta = deltas[j], 
+        #                                       alpha = alpha, 
+        #                                       Ni = sum(X_g[ , j]), 
+        #                                       n = n)
+        
+        stimMat[t + 1, j] <- globalStimUpdate_PerCap(stimulus = stimMat[t, j],
+                                                     delta = deltas[j], 
+                                                     alpha = alpha, 
+                                                     Ni = sum(X_g[ , j]), 
+                                                     n = n,
+                                                     m = m,
+                                                     quitP = quitP)
       }
       # Calculate task demand based on global stimuli
       P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
