@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "################################################################################\n#\n# Analyze Networks of Social Interactions\n#\n################################################################################\n\nrm(list = ls())\nsource(\"scripts/__Util__MASTER.R\")\nlibrary(RColorBrewer)\nlibrary(scales)\n\n\nfilename <- \"Sigma001-Eps001-Phi001-ConnectP01-Bias1.1\"\n\n####################\n# Compare entropies\n####################\n# Load social\nload(\"output/Rdata/Sigma001-Eps001-Phi001-ConnectP01-Bias1.1.Rdata\")\n\nnumber <- 180\n\ng <- unlist(groups_graphs, recursive = FALSE)\ng <- g[[number]]\n\ndegree <- rowSums(g)\ndegree <- as.data.frame(degree)\ndegree$Id <- row.names(degree)\n\nthreshMat <- unlist(groups_thresh, recursive = FALSE)\nthreshMat <- threshMat[[number]]\n\nthresh <- threshMat %>% \n  as.data.frame(.) %>% \n  mutate(ThreshRatio = log(Thresh1 / Thresh2),\n         Id = row.names(.))\n\nX_tot <- unlist(groups_taskDist, recursive = FALSE)\nX_tot <- X_tot[[number]]\n\nactivity <- X_tot %>% \n  as.data.frame(.) %>% \n  mutate(ActRatio = log(Task1 / Task2),\n         ActTotal = Task1 + Task2,\n         Id = row.names(.))\n\nmergedNodes <- merge(degree, thresh)\nmergedNodes <- merge(mergedNodes, activity)\n\nqplot(data = mergedNodes, x = ThreshRatio, y = ActTotal, colour = degree) + \n  theme_bw() +\n  theme(panel.grid = element_blank(),\n        panel.border = element_rect(size = 1, fill = NA))\n\n",
+    "created" : 1511534870467.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3913055216",
+    "id" : "FC285F39",
+    "lastKnownWriteTime" : 1511535329,
+    "last_content_update" : 1511535329286,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/AnalyzeNetworks.R",
+    "project_path" : "scripts/AnalyzeNetworks.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

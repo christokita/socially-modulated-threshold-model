@@ -12,7 +12,7 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 30, 50) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
@@ -27,8 +27,8 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0.01 #default forgetting rate of thresholds
+epsilon        <- 0 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
+phi            <- 0 #default forgetting rate of thresholds
 p              <- 0.1 #probability of interacting with individual in other states
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
@@ -43,6 +43,7 @@ groups_taskCorr  <- list()
 groups_taskStep  <- list()
 groups_taskTally <- list()
 groups_stim      <- list()
+groups_thresh    <- list()
 groups_entropy   <- list()
 groups_graphs    <- list()
 groups_specialization <- data.frame(NULL)
@@ -59,6 +60,7 @@ for (i in 1:length(Ns)) {
   ens_taskTally <- list()
   ens_entropy   <- list()
   ens_stim      <- list()
+  ens_thresh    <- list()
   ens_graphs    <- list()
   
   # Run Simulations
@@ -119,9 +121,6 @@ for (i in 1:length(Ns)) {
                                p = p,
                                bias = q)
       g_tot <- g_tot + g_adj
-      # Calculate information on neighbors performing tasks
-      L_g <- calcSocialInfo(SocialNetwork = g_adj,
-                            X_sub_g = X_g)
       # Calculate task demand based on global stimuli
       P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
                                     ThresholdMatrix = threshMat, 
@@ -235,6 +234,7 @@ for (i in 1:length(Ns)) {
     ens_taskTally[[sim]] <- taskTally
     ens_taskStep[[sim]]  <- taskStep
     ens_stim[[sim]]      <- stimMat
+    ens_thresh[[sim]]    <- threshMat 
     ens_graphs[[sim]]    <- g_tot / gens
     
     # Print simulation completed
@@ -266,6 +266,7 @@ for (i in 1:length(Ns)) {
   groups_taskStep[[i]]  <- ens_taskStep
   groups_taskTally[[i]] <- ens_taskTally
   groups_stim[[i]]      <- ens_stim
+  groups_thresh[[i]]    <- ens_thresh
   groups_entropy[[i]]   <- ens_entropy
   groups_graphs[[i]]    <- ens_graphs
   
@@ -276,10 +277,10 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1_LargerGroups"
+filename <- "Sigma001-Fixed-ConnectP01-Bias1.1"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
-     groups_taskStep, groups_taskTally, groups_specialization,
+     groups_taskStep, groups_taskTally, groups_specialization, groups_thresh,
      file = paste0("output/Rdata/", filename, ".Rdata"))
 
 # qplot(threshMat[,1], threshMat[,2]) + 
