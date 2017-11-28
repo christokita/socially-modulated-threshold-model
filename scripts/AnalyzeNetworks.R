@@ -92,7 +92,8 @@ gg_degree_act <- ggplot(data = social_graphs,
                         aes(x = ActTotal, y = degree, colour = ThreshRatio, group = n)) +
   geom_point(size = 0.5) +
   theme_bw() +
-  scale_colour_gradient2(high = "#d7191c",
+  scale_colour_gradient2(name = "Threshold\nRatio",
+                         high = "#d7191c",
                          mid = "#ffffbf", 
                          low = "#2c7bb6", 
                          midpoint = 0, 
@@ -111,7 +112,8 @@ gg_FIX_degree_act <- ggplot(data = fixed_graphs,
                         aes(x = ActTotal, y = degree, colour = ThreshRatio, group = n)) +
   geom_point() +
   theme_bw() +
-  scale_colour_gradient2(high = "#2c7bb6",
+  scale_colour_gradient2(name = "Threshold\nRatio",
+                         high = "#2c7bb6",
                          mid = "#ffffbf", 
                          low = "#d7191c", 
                          midpoint = 0, 
@@ -123,25 +125,41 @@ gg_FIX_degree_act <- ggplot(data = fixed_graphs,
 gg_FIX_degree_act
 ggsave(filename = "output/NetworkDataPlots/Fixed_DegreeVsActivity.png", width = 8, height = 6, units = "in", dpi = 600)
 
-
+# Comparing threshold ratio and total activity
 gg_thresh_degree <- ggplot(data = social_graphs, 
                         aes(x = ThreshRatio, y = degree, colour = ActTotal, group = n)) +
   geom_point() +
   theme_bw() +
-  scale_colour_gradient2(high = "#6e016b",
-                         mid = "#8c6bb1", 
-                         low = "#bfd3e6", 
-                         limits = c(0, 1),
-                         midpoint = 0.5,
-                         oob = squish) +
+  scale_colour_gradient2(high = "#00441b",
+                         mid = "#41ab5d", 
+                         low = "#c7e9c0", 
+                         midpoint = 0.5, 
+                         limits = c(0, 1)) +
   theme(panel.grid = element_blank(),
         panel.border = element_rect(size = 1, fill = NA)) +
   facet_wrap( ~ n, scales = "free_y")
 gg_thresh_degree
+ggsave(filename = "output/NetworkDataPlots/Social_ThreshRatioVsDegree.png", width = 8, height = 6, units = "in", dpi = 600)
+
+gg_FIX_thresh_degree <- ggplot(data = fixed_graphs, 
+                           aes(x = ThreshRatio, y = degree, colour = ActTotal, group = n)) +
+  geom_point() +
+  theme_bw() +
+  scale_colour_gradient2(high = "#00441b",
+                         mid = "#41ab5d", 
+                         low = "#c7e9c0", 
+                         midpoint = 0.5, 
+                         limits = c(0, 1)) +
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(size = 1, fill = NA)) +
+  facet_wrap( ~ n, scales = "free_y")
+gg_FIX_thresh_degree
+ggsave(filename = "output/NetworkDataPlots/Fixed_ThreshRatioVsDegree.png", width = 8, height = 6, units = "in", dpi = 600)
+
 
 
 test <- social_graphs %>% filter(n == 100)
-qplot(data = test, y = ThreshRatio, x = degree, color = ActTotal) + 
+qplot(data = test, x = ThreshRatio, y = degree, color = ActTotal) + 
   theme_bw() +
   scale_colour_gradient2(high = "#00441b", mid = "#41ab5d", low = "#c7e9c0", midpoint = 0.5, limits = c(0, 1)) +
   theme(panel.grid = element_blank(),
