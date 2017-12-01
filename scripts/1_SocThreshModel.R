@@ -27,8 +27,8 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0 #default forgetting rate of thresholds
+epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
+phi            <- 0.01 #default forgetting rate of thresholds
 p              <- 0.1 #probability of interacting with individual in other states
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 

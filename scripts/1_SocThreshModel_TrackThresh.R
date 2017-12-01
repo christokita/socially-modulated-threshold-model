@@ -7,12 +7,13 @@
 rm(list = ls())
 source("scripts/__Util__MASTER.R")
 
+
 ####################
 # Set global variables
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70) #vector of number of individuals to simulate
+Ns             <- c(20) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
@@ -27,8 +28,8 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0 #default forgetting rate of thresholds
+epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
+phi            <- 0.01 #default forgetting rate of thresholds
 p              <- 0.1 #probability of interacting with individual in other states
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
@@ -100,6 +101,12 @@ for (i in 1:length(Ns)) {
     taskStep <- list()
     taskTally <- list()
     
+    # Prep correlation tracking matrix
+    thresh1time <- list()
+    thresh2time <- list()
+    thresh1time[[1]] <- threshMat[,1]
+    thresh2time[[2]] <- threshMat[,2]
+    
     ####################
     # Simulate
     ####################
@@ -133,6 +140,9 @@ for (i in 1:length(Ns)) {
                                           X_sub_g = X_g, 
                                           epsilon = epsilon, 
                                           phi = phi)
+      thresh1time[[t + 1]] <- threshMat[,1]
+      thresh2time[[t + 1]] <- threshMat[,2]
+      
       
       # Capture current task performance tally
       tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)
@@ -238,17 +248,63 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma001-Fixed-ConnectP01-Bias1.1"
+library(RColorBrewer)
+library(scales)
+library(tidyr)
+library(ggthemes)
 
-save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
-     groups_taskStep, groups_taskTally, groups_thresh,
-     file = paste0("output/Rdata/", filename, ".Rdata"))
+thresh1time <- do.call("rbind", thresh1time)
+row.names(thresh1time) <- NULL
+thresh1time <- as.data.frame(thresh1time)
+thresh1time <- thresh1time %>% 
+  mutate(t = 0:(nrow(.)-1)) %>% 
+  gather("Id", "Threshold", 1:70)
 
-# qplot(threshMat[,1], threshMat[,2]) + 
-#   scale_color_gradient2(low = "red", mid = "yellow", high = "blue", midpoint = (max(threshMat) + min(threshMat)) / 2) + 
-#   theme_bw()
-# qplot(X_tot[,1], X_tot[,2], col = X_tot[,3]) + 
-#   scale_color_gradient2(low = "purple", mid = "grey", high = "green", midpoint = (max(X_tot) + min(X_tot)) / 2) + 
-#   theme_bw()
-# 
-# plot(stimMat[,1], type = "l")
+threshMat <- threshMat %>% 
+  as.data.frame(.) %>% 
+  mutate(ThreshRatio = log(Thresh1 / Thresh2),
+         Id = row.names(.)) %>% 
+  select(-Thresh1, -Thresh2)
+
+thresh1time <- merge(thresh1time, threshMat, by = "Id")
+
+
+base_breaks_x <- function(x){
+  b <- pretty(x)
+  adjust_for_ticks <- max(b) * 0.0025
+  d <- data.frame(y=-Inf, yend=-Inf, x=min(b) - adjust_for_ticks, xend=max(b) + adjust_for_ticks)
+  list(geom_segment(data=d, aes(x=x, y=y, xend=xend, yend=yend),size = 1, inherit.aes=FALSE),
+       scale_x_continuous(breaks=b))
+}
+base_breaks_y <- function(x){
+  b <- pretty(x)
+  adjust_for_ticks <- max(b) * 0.0025
+  d <- data.frame(x = -Inf, xend = -Inf, y=min(b) - adjust_for_ticks, yend = max(b) + adjust_for_ticks)
+  list(geom_segment(data=d, aes(x = x, y = y, xend = xend, yend = yend), size = 1, inherit.aes = FALSE),
+       scale_y_continuous(breaks=b))
+}
+
+test <- thresh1time[thresh1time$Id %in% c("v-22", "v-20", "v-25", "v-40"),]
+gg_thresh <- ggplot(data = thresh1time, 
+                    aes(x = t, y = Threshold)) +
+  theme_bw(base_size = 10) +
+  geom_line(aes(group = Id, colour = ThreshRatio), size = 0.5) +
+  scale_colour_gradient2(name = "ln(Threshold Ratio)",
+                         high = "#d7191c",
+                         mid = "#f2ec79", 
+                         low = "#2c7bb6", 
+                         midpoint = 0, 
+                         limits = c(-2, 2),
+                         oob = squish) +
+  base_breaks_x(thresh1time$t) +
+  base_breaks_y(thresh1time$Threshold) +
+  theme(aspect.ratio = 1,
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        axis.ticks.length = unit(4, "pts")
+        axis.text = element_text(color = "black"))
+gg_thresh
+
+ggsave("output/ThresholdTime/Size70.png", scale = 0.7)
