@@ -22,5 +22,5 @@ nodelist$Thresh1 <- threshMat[ , 1]
 nodelist$Thresh2 <- threshMat[ , 2]
 nodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])
 
-write.csv(edgelist, file = "output/Networks/GroupSize70edgelistNoBias.csv", row.names = FALSE)
-write.csv(nodelist, file = "output/Networks/GroupSize70nodelistNoBias.csv", row.names = FALSE)
+write.csv(edgelist, file = "output/Networks/GroupSize20edgelistFixed.csv", row.names = FALSE)
+write.csv(nodelist, file = "output/Networks/GroupSize20nodelistFixed.csv", row.names = FALSE)

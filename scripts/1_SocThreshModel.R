@@ -12,11 +12,11 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20, 30, 50) #vector of number of individuals to simulate
+Ns             <- c(70) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 30 #number of replications per simulation (for ensemble)
+reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
@@ -46,7 +46,6 @@ groups_stim      <- list()
 groups_thresh    <- list()
 groups_entropy   <- list()
 groups_graphs    <- list()
-groups_specialization <- data.frame(NULL)
 
 # Loop through group sizes
 for (i in 1:length(Ns)) {
@@ -100,7 +99,6 @@ for (i in 1:length(Ns)) {
     taskCorr <- list()
     taskStep <- list()
     taskTally <- list()
-    taskOverTime  <- matrix(nrow = 0, ncol = n)
     
     ####################
     # Simulate
@@ -135,17 +133,6 @@ for (i in 1:length(Ns)) {
                                           X_sub_g = X_g, 
                                           epsilon = epsilon, 
                                           phi = phi)
-      # Note which task is being peformed
-      taskPerf <- matrix(nrow = 1, ncol = n)
-      for (i in 1:nrow(X_g)) {
-        task <- unname(which(X_g[i, ] == 1))
-        if (length(task) == 0) {
-          task <- 0
-        }
-        taskPerf[i] <- task
-      }
-      colnames(taskPerf) <- row.names(X_g)
-      taskOverTime <- rbind(taskOverTime, taskPerf)
       
       # Capture current task performance tally
       tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)
@@ -181,32 +168,6 @@ for (i in 1:length(Ns)) {
         # Update previous step total matrix
         X_prev <- X_step
       }
-    }
-    
-    # Calculate specialization of task performance 
-    # from Gautrais et al. (2002)
-    for (col in 1:ncol(taskOverTime)) {
-      # Grab column of individual
-      t_prof <- taskOverTime[ , col ]
-      # Remove inactivity
-      t_prof <- paste(t_prof, collapse = "")
-      # Calculate transitions
-      t_prof <- gsub("1+", "1", t_prof)
-      t_prof <- gsub("2+", "2", t_prof)
-      t_prof <- gsub("0+", "", t_prof)
-      t_prof <- as.numeric(unlist(strsplit(as.character(t_prof), "")))
-      transitions <- lapply(2:length(t_prof), function(entry) {
-        a <- t_prof[entry] != t_prof[entry - 1]
-      })
-      C_i <- sum(unlist(transitions))
-      C_i <- C_i / (length(t_prof) - 1)
-      # Calulate specialization
-      F_i <- 1 - m * C_i
-      to_return <- data.frame(individual = paste0("v-", col), 
-                              n = n,
-                              replicate = sim,
-                              TransSpec = F_i)
-      groups_specialization <- rbind(groups_specialization, to_return)
     }
     
     # Calculate Entropy
@@ -280,7 +241,7 @@ if(1 %in% Ns) {
 filename <- "Sigma001-Fixed-ConnectP01-Bias1.1"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
-     groups_taskStep, groups_taskTally, groups_specialization, groups_thresh,
+     groups_taskStep, groups_taskTally, groups_thresh,
      file = paste0("output/Rdata/", filename, ".Rdata"))
 
 # qplot(threshMat[,1], threshMat[,2]) + 
