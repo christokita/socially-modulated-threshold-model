@@ -114,11 +114,6 @@ for (i in 1:length(Ns)) {
                                               Ni = sum(X_g[ , j]), 
                                               n = n)
       }
-      # Update social network
-      g_adj <- temporalNetwork(X_sub_g = X_g,
-                               p = p,
-                               bias = q)
-      g_tot <- g_tot + g_adj
       # Calculate task demand based on global stimuli
       P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
                                     ThresholdMatrix = threshMat, 
@@ -127,6 +122,11 @@ for (i in 1:length(Ns)) {
       X_g <- updateTaskPerformance(P_sub_g    = P_g,
                                    TaskMat    = X_g,
                                    QuitProb   = quitP)
+      # Update social network (previously this was before probability/task update)
+      g_adj <- temporalNetwork(X_sub_g = X_g,
+                               p = p,
+                               bias = q)
+      g_tot <- g_tot + g_adj
       # Adjust thresholds
       threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
                                           ThresholdMatrix = threshMat, 
