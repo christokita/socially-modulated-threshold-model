@@ -13,7 +13,7 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(20) #vector of number of individuals to simulate
+Ns             <- c(100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
@@ -258,7 +258,7 @@ row.names(thresh1time) <- NULL
 thresh1time <- as.data.frame(thresh1time)
 thresh1time <- thresh1time %>% 
   mutate(t = 0:(nrow(.)-1)) %>% 
-  gather("Id", "Threshold", 1:70)
+  gather("Id", "Threshold", 1:100)
 
 threshMat <- threshMat %>% 
   as.data.frame(.) %>% 
@@ -267,44 +267,68 @@ threshMat <- threshMat %>%
   select(-Thresh1, -Thresh2)
 
 thresh1time <- merge(thresh1time, threshMat, by = "Id")
+thresh1time$ThreshRatio[thresh1time$ThreshRatio > 10] <- 10
+thresh1time$ThreshRatio[thresh1time$ThreshRatio < -10] <- -10
 
 
-base_breaks_x <- function(x){
-  b <- pretty(x)
-  adjust_for_ticks <- max(b) * 0.0025
-  d <- data.frame(y=-Inf, yend=-Inf, x=min(b) - adjust_for_ticks, xend=max(b) + adjust_for_ticks)
-  list(geom_segment(data=d, aes(x=x, y=y, xend=xend, yend=yend),size = 1, inherit.aes=FALSE),
-       scale_x_continuous(breaks=b))
-}
-base_breaks_y <- function(x){
-  b <- pretty(x)
-  adjust_for_ticks <- max(b) * 0.0025
-  d <- data.frame(x = -Inf, xend = -Inf, y=min(b) - adjust_for_ticks, yend = max(b) + adjust_for_ticks)
-  list(geom_segment(data=d, aes(x = x, y = y, xend = xend, yend = yend), size = 1, inherit.aes = FALSE),
-       scale_y_continuous(breaks=b))
-}
+# base_breaks_x <- function(x){
+#   b <- pretty(x)
+#   adjust_for_ticks <- max(b) * 0.0025
+#   d <- data.frame(y=-Inf, yend=-Inf, x=min(b) - adjust_for_ticks, xend=max(b) + adjust_for_ticks)
+#   list(geom_segment(data=d, aes(x=x, y=y, xend=xend, yend=yend),size = 1, inherit.aes=FALSE),
+#        scale_x_continuous(breaks=b))
+# }
+# base_breaks_y <- function(x){
+#   b <- pretty(x)
+#   adjust_for_ticks <- max(b) * 0.0025
+#   d <- data.frame(x = -Inf, xend = -Inf, y=min(b) - adjust_for_ticks, yend = max(b) + adjust_for_ticks)
+#   list(geom_segment(data=d, aes(x = x, y = y, xend = xend, yend = yend), size = 1, inherit.aes = FALSE),
+#        scale_y_continuous(breaks=b))
+# }
+# 
+# test <- thresh1time[thresh1time$Id %in% c("v-22", "v-20", "v-25", "v-40"),]
+# gg_thresh <- ggplot(data = thresh1time, 
+#                     aes(x = t, y = Threshold)) +
+#   theme_bw(base_size = 10) +
+#   geom_line(aes(group = Id, colour = ThreshRatio), size = 0.5) +
+#   scale_colour_gradient2(name = "ln(Threshold Ratio)",
+#                          high = "#d7191c",
+#                          mid = "#cecece", 
+#                          low = "#2c7bb6", 
+#                          midpoint = 0, 
+#                          limits = c(-2, 2),
+#                          oob = squish) +
+#   base_breaks_x(thresh1time$t) +
+#   base_breaks_y(thresh1time$Threshold) +
+#   theme(aspect.ratio = 1,
+#         panel.border = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         legend.position = "none",
+#         axis.ticks.length = unit(4, "pt"),
+#         axis.text = element_text(color = "black"))
+# gg_thresh
 
-test <- thresh1time[thresh1time$Id %in% c("v-22", "v-20", "v-25", "v-40"),]
+
 gg_thresh <- ggplot(data = thresh1time, 
                     aes(x = t, y = Threshold)) +
-  theme_bw(base_size = 10) +
+  theme_classic(base_size = 10) +
   geom_line(aes(group = Id, colour = ThreshRatio), size = 0.5) +
   scale_colour_gradient2(name = "ln(Threshold Ratio)",
                          high = "#d7191c",
-                         mid = "#f2ec79", 
+                         mid = "#cecece", 
                          low = "#2c7bb6", 
                          midpoint = 0, 
                          limits = c(-2, 2),
                          oob = squish) +
-  base_breaks_x(thresh1time$t) +
-  base_breaks_y(thresh1time$Threshold) +
+  scale_y_continuous(limits = c(0, 25), breaks = seq(0,25, 5)) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = "none",
-        axis.ticks.length = unit(4, "pts")
+        axis.ticks.length = unit(4, "pt"),
         axis.text = element_text(color = "black"))
 gg_thresh
 
-ggsave("output/ThresholdTime/Size70.png", scale = 0.7)
+ggsave("output/ThresholdTime/Size100.png", scale = 0.6, dpi = 600)

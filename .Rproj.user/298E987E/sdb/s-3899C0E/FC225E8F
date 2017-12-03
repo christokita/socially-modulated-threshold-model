@@ -12,15 +12,15 @@
     "path" : null,
     "project_path" : null,
     "properties" : {
-        "cacheKey" : "DF0A9B21",
+        "cacheKey" : "1C028733",
         "caption" : "threshMat",
-        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=threshMat&cache_key=DF0A9B21",
-        "displayedObservations" : 70,
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=threshMat&cache_key=1C028733",
+        "displayedObservations" : "100",
         "environment" : "",
         "object" : "threshMat",
-        "preview" : 0,
-        "totalObservations" : 70,
-        "variables" : 2
+        "preview" : "0",
+        "totalObservations" : "100",
+        "variables" : "2"
     },
     "relative_order" : 5,
     "source_on_save" : false,
