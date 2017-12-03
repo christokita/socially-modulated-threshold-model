@@ -29,7 +29,7 @@ quitP          <- 0.2 #probability of quitting task once active
 # Social Network Parameters
 epsilon        <- 0.1 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
 phi            <- 0.1 #default forgetting rate of thresholds
-q              <- 1.2 #probability of interacting with individual in same state relative to others
+q              <- 2 #probability of interacting with individual in same state relative to others
 
 
 
