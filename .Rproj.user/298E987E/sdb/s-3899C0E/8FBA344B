@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1512338151615.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "8FBA344B",
+    "lastKnownWriteTime" : 4294967302,
+    "last_content_update" : 1512338151615,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D4223A78",
+        "caption" : "social_graphs",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=social_graphs&cache_key=D4223A78",
+        "displayedObservations" : 70,
+        "environment" : "",
+        "object" : "social_graphs",
+        "preview" : 0,
+        "totalObservations" : 70,
+        "variables" : 13
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

@@ -12,11 +12,11 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 30, 50, 70, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 1 #number of replications per simulation (for ensemble)
+reps           <- 30 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
@@ -27,9 +27,9 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.1 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0.1 #default forgetting rate of thresholds
-q              <- 2 #probability of interacting with individual in same state relative to others
+epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
+phi            <- 0.01 #default forgetting rate of thresholds
+q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 
@@ -236,11 +236,11 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-# filename <- "Sigma001-Fixed-ConnectP01-Bias1.1"
-# 
-# save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
-#      groups_taskStep, groups_taskTally, groups_thresh,
-#      file = paste0("output/Rdata/", filename, ".Rdata"))
+filename <- "Sigma0.01-Epsilon0.01-Bias1.1_testframework"
+
+save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
+     groups_taskStep, groups_taskTally, groups_thresh,
+     file = paste0("output/Rdata/", filename, ".Rdata"))
 
 # qplot(threshMat[,1], threshMat[,2]) + 
 #   scale_color_gradient2(low = "red", mid = "yellow", high = "blue", midpoint = (max(threshMat) + min(threshMat)) / 2) + 

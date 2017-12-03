@@ -59,11 +59,13 @@ temporalNetwork_test <- function(X_sub_g, bias) {
     task <- which(X_sub_g[i, ] == 1)
     # set up list of potential connections
     potential <- seq(1:dimension)
-    potential <- potential[-i]
+    baseline_prob <- rep(1, length(potential))
     # loop through column individuals
     # If inactive, all connections equal prob
     if (length(task) == 0) {
-      connection <- sample(x = potential, size = 1)
+      potential <- potential[-i] #remove self
+      baseline_prob <- baseline_prob[-i] #remove self
+      connection <- sample(x = potential, size = 1, prob = baseline_prob)
       g_adj[i, connection] <- 1
       g_adj[connection, i] <- 1
     }
@@ -71,7 +73,10 @@ temporalNetwork_test <- function(X_sub_g, bias) {
     else {
       # find which individuals are perfoming same task and relatively weight probabilities
       same <- which(X_sub_g[ , task] == 1)
-      connection <- sample(x = potential, size = 1)
+      baseline_prob[same] <- baseline_prob[same] * bias
+      potential <- potential[-i] #remove self
+      baseline_prob <- baseline_prob[-i] #remove self
+      connection <- sample(x = potential, size = 1, prob = baseline_prob)
       g_adj[i, connection] <- 1
       g_adj[connection, i] <- 1
     }
