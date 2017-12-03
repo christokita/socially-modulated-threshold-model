@@ -47,18 +47,38 @@ temporalNetwork <- function(X_sub_g, p, bias) {
   return(g_adj)
 }
 
-
 ####################
-# Calculate Number of Neighbors Performing Task 
+# Form connections probabilistically - Test new formulation
 ####################
-calcSocialInfo <- function(SocialNetwork, X_sub_g) {
-  # Calculate "sum" of task states/probs of neighbors
-  L <- SocialNetwork %*% X_sub_g
-  # Fix unconnected nodes
-  L[is.na(L)] <- 0
-  # Return
-  colnames(L) <- paste0("NeighborTask", 1:ncol(L))
-  rownames(L) <- paste0("v-", 1:nrow(L))
-  return(L)
+temporalNetwork_test <- function(X_sub_g, bias) {
+  dimension <- nrow(X_sub_g)
+  g_adj <- matrix(data = rep(0, dimension*dimension), ncol = dimension)
+  # Loop through row individuals
+  for (i in 1:dimension) {
+    # get task performance of individual
+    task <- which(X_sub_g[i, ] == 1)
+    # set up list of potential connections
+    potential <- seq(1:dimension)
+    potential <- potential[-i]
+    # loop through column individuals
+    # If inactive, all connections equal prob
+    if (length(task) == 0) {
+      connection <- sample(x = potential, size = 1)
+      g_adj[i, connection] <- 1
+      g_adj[connection, i] <- 1
+    }
+    # If active, biased towards individuals in same state
+    else {
+      # find which individuals are perfoming same task and relatively weight probabilities
+      same <- which(X_sub_g[ , task] == 1)
+      connection <- sample(x = potential, size = 1)
+      g_adj[i, connection] <- 1
+      g_adj[connection, i] <- 1
+    }
+  }
+  # bind and name columns
+  diag(g_adj) <- 0 #remove self-connections
+  colnames(g_adj) <- paste0("v-", 1:dimension)
+  rownames(g_adj) <- paste0("v-", 1:dimension)
+  return(g_adj)
 }
-
