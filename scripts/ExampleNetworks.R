@@ -5,9 +5,12 @@
 ################################################################################
 
 g <- g_tot / gens
-
-# Drop edges below baseline interaction probability
-g[g < p] <- 0
+diag(g) <- NA
+# Only show edges above 50th percentile
+percentiles <- quantile(g, na.rm = TRUE)
+fiftypercent <- percentiles[3]
+g[g <= fiftypercent] <- 0
+diag(g) <- 0
 
 # Edgelist
 graph <- graph.adjacency(g, weighted = T)
@@ -22,5 +25,5 @@ nodelist$Thresh1 <- threshMat[ , 1]
 nodelist$Thresh2 <- threshMat[ , 2]
 nodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])
 
-write.csv(edgelist, file = "output/Networks/GroupSize20edgelistFixed.csv", row.names = FALSE)
-write.csv(nodelist, file = "output/Networks/GroupSize20nodelistFixed.csv", row.names = FALSE)
+write.csv(edgelist, file = "output/Networks/GroupSize70edgelist.csv", row.names = FALSE)
+write.csv(nodelist, file = "output/Networks/GroupSize70nodelist.csv", row.names = FALSE)

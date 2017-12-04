@@ -12,15 +12,15 @@
     "path" : null,
     "project_path" : null,
     "properties" : {
-        "cacheKey" : "D4223A78",
+        "cacheKey" : "2730C01C",
         "caption" : "social_graphs",
-        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=social_graphs&cache_key=D4223A78",
-        "displayedObservations" : 70,
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=social_graphs&cache_key=2730C01C",
+        "displayedObservations" : "8550",
         "environment" : "",
         "object" : "social_graphs",
-        "preview" : 0,
-        "totalObservations" : 70,
-        "variables" : 13
+        "preview" : "0",
+        "totalObservations" : "8550",
+        "variables" : "13"
     },
     "relative_order" : 4,
     "source_on_save" : false,

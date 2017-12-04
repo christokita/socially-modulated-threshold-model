@@ -102,7 +102,7 @@ gg_degree_act <- ggplot(data = social_graphs,
                          mid = "#ffffbf", 
                          low = "#2c7bb6", 
                          midpoint = 0, 
-                         limits = c(-2, 2),
+                         limits = c(-1, 1),
                          oob = squish) +
   theme(panel.grid = element_blank(),
         panel.border = element_rect(size = 1, fill = NA),
@@ -187,7 +187,7 @@ gg_degree_actRatio <- ggplot(data = social_graphs,
                          mid = "#ffffbf", 
                          low = "#2c7bb6", 
                          midpoint = 0, 
-                         limits = c(-2, 2),
+                         limits = c(-1, 1),
                          oob = squish) +
   theme(panel.grid = element_blank(),
         panel.border = element_rect(size = 1, fill = NA)) +
@@ -210,7 +210,7 @@ gg_activity <- ggplot(data = social_graphs,
                          mid = "#ffffbf", 
                          low = "#2c7bb6", 
                          midpoint = 0, 
-                         limits = c(-2, 2),
+                         limits = c(-0.5, 0.5),
                          oob = squish) +
   xlab("Task 1") +
   ylab("Task 2") +
