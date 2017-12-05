@@ -10,13 +10,13 @@ library(RColorBrewer)
 library(scales)
 
 
-filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1"
+filename <- "Sigma001-Eps001-Bias1.1-TestFramework"
 
 ####################
 # Compare entropies
 ####################
 # Load social
-load("output/Rdata/Sigma001-Eps001-Phi001-ConnectP01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.01-Epsilon0.01-Bias1.1_testframework.Rdata")
 
 entropy <- unlist(groups_entropy, recursive = FALSE)
 entropy <- do.call("rbind", entropy)  %>% 
@@ -85,7 +85,7 @@ ggsave(gg_entropy, file = paste0("output/SpecializationPlots/", filename, ".png"
 # Create inset for task rank correlation
 ####################
 # Load social
-load("output/Sigma001-Eps001-Phi001-ConnectP01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.01-Epsilon0.01-Bias1.1_testframework.Rdata")
 
 taskCorrTot <- do.call("rbind", groups_taskCorr)
 taskCorrTot <- taskCorrTot %>% 
@@ -98,7 +98,7 @@ taskCorrTot <- taskCorrTot %>%
   mutate(Model = "Social")
 
 # Load non-social
-load("output/Sigma001-Eps0-Phi0.Rdata")
+load("output/Rdata/Sigma001-FIXED-ConnectP01-Bias1.1.Rdata")
 
 taskCorrTot1 <- do.call("rbind", groups_taskCorr)
 taskCorrTot1 <- taskCorrTot1 %>% 
@@ -119,7 +119,7 @@ gg_corr <- ggplot(data = taskCorrTot, aes(x = n, group = Model)) +
   theme_classic() +
   xlab("Group Size") +
   ylab("Rank Correlation") +
-  scale_y_continuous(limits = c(0, 1),
+  scale_y_continuous(limits = c(-0.1, 1),
                      breaks = seq(0, 1, 0.2)) +
   scale_x_continuous(breaks = unique(entropy$n)) +
   scale_color_manual(values = c("black", "mediumseagreen")) +

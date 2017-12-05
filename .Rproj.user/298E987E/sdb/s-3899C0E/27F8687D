@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "################################################################################\n#\n# Examine Network from last run\n#\n################################################################################\n\ng <- g_tot / gens\ndiag(g) <- NA\n# Only show edges above 50th percentile\npercentiles <- quantile(g, na.rm = TRUE)\nfiftypercent <- percentiles[3]\ng[g <= fiftypercent] <- 0\ndiag(g) <- 0\n\n# Edgelist\ngraph <- graph.adjacency(g, weighted = T)\nedgelist <- get.edgelist(graph)\nedgelist <- as.data.frame(edgelist)\nnames(edgelist) <- c(\"Source\", \"Target\")\nedgelist$Weight <- E(graph)$weight \n\n# Nodelist\nnodelist <- data.frame(Id = rownames(threshMat))\nnodelist$Thresh1 <- threshMat[ , 1]\nnodelist$Thresh2 <- threshMat[ , 2]\nnodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])\n\nwrite.csv(edgelist, file = \"output/Networks/GroupSize20edgelist.csv\", row.names = FALSE)\nwrite.csv(nodelist, file = \"output/Networks/GroupSize20nodelist.csv\", row.names = FALSE)\n\n# Try plotting with igraph\nlibrary(igraph)\nlibrary(RColorBrewer)\ng <- graph_from_adjacency_matrix(g, mode = \"undirected\", weighted = TRUE)\nV(g)$ThreshRatio <- nodelist$ThreshRatio\nE(g)$Reweight <- (E(g)$weight - min(E(g)$weight)) / (max(E(g)$weight) - min(E(g)$weight))\nmy.col <- colorRampPalette(brewer.pal(11, \"RdYlBu\"))(diff(range(V(g)$ThreshRatio)))\nplot(g, vertex.label = NA, edge.width = (E(g)$Reweight+0.01) * 5, vertex.color = V(g)$ThreshRatio)\n",
+    "created" : 1512420062677.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3220628413",
+    "id" : "27F8687D",
+    "lastKnownWriteTime" : 1512420301,
+    "last_content_update" : 1512420301695,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/ExampleNetworks.R",
+    "project_path" : "scripts/ExampleNetworks.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

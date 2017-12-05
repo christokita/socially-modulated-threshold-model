@@ -25,5 +25,14 @@ nodelist$Thresh1 <- threshMat[ , 1]
 nodelist$Thresh2 <- threshMat[ , 2]
 nodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])
 
-write.csv(edgelist, file = "output/Networks/GroupSize70edgelist.csv", row.names = FALSE)
-write.csv(nodelist, file = "output/Networks/GroupSize70nodelist.csv", row.names = FALSE)
+write.csv(edgelist, file = "output/Networks/GroupSize20edgelist.csv", row.names = FALSE)
+write.csv(nodelist, file = "output/Networks/GroupSize20nodelist.csv", row.names = FALSE)
+
+# Try plotting with igraph
+library(igraph)
+library(RColorBrewer)
+g <- graph_from_adjacency_matrix(g, mode = "undirected", weighted = TRUE)
+V(g)$ThreshRatio <- nodelist$ThreshRatio
+E(g)$Reweight <- (E(g)$weight - min(E(g)$weight)) / (max(E(g)$weight) - min(E(g)$weight))
+my.col <- colorRampPalette(brewer.pal(11, "RdYlBu"))(diff(range(V(g)$ThreshRatio)))
+plot(g, vertex.label = NA, edge.width = (E(g)$Reweight+0.01) * 5, vertex.color = V(g)$ThreshRatio)
