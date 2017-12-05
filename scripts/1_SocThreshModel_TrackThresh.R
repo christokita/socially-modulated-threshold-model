@@ -38,30 +38,11 @@ q              <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Run simulation multiple times
 ####################
-# Prep meta-lists for collection of group size simulations
-groups_taskDist  <- list()
-groups_taskCorr  <- list()
-groups_taskStep  <- list()
-groups_taskTally <- list()
-groups_stim      <- list()
-groups_thresh    <- list()
-groups_entropy   <- list()
-groups_graphs    <- list()
 
 # Loop through group sizes
 for (i in 1:length(Ns)) {
   # Set group size
   n <- Ns[i]
-  
-  # Prep lists for collection of simulation outputs
-  ens_taskDist  <- list()
-  ens_taskCorr  <- list()
-  ens_taskStep  <- list()
-  ens_taskTally <- list()
-  ens_entropy   <- list()
-  ens_stim      <- list()
-  ens_thresh    <- list()
-  ens_graphs    <- list()
   
   # Run Simulations
   for (sim in 1:reps) {
@@ -94,13 +75,6 @@ for (i in 1:length(Ns)) {
     colnames(g_tot) <- paste0("v-", 1:n)
     rownames(g_tot) <- paste0("v-", 1:n)
     
-    # Prep correlation step matrix
-    X_prev <- matrix(data = rep(0, n * m), ncol = m)
-    X_prevTot <- matrix(data = rep(0, n * m), ncol = m)
-    taskCorr <- list()
-    taskStep <- list()
-    taskTally <- list()
-    
     # Prep correlation tracking matrix
     thresh1time <- list()
     thresh2time <- list()
@@ -131,7 +105,6 @@ for (i in 1:length(Ns)) {
                                    QuitProb   = quitP)
       # Update social network (previously this was before probability/task update)
       g_adj <- temporalNetwork(X_sub_g = X_g,
-                               p = p,
                                bias = q)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
@@ -143,109 +116,15 @@ for (i in 1:length(Ns)) {
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]
       
-      
-      # Capture current task performance tally
-      tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)
-      colnames(tally) <- c("t", colnames(X_g))
-      tally <- transform(tally, Inactive = n - sum(X_g), n = n, replicate = sim)
-      taskTally[[t]] <- tally
-      
       # Update total task performance profile
       X_tot <- X_tot + X_g
       
-      # Create time step for correlation
-      if (t %% corrStep == 0) {
-        # Get tasks performance in correlation step
-        X_step <- X_tot - X_prevTot
-        # Add to ensemble list of task steps
-        taskStep[[t / corrStep]] <- X_step
-        # Calculate rank correlation if it is not the first step
-        if(sum(X_prev) != 0) {
-          # Normalize
-          stepNorm <- X_step / rowSums(X_step)
-          prevNorm <- X_prev / rowSums(X_prev)
-          # Calculate ranks
-          step_ranks <- calculateTaskRank(TaskStepMat = X_step)
-          prev_ranks <- calculateTaskRank(TaskStepMat = X_prev)
-          # Calculate Correlation
-          rankCorr <- cor(prev_ranks, step_ranks, method = "spearman")
-          # Put in list
-          taskCorr[[(t / corrStep) - 1]] <- diag(rankCorr)
-          names(taskCorr)[(t / corrStep) - 1] <- paste0("Gen", t)
-        }
-        # Update previous step total matrix
-        X_prevTot <- X_tot
-        # Update previous step total matrix
-        X_prev <- X_step
-      }
     }
-    
-    # Calculate Entropy
-    entropy <- mutualEntropy(TotalStateMat = X_tot)
-    entropy <- transform(entropy, n = n, replicate = sim)
-    
-    # Calculate total task distribution
-    # totalTaskDist <- X_tot / rowSums(X_tot)
-    totalTaskDist <- X_tot / gens
-    totalTaskDist <- transform(totalTaskDist, Inactive = gens - rowSums(X_tot), n = n, replicate = sim)
-    
-    # Create tasktally table
-    taskTally <- do.call("rbind", taskTally)
-    
-    # Create tasktally table
-    stimMat <- transform(stimMat, n = n, replicate = sim)
-    
-    # Create tasktally table
-    taskCorr <- transform(taskCorr, replicate = sim)
-    
-    # Add total task distributions, entropy values, and graphs to lists
-    ens_taskDist[[sim]]  <- totalTaskDist
-    ens_entropy[[sim]]   <- entropy
-    ens_taskCorr[[sim]]  <- taskCorr
-    ens_taskTally[[sim]] <- taskTally
-    ens_taskStep[[sim]]  <- taskStep
-    ens_stim[[sim]]      <- stimMat
-    ens_thresh[[sim]]    <- threshMat 
-    ens_graphs[[sim]]    <- g_tot / gens
-    
+
     # Print simulation completed
     print(paste0("DONE: N = ", n, ", Simulation ", sim))
   }
   
-  # Calculate mean correlation for each n
-  runCorrs <- lapply(ens_taskCorr, function(x) {
-    # Unlist
-    runs <- do.call("rbind", x)
-    replicate <- runs[nrow(runs), ]
-    replicate <- unique(replicate)
-    runs <- runs[-nrow(runs), ]
-    # Calculate mean
-    runMean <- matrix(data = rep(NA, m), ncol =  m)
-    for (column in 1:m) {
-      runMean[ , column] <- mean(runs[ , column], na.rm = TRUE)
-    }
-    runMean <- cbind(runMean, replicate)
-    colnames(runMean) <- c(paste0("Task", 1:m), "replicate")
-    return(runMean)
-  })
-  runCorrs <- do.call("rbind", runCorrs)
-  runCorrs <- transform(runCorrs, n = n)
-  
-  # Add to list of lists
-  groups_taskDist[[i]]  <- ens_taskDist
-  groups_taskCorr[[i]]  <- runCorrs
-  groups_taskStep[[i]]  <- ens_taskStep
-  groups_taskTally[[i]] <- ens_taskTally
-  groups_stim[[i]]      <- ens_stim
-  groups_thresh[[i]]    <- ens_thresh
-  groups_entropy[[i]]   <- ens_entropy
-  groups_graphs[[i]]    <- ens_graphs
-  
-}
-
-# trim out correlations for group size 1
-if(1 %in% Ns) {
-  groups_taskCorr <- groups_taskCorr[-1]
 }
 
 library(RColorBrewer)
@@ -316,12 +195,13 @@ gg_thresh <- ggplot(data = thresh1time,
   geom_line(aes(group = Id, colour = ThreshRatio), size = 0.5) +
   scale_colour_gradient2(name = "ln(Threshold Ratio)",
                          high = "#d7191c",
-                         mid = "#cecece", 
+                         mid = "#ffffbf", 
+                         # mid = "#cecece", 
                          low = "#2c7bb6", 
                          midpoint = 0, 
-                         limits = c(-2, 2),
+                         limits = c(-1, 1),
                          oob = squish) +
-  scale_y_continuous(limits = c(0, 25), breaks = seq(0,25, 5)) +
+  scale_y_continuous(limits = c(4, 16), breaks = seq(0,20, 5)) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -331,4 +211,4 @@ gg_thresh <- ggplot(data = thresh1time,
         axis.text = element_text(color = "black"))
 gg_thresh
 
-ggsave("output/ThresholdTime/Size100.png", scale = 0.6, dpi = 600)
+ggsave("output/ThresholdTime/Size100test.png", scale = 0.6, dpi = 600)

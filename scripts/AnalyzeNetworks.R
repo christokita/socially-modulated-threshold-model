@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-filename <- "Sigma001-Eps001-Phi001-ConnectP01-Bias1.1"
+filename <- "Sigma001-Eps001--Bias1.1"
 
 # Cutoff for threshold ratio to allow easier plotting
 ThreshCutoffValue <- 10
@@ -21,7 +21,7 @@ ThreshCutoffReplacementColor <- 10
 # Compare entropies
 ####################
 # Load social
-load("output/Rdata/Sigma001-Eps001-Phi001-ConnectP01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.01-Epsilon0.01-Bias1.1.Rdata")
 
 graphs <- unlist(groups_graphs, recursive = FALSE)
 threshMat <- unlist(groups_thresh, recursive = FALSE)
@@ -92,6 +92,9 @@ fixed_graphs <- lapply(1:length(graphs), function(i) {
 
 fixed_graphs <- do.call("rbind", fixed_graphs)
 
+####################
+# Compare activity, degree, and thershold ratios
+####################
 # Comparing activity and degree, colored by threshold ratio
 gg_degree_act <- ggplot(data = social_graphs, 
                         aes(x = ActTotal, y = degree, colour = ThreshRatioColor, group = n)) +
@@ -179,7 +182,7 @@ ggsave(filename = "output/NetworkDataPlots/Fixed_ThreshRatioVsDegree.png", width
 
 # Comparing activity and degree, colored by threshold ratio
 gg_degree_actRatio <- ggplot(data = social_graphs, 
-                        aes(x = ActRatio, y = ActTotal, colour = ThreshRatioColor, group = n)) +
+                        aes(x = ActRatio, y = degree, colour = ThreshRatioColor, group = n)) +
   geom_point(size = 0.5) +
   theme_bw(base_size = 10) +
   scale_colour_gradient2(name = "Threshold\nRatio",
@@ -218,5 +221,5 @@ gg_activity <- ggplot(data = social_graphs,
 gg_activity
 ggsave(filename = "output/NetworkDataPlots/Social_TaskPerfVsThreshRatio.png", width = 5, height = 4, units = "in", dpi = 600)
 
-
+# Comparing thresholds
 

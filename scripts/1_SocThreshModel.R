@@ -12,11 +12,11 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70) #vector of number of individuals to simulate
+Ns             <- c(10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 1 #number of replications per simulation (for ensemble)
+reps           <- 5 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
@@ -29,8 +29,7 @@ quitP          <- 0.2 #probability of quitting task once active
 # Social Network Parameters
 epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
 phi            <- 0.01 #default forgetting rate of thresholds
-p              <- 0.1 #probability of interacting with individual in other states
-q              <- 1.1 #probability of interacting with individual in same state relative to others
+q              <- 1.05 #probability of interacting with individual in same state relative to others
 
 
 
@@ -122,10 +121,9 @@ for (i in 1:length(Ns)) {
       X_g <- updateTaskPerformance(P_sub_g    = P_g,
                                    TaskMat    = X_g,
                                    QuitProb   = quitP)
-      # Update social network (previously this was before probability/task update)
+      # Update social network
       g_adj <- temporalNetwork(X_sub_g = X_g,
-                               p = p,
-                               bias = q)
+                              bias = q)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
       threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
@@ -238,7 +236,7 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma001-Fixed-ConnectP01-Bias1.1"
+filename <- "Sigma0.01-Epsilon0.01-Bias1.1_testframework"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_thresh,

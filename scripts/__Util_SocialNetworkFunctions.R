@@ -5,9 +5,51 @@
 ##################################################
 
 ####################
+# Form connections probabilistically -  new formulation
+####################
+temporalNetwork <- function(X_sub_g, bias) {
+  dimension <- nrow(X_sub_g)
+  g_adj <- matrix(data = rep(0, dimension*dimension), ncol = dimension)
+  # Loop through row individuals
+  for (i in 1:dimension) {
+    # get task performance of individual
+    task <- which(X_sub_g[i, ] == 1)
+    # set up list of potential connections
+    potential <- seq(1:dimension)
+    baseline_prob <- rep(1, length(potential))
+    # loop through column individuals
+    # If inactive, all connections equal prob
+    if (length(task) == 0) {
+      potential <- potential[-i] #remove self
+      baseline_prob <- baseline_prob[-i] #remove self
+      connection <- sample(x = potential, size = 1, prob = baseline_prob)
+      g_adj[i, connection] <- 1
+      g_adj[connection, i] <- 1
+    }
+    # If active, biased towards individuals in same state
+    else {
+      # find which individuals are perfoming same task and relatively weight probabilities
+      same <- which(X_sub_g[ , task] == 1)
+      baseline_prob[same] <- baseline_prob[same] * bias
+      potential <- potential[-i] #remove self
+      baseline_prob <- baseline_prob[-i] #remove self
+      connection <- sample(x = potential, size = 1, prob = baseline_prob)
+      g_adj[i, connection] <- 1
+      g_adj[connection, i] <- 1
+    }
+  }
+  # bind and name columns
+  diag(g_adj) <- 0 #remove self-connections
+  colnames(g_adj) <- paste0("v-", 1:dimension)
+  rownames(g_adj) <- paste0("v-", 1:dimension)
+  return(g_adj)
+}
+
+
+####################
 # Form connections probabilistically
 ####################
-temporalNetwork <- function(X_sub_g, p, bias) {
+temporalNetwork_OLD <- function(X_sub_g, p, bias) {
   dimension <- nrow(X_sub_g)
   g_adj <- matrix(data = rep(NA, dimension*dimension), ncol = dimension)
   # Loop through row individuals
@@ -47,43 +89,3 @@ temporalNetwork <- function(X_sub_g, p, bias) {
   return(g_adj)
 }
 
-####################
-# Form connections probabilistically - Test new formulation
-####################
-temporalNetwork_test <- function(X_sub_g, bias) {
-  dimension <- nrow(X_sub_g)
-  g_adj <- matrix(data = rep(0, dimension*dimension), ncol = dimension)
-  # Loop through row individuals
-  for (i in 1:dimension) {
-    # get task performance of individual
-    task <- which(X_sub_g[i, ] == 1)
-    # set up list of potential connections
-    potential <- seq(1:dimension)
-    baseline_prob <- rep(1, length(potential))
-    # loop through column individuals
-    # If inactive, all connections equal prob
-    if (length(task) == 0) {
-      potential <- potential[-i] #remove self
-      baseline_prob <- baseline_prob[-i] #remove self
-      connection <- sample(x = potential, size = 1, prob = baseline_prob)
-      g_adj[i, connection] <- 1
-      g_adj[connection, i] <- 1
-    }
-    # If active, biased towards individuals in same state
-    else {
-      # find which individuals are perfoming same task and relatively weight probabilities
-      same <- which(X_sub_g[ , task] == 1)
-      baseline_prob[same] <- baseline_prob[same] * bias
-      potential <- potential[-i] #remove self
-      baseline_prob <- baseline_prob[-i] #remove self
-      connection <- sample(x = potential, size = 1, prob = baseline_prob)
-      g_adj[i, connection] <- 1
-      g_adj[connection, i] <- 1
-    }
-  }
-  # bind and name columns
-  diag(g_adj) <- 0 #remove self-connections
-  colnames(g_adj) <- paste0("v-", 1:dimension)
-  rownames(g_adj) <- paste0("v-", 1:dimension)
-  return(g_adj)
-}
