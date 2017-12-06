@@ -12,11 +12,11 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 5 #number of replications per simulation (for ensemble)
+reps           <- 30 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
@@ -27,9 +27,9 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0.01 #default forgetting rate of thresholds
-q              <- 1.05 #probability of interacting with individual in same state relative to others
+epsilon        <- 0.0 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
+phi            <- 0.0 #default forgetting rate of thresholds
+q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 
