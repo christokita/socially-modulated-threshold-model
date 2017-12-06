@@ -23,17 +23,17 @@ ThreshCutoffReplacementColor <- 10
 # Load social
 load("output/Rdata/Sigma0.01-Epsilon0.01-Bias1.1.Rdata")
 
-graphs <- unlist(groups_graphs, recursive = FALSE)
-threshMat <- unlist(groups_thresh, recursive = FALSE)
-actMat <- unlist(groups_taskDist, recursive = FALSE)
+soc_graphs <- unlist(groups_graphs, recursive = FALSE)
+soc_threshMat <- unlist(groups_thresh, recursive = FALSE)
+soc_actMat <- unlist(groups_taskDist, recursive = FALSE)
 
-social_graphs <- lapply(1:length(graphs), function(i) {
+social_graphs <- lapply(1:length(soc_graphs), function(i) {
   # Calculated degree
   degree <- rowSums(graphs[[i]])
   degree <- as.data.frame(degree)
   degree$Id <- row.names(degree)
   # Calculate thresholds
-  thresh <- threshMat[[i]] %>% 
+  thresh <- soc_threshMat[[i]] %>% 
     as.data.frame(.) %>% 
     mutate(ThreshRatio = log(Thresh1 / Thresh2),
            Id = row.names(.))
@@ -43,7 +43,7 @@ social_graphs <- lapply(1:length(graphs), function(i) {
   thresh$ThreshRatioColor[thresh$ThreshRatio > ThreshCutoffValue] <- ThreshCutoffReplacementColor
   thresh$ThreshRatioColor[thresh$ThreshRatio < -ThreshCutoffValue] <- -ThreshCutoffReplacementColor
   # Calculate actibity
-  activity <- actMat[[i]] %>% 
+  activity <- soc_actMat[[i]] %>% 
     as.data.frame(.) %>% 
     mutate(ActRatio = log(Task1 / Task2),
            ActTotal = Task1 + Task2,
@@ -59,17 +59,17 @@ social_graphs <- do.call("rbind", social_graphs)
 # Load fixed
 load("output/Rdata/Sigma001-FIXED-ConnectP01-Bias1.1.Rdata")
 
-graphs <- unlist(groups_graphs, recursive = FALSE)
-threshMat <- unlist(groups_thresh, recursive = FALSE)
-actMat <- unlist(groups_taskDist, recursive = FALSE)
+fix_graphs <- unlist(groups_graphs, recursive = FALSE)
+fix_threshMat <- unlist(groups_thresh, recursive = FALSE)
+fix_actMat <- unlist(groups_taskDist, recursive = FALSE)
 
-fixed_graphs <- lapply(1:length(graphs), function(i) {
+fixed_graphs <- lapply(1:length(fix_graphs), function(i) {
   # Calculated degree
   degree <- rowSums(graphs[[i]])
   degree <- as.data.frame(degree)
   degree$Id <- row.names(degree)
   # Calculate thresholds
-  thresh <- threshMat[[i]] %>% 
+  thresh <- fix_threshMat[[i]] %>% 
     as.data.frame(.) %>% 
     mutate(ThreshRatio = log(Thresh1 / Thresh2),
            Id = row.names(.))
@@ -79,7 +79,7 @@ fixed_graphs <- lapply(1:length(graphs), function(i) {
   thresh$ThreshRatioColor[thresh$ThreshRatio > ThreshCutoffValue] <- ThreshCutoffReplacementColor
   thresh$ThreshRatioColor[thresh$ThreshRatio < -ThreshCutoffValue] <- -ThreshCutoffReplacementColor
   # Calculate actibity
-  activity <- actMat[[i]] %>% 
+  activity <- fix_actMat[[i]] %>% 
     as.data.frame(.) %>% 
     mutate(ActRatio = log(Task1 / Task2),
            ActTotal = Task1 + Task2,
@@ -221,5 +221,33 @@ gg_activity <- ggplot(data = social_graphs,
 gg_activity
 ggsave(filename = "output/NetworkDataPlots/Social_TaskPerfVsThreshRatio.png", width = 5, height = 4, units = "in", dpi = 600)
 
-# Comparing thresholds
+####################
+# Compare social network features
+####################
+# Network "dispersion" (? - standard deviation over mean degree)
+dispersion <- lapply(graphs, function(graph) {
+  # Group size
+  n <- nrow(graph)
+  # Degrees
+  degrees <- rowSums(graph)
+  deg_mean <- mean(degrees)
+  deg_sd <- sd(degrees)
+  # compile and return
+  to_return <- data.frame(n = n, DegreeMean = deg_mean, DegreeSD = deg_sd)
+})
+dispersion <- do.call("rbind", dispersion)
+dispersion <- dispersion %>% 
+  mutate(Dispersion = DegreeSD / DegreeMean)
+dispersionSummary <- dispersion %>% 
+  group_by(n) %>% 
+  summarise(Dispersion = mean(Dispersion))
+
+gg_dispersion <- ggplot(data = dispersionSummary, aes(x = n, y = Dispersion)) +
+  geom_point(data = dispersion, aes(x = n, y = Dispersion), color = "grey80", size = 0.5) +
+  geom_line(linetype = "dashed") +
+  geom_point(size = 2) +
+  theme_classic() +
+  theme(aspect.ratio = 1) 
+gg_dispersion
+
 
