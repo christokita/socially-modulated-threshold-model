@@ -236,7 +236,7 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma0.01-Epsilon0.01-Bias1.1_testframework"
+filename <- "Sigma0.01-FIXED-Bias1.1"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_thresh,

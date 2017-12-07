@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-filename <- "Sigma001-Eps001-Bias1.1-TestFramework"
+filename <- "Sigma001-Eps001-Bias1.1"
 
 ####################
 # Compare entropies
@@ -29,7 +29,7 @@ entropy <- do.call("rbind", entropy)  %>%
   mutate(Model = "Social")
 
 # Load non-social
-load("output/Rdata/Sigma001-FIXED-ConnectP01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.01-FIXED-Bias1.1.Rdata")
 
 entropy1 <- unlist(groups_entropy, recursive = FALSE)
 entropy1 <- do.call("rbind", entropy1)  %>% 
