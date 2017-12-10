@@ -8,9 +8,9 @@ rm(list = ls())
 source("scripts/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
+library(igraph)
 
-
-filename <- "Sigma001-Eps001--Bias1.1"
+filename <- "Sigma0.05-Eps0.01--Bias1.1"
 
 # Cutoff for threshold ratio to allow easier plotting
 ThreshCutoffValue <- 10
@@ -18,10 +18,10 @@ ThreshCutoffReplacement <- Inf
 ThreshCutoffReplacementColor <- 10
 
 ####################
-# Compare entropies
+# Load data
 ####################
 # Load social
-load("output/Rdata/Sigma0.01-Epsilon0.01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.05-Epsilon0.01-Bias1.1.Rdata")
 
 soc_graphs <- unlist(groups_graphs, recursive = FALSE)
 soc_threshMat <- unlist(groups_thresh, recursive = FALSE)
@@ -57,7 +57,7 @@ social_graphs <- lapply(1:length(soc_graphs), function(i) {
 social_graphs <- do.call("rbind", social_graphs)
 
 # Load fixed
-load("output/Rdata/Sigma0.01-FIXED-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
 
 fix_graphs <- unlist(groups_graphs, recursive = FALSE)
 fix_threshMat <- unlist(groups_thresh, recursive = FALSE)
@@ -92,139 +92,12 @@ fixed_graphs <- lapply(1:length(fix_graphs), function(i) {
 
 fixed_graphs <- do.call("rbind", fixed_graphs)
 
-####################
-# Compare activity, degree, and thershold ratios
-####################
-# Comparing activity and degree, colored by threshold ratio
-gg_degree_act <- ggplot(data = social_graphs, 
-                        aes(x = ActTotal, y = degree, colour = ThreshRatioColor, group = n)) +
-  geom_point(size = 0.2) +
-  theme_bw(base_size = 10) +
-  scale_colour_gradient2(name = "Threshold\nRatio (ln)",
-                         high = "#d7191c",
-                         mid = "#ffffbf", 
-                         low = "#2c7bb6", 
-                         midpoint = 0, 
-                         limits = c(-1, 1),
-                         oob = squish) +
-  theme(panel.grid = element_blank(),
-        panel.border = element_rect(size = 1, fill = NA),
-        axis.text = element_text(color = "black"),
-        strip.background = element_blank()) +
-  xlab("Total Activity Level") +
-  ylab("Total Degree") +
-  scale_x_continuous(breaks = c(0, 0.4, 0.8)) +
-  facet_wrap( ~ n, scales = "free_y")
-gg_degree_act
-ggsave(filename = "output/NetworkDataPlots/Social_DegreeVsActivity.png", width = 5, height = 4, units = "in", dpi = 600)
-
-
-gg_FIX_degree_act <- ggplot(data = fixed_graphs, 
-                        aes(x = ActTotal, y = degree, colour = ThreshRatioColor, group = n)) +
-  geom_point(size = 0.2) +
-  theme_bw(base_size = 10) +
-  scale_colour_gradient2(name = "Threshold\nRatio (ln)",
-                         high = "#2c7bb6",
-                         mid = "#ffffbf", 
-                         low = "#d7191c", 
-                         midpoint = 0, 
-                         limits = c(-1, 1),
-                         oob = squish) +
-  theme(panel.grid = element_blank(),
-        panel.border = element_rect(size = 1, fill = NA),
-        axis.text = element_text(color = "black"),
-        strip.background = element_blank()) +
-  facet_wrap( ~ n, scales = "free_y")
-gg_FIX_degree_act
-ggsave(filename = "output/NetworkDataPlots/Fixed_DegreeVsActivity.png", width = 5, height = 4, units = "in", dpi = 600)
-
-# Comparing threshold ratio and total activity
-gg_thresh_degree <- ggplot(data = social_graphs, 
-                           aes(x = ThreshRatio, y = degree, colour = ActTotal, group = n)) +
-  geom_point(size = 0.2) +
-  theme_bw(base_size = 10) +
-  scale_colour_gradient2(name = "Total\nActivity",
-                         high = "#00441b",
-                         mid = "#41ab5d", 
-                         low = "#c7e9c0", 
-                         midpoint = 0.5, 
-                         limits = c(0, 1)) +
-  theme(panel.grid = element_blank(),
-        panel.border = element_rect(size = 1, fill = NA),
-        axis.text = element_text(color = "black"),
-        strip.background = element_blank()) +
-  xlab("Thresold Ratio") +
-  ylab("Degree") +
-  facet_wrap( ~ n, scales = "free_y")
-gg_thresh_degree
-ggsave(filename = "output/NetworkDataPlots/Social_ThreshRatioVsDegree.png", width = 5, height = 4, units = "in", dpi = 600)
-
-gg_FIX_thresh_degree <- ggplot(data = fixed_graphs, 
-                           aes(x = ThreshRatio, y = degree, colour = ActTotal, group = n)) +
-  geom_point(size = 0.2) +
-  theme_bw(base_size = 10) +
-  scale_colour_gradient2(name = "Total\nActivity",
-                         high = "#00441b",
-                         mid = "#41ab5d", 
-                         low = "#c7e9c0", 
-                         midpoint = 0.5, 
-                         limits = c(0, 1)) +
-  theme(panel.grid = element_blank(),
-        panel.border = element_rect(size = 1, fill = NA),
-        axis.text = element_text(color = "black"),
-        strip.background = element_blank()) +
-  scale_x_continuous(breaks = c(-0.05, 0, 0.05)) +
-  xlab("Thresold Ratio") +
-  ylab("Degree") +
-  facet_wrap( ~ n, scales = "free_y")
-gg_FIX_thresh_degree
-ggsave(filename = "output/NetworkDataPlots/Fixed_ThreshRatioVsDegree.png", width = 5, height = 4, units = "in", dpi = 600)
-
-# Comparing activity and degree, colored by threshold ratio
-gg_degree_actRatio <- ggplot(data = social_graphs, 
-                        aes(x = ActRatio, y = degree, colour = ThreshRatioColor, group = n)) +
-  geom_point(size = 0.5) +
-  theme_bw(base_size = 10) +
-  scale_colour_gradient2(name = "Threshold\nRatio",
-                         high = "#d7191c",
-                         mid = "#ffffbf", 
-                         low = "#2c7bb6", 
-                         midpoint = 0, 
-                         limits = c(-1, 1),
-                         oob = squish) +
-  theme(panel.grid = element_blank(),
-        panel.border = element_rect(size = 1, fill = NA)) +
-  xlab("Total Activity Level") +
-  ylab("Total Degree") +
-  facet_wrap( ~ n, scales = "free_y")
-gg_degree_actRatio
-
-# Comparing thresholds
-gg_activity <- ggplot(data = social_graphs, 
-                             aes(x = Task1, y = Task2, color = ThreshRatioColor, group = n)) +
-  geom_point(size = 0.2) +
-  theme_bw(base_size = 10) +
-  theme(panel.grid = element_blank(),
-        panel.border = element_rect(size = 1, fill = NA),
-        axis.text = element_text(color = "black"),
-        strip.background = element_blank()) +
-  scale_colour_gradient2(name = "Threshold\nRatio (ln)",
-                         high = "#d7191c",
-                         mid = "#ffffbf", 
-                         low = "#2c7bb6", 
-                         midpoint = 0, 
-                         limits = c(-1, 1),
-                         oob = squish) +
-  xlab("Task 1") +
-  ylab("Task 2") +
-  facet_wrap( ~ n)
-gg_activity
-ggsave(filename = "output/NetworkDataPlots/Social_TaskPerfVsThreshRatio.png", width = 5, height = 4, units = "in", dpi = 600)
 
 ####################
 # Compare social network features
 ####################
-# Network "dispersion" (? - standard deviation over mean degree)
+
+###### Network "dispersion" (? - standard deviation over mean degree) ###### 
 soc_dispersion <- lapply(soc_graphs, function(graph) {
   # Group size
   n <- nrow(graph)
@@ -241,7 +114,9 @@ dispersion <- dispersion %>%
 dispersionSummary <- dispersion %>% 
   mutate(Model = "Social") %>% 
   group_by(n, Model) %>% 
-  summarise(Dispersion = mean(Dispersion))
+  summarise(Dispersion = mean(Dispersion),
+            DegreeMean = mean(DegreeMean),
+            DegreeSD = mean(DegreeSD))
 
 fixed_dispersion <- lapply(fix_graphs, function(graph) {
   # Group size
@@ -259,7 +134,9 @@ fixed_dispersion <- fixed_dispersion %>%
 fixed_dispersionSummary <- fixed_dispersion %>% 
   mutate(Model = "Fixed") %>% 
   group_by(n, Model) %>% 
-  summarise(Dispersion = mean(Dispersion))
+  summarise(Dispersion = mean(Dispersion),
+            DegreeMean = mean(DegreeMean),
+            DegreeSD = mean(DegreeSD))
 
 dispersionSummary <- rbind(dispersionSummary, fixed_dispersionSummary)
 rm(fixed_dispersion, fixed_dispersionSummary)
@@ -274,7 +151,8 @@ gg_dispersion <- ggplot(data = dispersionSummary, aes(x = n, y = Dispersion, gro
         axis.text = element_text(color = "black")) 
 gg_dispersion
 
-# Network homophily
+
+###### Network homophily ###### 
 weighted_ratios <- lapply(1:length(soc_graphs), function(i) {
   # Social
   # Get graph and thresh matrix for simulation
@@ -284,11 +162,15 @@ weighted_ratios <- lapply(1:length(soc_graphs), function(i) {
   threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
   # Calculate weighted neighbor sum for each individual
   weighted_sum <- graph %*% threshRatio
+  # Calculate weighted neighbor sum for each individual
+  strength <- rowSums(graph)
+  disparity <- rowSums((graph / strength)^2)
   # Construct dataframe to return
   to_return <- data.frame(Id = row.names(weighted_sum), 
                           n = length(weighted_sum),
                           ThreshRatio = threshRatio,
                           WeightNeighbor = weighted_sum,
+                          Disparity = disparity,
                           Model = "Social")
   row.names(to_return) <- NULL
   # Fixed
@@ -299,11 +181,15 @@ weighted_ratios <- lapply(1:length(soc_graphs), function(i) {
   threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
   # Calculate weighted neighbor sum for each individual
   weighted_sum <- graph %*% threshRatio
+  # Calculate weighted neighbor sum for each individual
+  strength <- rowSums(graph)
+  disparity <- rowSums((graph / strength)^2)
   # Construct dataframe to return
   to_return2 <- data.frame(Id = row.names(weighted_sum), 
                           n = length(weighted_sum),
                           ThreshRatio = threshRatio,
                           WeightNeighbor = weighted_sum,
+                          Disparity = disparity,
                           Model = "Fixed")
   row.names(to_return) <- NULL
   # Return
@@ -334,3 +220,16 @@ gg_weighted_corr <- ggplot(data = weighted_summary, aes(x = n, y = CorrelationTh
   theme(aspect.ratio = 1,
         axis.text = element_text(color = "black")) 
 gg_weighted_corr
+
+
+###### Network disparity ###### 
+gg_disparity <- ggplot(data = weighted_ratios, aes(x = ThreshRatio, y = Disparity)) +
+  geom_point(size = 0.2) +
+  theme_classic(base_size = 10) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black"))  +
+  facet_wrap(~n, scales = "free")
+gg_disparity
+
+
+###### Modularity ###### 

@@ -25,9 +25,7 @@ temporalNetwork <- function(X_sub_g, bias) {
       connection <- sample(x = potential, size = 1, prob = baseline_prob)
       g_adj[i, connection] <- 1
       g_adj[connection, i] <- 1
-    }
-    # If active, biased towards individuals in same state
-    else {
+    } else { # If active, biased towards individuals in same state
       # find which individuals are perfoming same task and relatively weight probabilities
       same <- which(X_sub_g[ , task] == 1)
       baseline_prob[same] <- baseline_prob[same] * bias
