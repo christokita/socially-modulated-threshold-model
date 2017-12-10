@@ -22,12 +22,12 @@ reps           <- 30 #number of replications per simulation (for ensemble)
 ThreshM        <- rep(10, m) #population threshold means 
 ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.6, m) #vector of stimuli increase rates  
+deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.00 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.01 #relative weighting of social interactions for adjusting thresholds
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -234,7 +234,7 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma0.05-FIXED-Bias1.1"
+filename <- "Sigma0.05-Epsilon0.01-Bias1.1-Delta0.8"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_thresh,
