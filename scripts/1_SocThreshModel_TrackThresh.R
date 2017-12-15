@@ -15,13 +15,13 @@ source("scripts/__Util__MASTER.R")
 # Base parameters
 Ns             <- c(100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
+gens           <- 30000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.01 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0.0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -29,8 +29,6 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 epsilon        <- 0.01 #relative weighting of social interactions for lowering thresholds #0.01 = epsilon = phi
-phi            <- 0.01 #default forgetting rate of thresholds
-p              <- 0.1 #probability of interacting with individual in other states
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -111,8 +109,7 @@ for (i in 1:length(Ns)) {
       threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
                                           ThresholdMatrix = threshMat, 
                                           X_sub_g = X_g, 
-                                          epsilon = epsilon, 
-                                          phi = phi)
+                                          epsilon = epsilon)
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]
       
@@ -201,7 +198,7 @@ gg_thresh <- ggplot(data = thresh1time,
                          midpoint = 0, 
                          limits = c(-1, 1),
                          oob = squish) +
-  scale_y_continuous(limits = c(4, 16), breaks = seq(0,20, 5)) +
+  # scale_y_continuous(limits = c(4, 16), breaks = seq(0,20, 5)) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
@@ -211,4 +208,4 @@ gg_thresh <- ggplot(data = thresh1time,
         axis.text = element_text(color = "black"))
 gg_thresh
 
-ggsave("output/ThresholdTime/Size100test.png", scale = 0.6, dpi = 600)
+ggsave("output/ThresholdTime/Size100_Sigma0.0_TripleTimeLength.png", scale = 0.6, dpi = 600)

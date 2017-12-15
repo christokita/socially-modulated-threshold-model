@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-filename <- "Sigma005-Eps001-Bias1.1"
+filename <- "Sigma0.05-Eps0.01-Bias1.1"
 
 ####################
 # Compare entropies

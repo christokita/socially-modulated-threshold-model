@@ -20,7 +20,7 @@ ThreshCutoffReplacementColor <- 10
 # Load data
 ####################
 # Load social
-load("output/Rdata/Sigma0.01-Epsilon0.01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.1.Rdata")
 
 soc_graphs <- unlist(groups_graphs, recursive = FALSE)
 soc_threshMat <- unlist(groups_thresh, recursive = FALSE)
@@ -56,7 +56,7 @@ social_graphs <- lapply(1:length(soc_graphs), function(i) {
 social_graphs <- do.call("rbind", social_graphs)
 
 # Load fixed
-load("output/Rdata/Sigma0.01-FIXED-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
 
 fix_graphs <- unlist(groups_graphs, recursive = FALSE)
 fix_threshMat <- unlist(groups_thresh, recursive = FALSE)

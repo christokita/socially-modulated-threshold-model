@@ -4,12 +4,15 @@
 #
 ################################################################################
 
+
+
 g <- g_tot / gens
 diag(g) <- NA
 # Only show edges above 50th percentile
 percentiles <- quantile(g, na.rm = TRUE)
 fiftypercent <- percentiles[3]
-g[g <= fiftypercent] <- 0
+seventyfivepercent <- percentiles[4]
+g[g <= seventyfivepercent] <- 0
 diag(g) <- 0
 
 # Edgelist
@@ -25,8 +28,8 @@ nodelist$Thresh1 <- threshMat[ , 1]
 nodelist$Thresh2 <- threshMat[ , 2]
 nodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])
 
-write.csv(edgelist, file = "output/Networks/GroupSize20edgelist.csv", row.names = FALSE)
-write.csv(nodelist, file = "output/Networks/GroupSize20nodelist.csv", row.names = FALSE)
+write.csv(edgelist, file = "output/Networks/GroupSize100edgelist.csv", row.names = FALSE)
+write.csv(nodelist, file = "output/Networks/GroupSize100nodelist.csv", row.names = FALSE)
 
 # Try plotting with igraph
 library(igraph)
