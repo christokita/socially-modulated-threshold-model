@@ -199,12 +199,14 @@ weighted_ratios <- lapply(1:length(soc_graphs), function(i) {
 })
 weighted_ratios <- do.call("rbind", weighted_ratios)
 
-gg_weighted_ratios <- ggplot(data = weighted_ratios, aes(x = ThreshRatio, y = WeightNeighbor)) +
+test <- weighted_ratios %>% filter(Model == "Fixed")
+
+gg_weighted_ratios <- ggplot(data = test, aes(x = ThreshRatio, y = WeightNeighbor)) +
   geom_point() +
   theme_classic(base_size = 10) +
   theme(aspect.ratio = 1,
         axis.text = element_text(color = "black"))  +
-  facet_wrap(~n, scales = "free")
+  facet_wrap(~n)
 gg_weighted_ratios
 
 weighted_summary <- weighted_ratios %>% 
@@ -220,6 +222,40 @@ gg_weighted_corr <- ggplot(data = weighted_summary, aes(x = n, y = CorrelationTh
   theme(aspect.ratio = 1,
         axis.text = element_text(color = "black")) 
 gg_weighted_corr
+
+
+###### Network assortivity ######
+# From Newmann (2003)
+assortivity <- lapply(1:length(soc_graphs), function(i) {
+  # Social
+  # Get graph and thresh matrix for simulation
+  graph <- soc_graphs[[i]]
+  thresh <- as.data.frame(soc_threshMat[[i]])
+  # Calculate thresh ratio
+  threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+  # Normalize graph
+  norm_graph <- graph / sum(graph)
+  # Calculate
+  sigma_a <- sd(rowSums(norm_graph))
+  pearson <- lapply(1:length(threshRatio), function(n) {
+    x <- threshRatio[n]
+    to_sum <- c()
+    for (m in n:length(threshRatio)) {
+      y <- threshRatio[m]
+      e_xy <- norm_graph[n, m]  #symmetric
+      a_x <- sum(norm_graph[n, ])
+      value <- x * y * (e_xy - 2 * a_x)
+      to_sum <- c(to_sum, value)
+    }
+    sum_value <- sum(to_sum)
+    return(sum_value)
+  })
+  pearson <- sum(unlist(pearson)) / sigma_a / sigma_a
+  
+})
+assortivity <- do.call("rbind", assortivity)
+
+
 
 
 ###### Network disparity ###### 

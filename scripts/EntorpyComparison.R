@@ -16,7 +16,7 @@ filename <- "Sigma0.05-Eps0.01-Bias1.1"
 # Compare entropies
 ####################
 # Load social
-load("output/Rdata/Sigma0.05-Epsilon0.01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.1.Rdata")
 
 entropy <- unlist(groups_entropy, recursive = FALSE)
 entropy <- do.call("rbind", entropy)  %>% 
