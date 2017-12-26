@@ -27,7 +27,7 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.0015 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.0003 #relative weighting of social interactions for adjusting thresholds
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -234,7 +234,7 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma0.0-Epsilon0.0015-Bias1.1"
+filename <- "Sigma0.0-Epsilon0.0003-Bias1.1"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_thresh,

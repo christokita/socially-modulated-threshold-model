@@ -75,7 +75,7 @@ ggsave(filename = "output/SpecializationPlots/Sigma0-Epsilon0.01-BetaSweep.png",
 
 # Epsilon
 entropies <- entropies %>% 
-  filter(Epsilon == -3 | Epsilon <= -2)
+  filter(Epsilon >= -3 & Epsilon <= -2) #remove crowded area of graph between these values
 
 pal <- brewer.pal(9, "YlGnBu")
 pal <- pal[-1]
@@ -93,12 +93,13 @@ gg_entropies <- ggplot(data = entropies, aes(x = n, group = Epsilon, color = Eps
   scale_x_continuous(breaks = unique(entropies$n)) +
   scale_colour_gradientn(name = bquote(epsilon),
                          colours = pal,
-                         breaks = seq(-1, -3, -0.5),
-                         labels = parse(text = paste0("10^", signif(seq(-1, -3, -0.5), digits = 2)))) +
+                         breaks = seq(-1, -4, -0.5),
+                         labels = parse(text = paste0("10^", formatC(seq(-1, -4, -0.5), digits = 2)))) +
   theme(aspect.ratio = 1,
         axis.text = element_text(color = "black"),
         legend.key.width = unit(3, "mm"),
-        legend.title = element_text(size = 14))
+        legend.title = element_text(size = 14),
+        panel.background = element_rect(color = "black"))
 
 gg_entropies
 

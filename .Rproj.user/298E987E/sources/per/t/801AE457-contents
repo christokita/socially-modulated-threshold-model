@@ -1,0 +1,107 @@
+################################################################################
+#
+# Entropy across parameter
+#
+################################################################################
+
+rm(list = ls())
+source("scripts/__Util__MASTER.R")
+library(RColorBrewer)
+library(scales)
+
+file_pattern <- "Sigma0.0-.*-Bias1.1.Rdata"
+
+####################
+# Load Data
+####################
+# List files 
+potential_file <- list.files("output/Rdata/", full.names = T)
+file_list <- potential_file[grepl(pattern = file_pattern, x = potential_file)]
+
+####################
+# Process and Bind
+####################
+entropies <- lapply(file_list, function(file) {
+  # Load and grab interaction and bias strength
+  load(file)
+  bias <- gsub(pattern = ".*Bias([0-9\\.]+)\\.Rdata", x = file, replacement = "\\1")
+  epsilon <- gsub(pattern = ".*Epsilon([0-9\\.]+).*", x = file, replacement = "\\1")
+  # Process
+  entropy <- unlist(groups_entropy, recursive = FALSE)
+  entropy <- do.call("rbind", entropy)  %>% 
+    mutate(set = paste(n, replicate, sep = "-"))%>% 
+    select(-Dsym, -Dtask) %>% 
+    filter(n != 1) %>% 
+    group_by(n) %>% 
+    summarise(Mean = mean(Dind),
+              SE = sd(Dind) / sqrt(length(Dind))) %>% 
+    mutate(Model = "Social",
+           Epsilon = log10(as.numeric(epsilon)),
+           Beta = as.numeric(bias)) 
+  # Return
+  return(entropy)
+})
+entropies <- do.call("rbind", entropies)
+
+
+####################
+# Plot
+####################
+# Beta
+pal <- brewer.pal(9, "PuRd")
+pal <- pal[-1]
+
+gg_entropies <- ggplot(data = entropies, aes(x = n, group = Beta, color = Beta)) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                width = 0.7) +
+  geom_line(aes(y = Mean)) +
+  geom_point(aes(y = Mean), 
+             size = 2) +
+  theme_classic(base_size = 10) +
+  ylab("DOL Entropy") +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(breaks = unique(entropies$n)) +
+  scale_colour_gradientn(name = bquote(beta),
+                         colours = pal) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black"),
+        legend.key.width = unit(3, "mm"),
+        legend.title = element_text(size = 14))
+
+gg_entropies
+
+ggsave(filename = "output/SpecializationPlots/Sigma0-Epsilon0.01-BetaSweep.png", width = 3.5, height = 3, dpi = 600)
+
+# Epsilon
+entropies <- entropies %>% 
+  filter(Epsilon >= -3 & Epsilon <= -2) #remove crowded area of graph between these values
+
+pal <- brewer.pal(9, "YlGnBu")
+pal <- pal[-1]
+
+gg_entropies <- ggplot(data = entropies, aes(x = n, group = Epsilon, color = Epsilon)) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                width = 0.7) +
+  geom_line(aes(y = Mean)) +
+  geom_point(aes(y = Mean), 
+             size = 2) +
+  theme_classic(base_size = 10) +
+  ylab("DOL Entropy") +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = seq(0, 1, 0.2)) +
+  scale_x_continuous(breaks = unique(entropies$n)) +
+  scale_colour_gradientn(name = bquote(epsilon),
+                         colours = pal,
+                         breaks = seq(-1, -4, -0.5),
+                         labels = parse(text = paste0("10^", formatC(seq(-1, -4, -0.5), digits = 2)))) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black"),
+        legend.key.width = unit(3, "mm"),
+        legend.title = element_text(size = 14),
+        panel.background = element_rect(color = "black"))
+
+gg_entropies
+
+ggsave(filename = "output/SpecializationPlots/Sigma0-Bias1.1-EpsilonSweep.png", width = 3.5, height = 3, dpi = 600)
+

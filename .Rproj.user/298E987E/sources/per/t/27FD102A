@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1513831538739.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1669913106",
+    "id" : "27FD102A",
+    "lastKnownWriteTime" : 1513823746,
+    "last_content_update" : 1513823746,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/EntorpyComparison.R",
+    "project_path" : "scripts/EntorpyComparison.R",
+    "properties" : {
+        "cursorPosition" : "28,26",
+        "scrollLine" : "7"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
