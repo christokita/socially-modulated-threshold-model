@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 library(igraph)
 
-filename <- "Sigma0.0-Eps0.01--Bias1.1"
+filename <- "Sigma0.05-Eps0.01--Bias1.1"
 
 # Cutoff for threshold ratio to allow easier plotting
 ThreshCutoffValue <- 10
@@ -292,13 +292,51 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
     thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
     ratio <- order(thresh$ThreshRatio)
     # Create order by threshold ratio
-    g <- g[rev(ratio) , ratio]
+    g <- g[ratio, ratio]
     # return
     return(g)
   })
   # Avearge across all to make 'typical' adjacency matrix
   avg_g <- Reduce("+", size_graph) / length(size_graph)
+  # Create graph object
+  g <- scale(avg_g)
+  g <- graph_from_adjacency_matrix(g, mode = c("directed"), weighted = TRUE, diag = TRUE)
+  # Get node and edge list
+  node_list <- get.data.frame(g, what = "vertices")
+  edge_list <- get.data.frame(g, what = "edges")
+  # Create dataframe for plotting
+  plot_data <- edge_list %>% mutate(
+    to = factor(to, levels = node_list$name),
+    from = factor(from, levels = node_list$name))
+  # Plot
+  groupsize <- ncol(avg_g)
+  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
+    geom_raster() +
+    theme_bw() +
+    # Because we need the x and y axis to display every node,
+    # not just the nodes that have connections to each other,
+    # make sure that ggplot does not drop unused factor levels
+    scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
+    scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
+    # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
+    scale_fill_gradientn(name = "Relative Interaction\nFrequency",
+                         colours = brewer.pal(9,"BuPu"), 
+                         na.value = "white", 
+                         limit = c(-1, 1), 
+                         oob = squish) +
+    theme(axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title = element_blank(),
+      aspect.ratio = 1,
+      # Hide the legend (optional)
+      legend.position = "none",
+      panel.border = element_rect(size = 1)) +
+    ggtitle(paste0("Group Size = ", groupsize))
+  # return graph
+  return(gg_avg_adj)
 })
+
+
 
 
 # Testing whatever here
@@ -324,6 +362,7 @@ edge_list <- get.data.frame(g, what = "edges") %>%
   inner_join(node_list %>% select(name, membership), by = c("to" = "name")) %>%
   mutate(group = ifelse(membership.x == membership.y, membership.x, NA) %>% factor())
 
+name_order <- node_list$name
 
 name_order <- (node_list %>% arrange(ThreshRatio))$name
 
@@ -333,14 +372,14 @@ plot_data <- edge_list %>% mutate(
   to = factor(to, levels = name_order),
   from = factor(from, levels = name_order))
 
-ggplot(plot_data, aes(x = from, y = to, fill = group)) +
+ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
   geom_raster() +
   theme_bw() +
   # Because we need the x and y axis to display every node,
   # not just the nodes that have connections to each other,
   # make sure that ggplot does not drop unused factor levels
-  scale_x_discrete(drop = FALSE) +
-  scale_y_discrete(drop = FALSE) +
+  scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
+  scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
   # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
   scale_fill_gradientn(name = "Relative Interaction\nFrequency",
     colours = brewer.pal(9,"BuPu"), 

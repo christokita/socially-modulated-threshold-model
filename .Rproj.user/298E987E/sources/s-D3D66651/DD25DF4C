@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1516141072486.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DD25DF4C",
+    "lastKnownWriteTime" : 1495768004,
+    "last_content_update" : 1495768004,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/__Util__ResamplingCIFunctions.R",
+    "project_path" : "scripts/__Util__ResamplingCIFunctions.R",
+    "properties" : {
+        "cursorPosition" : "6,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
