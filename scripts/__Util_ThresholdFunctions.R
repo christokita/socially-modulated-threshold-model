@@ -89,8 +89,8 @@ calcThresholdDetermSocial <- function(TimeStep, ThresholdMatrix, StimulusMatrix,
 ####################
 adjustThresholdsSocial <- function(SocialNetwork, ThresholdMatrix, X_sub_g, epsilon) {
   # Calculate "sum" of task states/probs of neighbors
-  NeighborSums <- t(SocialNetwork) %*% X_sub_g
-  totalSums <- rowSums(NeighborSums)
+  NeighborSums <- t(SocialNetwork) %*% X_sub_g #active neighbors by category
+  totalSums <- rowSums(NeighborSums) #total active neighbors
   # Loop through individuals
   for (i in 1:nrow(X_sub_g)) {
     for (j in 1:ncol(X_sub_g)) {

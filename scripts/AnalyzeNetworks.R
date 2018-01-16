@@ -273,14 +273,16 @@ gg_disparity
 ###### Clustering Coefficient ###### 
 
 # Testing whatever here
-look <- soc_graphs[[230]]
-diag(look) <- NA
-look <- scale(look)
-g <- graph_from_adjacency_matrix(look, mode = c("directed"), weighted = TRUE, diag = TRUE)
+g <- soc_graphs[[230]]
+diag(g) <- NA
+g <- scale(g)
+g <- graph_from_adjacency_matrix(g, mode = c("directed"), weighted = TRUE, diag = TRUE)
 
 test <- spinglass.community(g, weights = E(g)$weight)
 
 V(g)$membership <- test$membership
+thresh <- as.data.frame(soc_threshMat[[230]])
+V(g)$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
 
 
 node_list <- get.data.frame(g, what = "vertices")
@@ -294,7 +296,7 @@ edge_list <- get.data.frame(g, what = "edges") %>%
   mutate(group = ifelse(membership.x == membership.y, membership.x, NA) %>% factor())
 
 
-name_order <- (node_list %>% arrange(membership))$name
+name_order <- (node_list %>% arrange(ThreshRatio))$name
 
 plot_data <- edge_list %>% mutate(
   to = factor(to, levels = name_order),
@@ -309,7 +311,7 @@ ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
   scale_x_discrete(drop = FALSE) +
   scale_y_discrete(drop = FALSE) +
   # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
-  scale_fill_gradientn(colours = brewer.pal(9,"BuPu"), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
+  scale_fill_gradientn(colours = brewer.pal(9,"BuPu"), na.value = "white", limit = c(-1, 1), oob = squish) +
   theme(
     # Rotate the x-axis lables so they are legible
     axis.text.x = element_text(angle = 270, hjust = 0, size = 2),

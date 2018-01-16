@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "2431182199",
+    "hash" : "1817374067",
     "id" : "1ED03B7",
-    "lastKnownWriteTime" : 1512682903,
-    "last_content_update" : 1512682903,
+    "lastKnownWriteTime" : 1516113396,
+    "last_content_update" : 1516113396009,
     "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/__Util_ThresholdFunctions.R",
     "project_path" : "scripts/__Util_ThresholdFunctions.R",
     "properties" : {
-        "cursorPosition" : "89,76",
-        "scrollLine" : "0"
+        "cursorPosition" : "91,76",
+        "scrollLine" : "84"
     },
     "relative_order" : 3,
     "source_on_save" : false,
