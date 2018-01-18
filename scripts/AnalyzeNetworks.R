@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 library(igraph)
 
-filename <- "Sigma0.05-Eps0.01--Bias1.1"
+filename <- "Sigma0.0-Epsilon0.01-Bias1.05"
 
 # Cutoff for threshold ratio to allow easier plotting
 ThreshCutoffValue <- 10
@@ -21,7 +21,7 @@ ThreshCutoffReplacementColor <- 10
 # Load data
 ####################
 # Load social
-load("output/Rdata/Sigma0.05-Epsilon0.01-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.05.Rdata")
 
 soc_groups_graphs <- groups_graphs
 soc_groups_threshMat <- groups_thresh
@@ -284,23 +284,29 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
   # Get graph and make adjacency matrix
   size_graph <- lapply(1:length(graphs), function(j) {
     # Format: set diagonal, rescale, and make adj matrix
-    g <- graphs[[j]]
-    diag(g) <- NA
+    this_graph <- graphs[[j]]
+    diag(this_graph) <- NA
+    dimensions <- dim(this_graph)
+    labs <- colnames(this_graph)
+    this_graph <- as.vector(this_graph)
+    this_graph <- scale(this_graph)
+    this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
+    colnames(this_graph) <- labs
+    rownames(this_graph) <- labs
     # Calculate thresh ratio
     ind <- replicates * i + j
     thresh <- as.data.frame(soc_groups_threshMat[[i]][j])
     thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
     ratio <- order(thresh$ThreshRatio)
     # Create order by threshold ratio
-    g <- g[ratio, ratio]
+    this_graph <- this_graph[ratio, ratio]
     # return
-    return(g)
+    return(this_graph)
   })
   # Avearge across all to make 'typical' adjacency matrix
   avg_g <- Reduce("+", size_graph) / length(size_graph)
   # Create graph object
-  g <- scale(avg_g)
-  g <- graph_from_adjacency_matrix(g, mode = c("directed"), weighted = TRUE, diag = TRUE)
+  g <- graph_from_adjacency_matrix(avg_g, mode = c("directed"), weighted = TRUE, diag = TRUE)
   # Get node and edge list
   node_list <- get.data.frame(g, what = "vertices")
   edge_list <- get.data.frame(g, what = "edges")
@@ -320,9 +326,9 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
     scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
     # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
-                         colours = brewer.pal(9,"BuPu"), 
+                         colours = brewer.pal(5,"BuPu"), 
                          na.value = "white", 
-                         limit = c(-1, 1), 
+                         limit = c(-0.5, 0.5),
                          oob = squish) +
     theme(axis.text = element_blank(),
       axis.ticks = element_blank(),
@@ -330,17 +336,26 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
       aspect.ratio = 1,
       # Hide the legend (optional)
       legend.position = "none",
-      panel.border = element_rect(size = 1)) +
+      panel.border = element_rect(size = 1.5), 
+      title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
   return(gg_avg_adj)
+  # return(avg_g)
 })
+
+png(filename = paste0("output/Networks/IntMat_", filename, ".png"), width = 5, height = 2.5, units = "in", res = 600)
+multiplot(plotlist = interaction_graphs, layout = matrix(c(seq(1:length(interaction_graphs))), nrow=2, byrow=TRUE))
+dev.off()
+
+
+
 
 
 
 
 # Testing whatever here
-g <- soc_graphs[[120]]
+g <- soc_graphs[[2]]
 diag(g) <- NA
 g <- scale(g)
 g <- graph_from_adjacency_matrix(g, mode = c("directed"), weighted = TRUE, diag = TRUE)
