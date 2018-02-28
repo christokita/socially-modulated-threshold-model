@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 library(igraph)
 
-filename <- "Sigma0.0-Epsilon0.01-Bias1.05"
+filename <- "Sigma0.0-Epsilon0.01-Bias1.1"
 
 # Cutoff for threshold ratio to allow easier plotting
 ThreshCutoffValue <- 10
@@ -21,7 +21,7 @@ ThreshCutoffReplacementColor <- 10
 # Load data
 ####################
 # Load social
-load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.05.Rdata")
+load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.1.Rdata")
 
 soc_groups_graphs <- groups_graphs
 soc_groups_threshMat <- groups_thresh
@@ -62,6 +62,8 @@ social_graphs <- do.call("rbind", social_graphs)
 # Load fixed
 load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
 
+fix_groups_graphs <- groups_graphs
+fix_groups_threshMat <- groups_thresh
 fix_graphs <- unlist(groups_graphs, recursive = FALSE)
 fix_threshMat <- unlist(groups_thresh, recursive = FALSE)
 fix_actMat <- unlist(groups_taskDist, recursive = FALSE)
@@ -276,9 +278,12 @@ gg_disparity
 
 ###### Interaction Matrix Plot ###### 
 
-interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
+type_groups_graphs <- fix_groups_graphs
+type_groups_threshMat <- fix_groups_threshMat
+
+interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
   # Get graphs
-  graphs <- soc_groups_graphs[[i]]
+  graphs <- type_groups_graphs[[i]]
   replicates <- length(graphs)
   # For each each compute interaction matrix
   # Get graph and make adjacency matrix
@@ -294,8 +299,8 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
     colnames(this_graph) <- labs
     rownames(this_graph) <- labs
     # Calculate thresh ratio
-    ind <- replicates * i + j
-    thresh <- as.data.frame(soc_groups_threshMat[[i]][j])
+    # ind <- replicates * i + j
+    thresh <- as.data.frame(type_groups_threshMat[[i]][j])
     thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
     ratio <- order(thresh$ThreshRatio)
     # Create order by threshold ratio
@@ -316,7 +321,7 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
     from = factor(from, levels = node_list$name))
   # Plot
   groupsize <- ncol(avg_g)
-  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
+  gg_avg_adj <- ggplot(plot_data, aes(x = rev(from), y = to, fill = weight)) +
     geom_raster() +
     theme_bw() +
     # Because we need the x and y axis to display every node,
@@ -336,7 +341,7 @@ interaction_graphs <- lapply(1:length(soc_groups_graphs), function(i) {
       aspect.ratio = 1,
       # Hide the legend (optional)
       legend.position = "none",
-      panel.border = element_rect(size = 1.5), 
+      panel.border = element_rect(size = 1.5),
       title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
@@ -348,63 +353,16 @@ png(filename = paste0("output/Networks/IntMat_", filename, ".png"), width = 5, h
 multiplot(plotlist = interaction_graphs, layout = matrix(c(seq(1:length(interaction_graphs))), nrow=2, byrow=TRUE))
 dev.off()
 
+# Subset of graphs plot for figure
+png(filename = paste0("output/Networks/FIGURE_IntMat_", filename, ".png"), width = 5, height = 2.5, units = "in", res = 600)
+multiplot(plotlist = interaction_graphs[c(1, 2, 5, 8)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
+dev.off()
 
 
-
-
-
-
-# Testing whatever here
-g <- soc_graphs[[2]]
-diag(g) <- NA
-g <- scale(g)
-g <- graph_from_adjacency_matrix(g, mode = c("directed"), weighted = TRUE, diag = TRUE)
-
-test <- spinglass.community(g, weights = E(g)$weight)
-
-V(g)$membership <- test$membership
-thresh <- as.data.frame(soc_threshMat[[120]])
-V(g)$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-
-
-node_list <- get.data.frame(g, what = "vertices")
-
-# Determine a community for each edge. If two nodes belong to the
-# same community, label the edge with that community. If not,
-# the edge community value is 'NA'
-edge_list <- get.data.frame(g, what = "edges") %>%
-  inner_join(node_list %>% select(name, membership), by = c("from" = "name")) %>%
-  inner_join(node_list %>% select(name, membership), by = c("to" = "name")) %>%
-  mutate(group = ifelse(membership.x == membership.y, membership.x, NA) %>% factor())
-
-name_order <- node_list$name
-
-name_order <- (node_list %>% arrange(ThreshRatio))$name
-
-name_order <- (node_list %>% arrange(membership))$name
-
-plot_data <- edge_list %>% mutate(
-  to = factor(to, levels = name_order),
-  from = factor(from, levels = name_order))
-
-ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
-  geom_raster() +
-  theme_bw() +
-  # Because we need the x and y axis to display every node,
-  # not just the nodes that have connections to each other,
-  # make sure that ggplot does not drop unused factor levels
-  scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
-  scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
-  # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
-  scale_fill_gradientn(name = "Relative Interaction\nFrequency",
-    colours = brewer.pal(9,"BuPu"), 
-    na.value = "white", 
-    limit = c(-1, 1), 
-    oob = squish) +
-  theme(
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    aspect.ratio = 1,
-    # Hide the legend (optional)
-    legend.position = "top")
+###### Distribution of degree ###### 
+degree_dist <- lapply(1:length(soc_groups_graphs), function(i) {
+  # Get graphs
+  graphs <- soc_groups_graphs[[i]]
+  replicates <- length(graphs)
+  
+})
