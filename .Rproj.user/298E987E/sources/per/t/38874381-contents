@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 library(igraph)
 
-filename <- "Sigma0.05-FIXED-Bias1.1"
+filename <- "Sigma0.0-Epsilon0.01-Bias1.1"
 
 # Cutoff for threshold ratio to allow easier plotting
 ThreshCutoffValue <- 10
@@ -60,7 +60,7 @@ social_graphs <- lapply(1:length(soc_graphs), function(i) {
 social_graphs <- do.call("rbind", social_graphs)
 
 # Load fixed
-load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.01-FIXED-Bias1.1.Rdata")
 
 fix_groups_graphs <- groups_graphs
 fix_groups_threshMat <- groups_thresh
@@ -278,8 +278,8 @@ gg_disparity
 
 ###### Interaction Matrix Plot ###### 
 
-type_groups_graphs <- fix_groups_graphs
-type_groups_threshMat <- fix_groups_threshMat
+type_groups_graphs <- soc_groups_graphs
+type_groups_threshMat <- soc_groups_threshMat
 
 interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
   # Get graphs
@@ -340,7 +340,8 @@ interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
       axis.title = element_blank(),
       aspect.ratio = 1,
       # Hide the legend (optional)
-      legend.position = "none",
+      legend.position = "right",
+      legend.key.height = units(2, "in"),
       panel.border = element_rect(size = 1.5),
       title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
@@ -354,8 +355,8 @@ multiplot(plotlist = interaction_graphs, layout = matrix(c(seq(1:length(interact
 dev.off()
 
 # Subset of graphs plot for figure
-svg(filename = paste0("output/Networks/FIGURE_IntMat_", filename, ".svg"), width = 5, height = 1, units = "in", res = 600)
-multiplot(plotlist = interaction_graphs[c(1, 2, 5, 8)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
+png(filename = paste0("output/Networks/FIGURE_IntMat_Single", filename, ".png"), width = 2, height = 2, units = "in", res = 600)
+multiplot(plotlist = interaction_graphs[c(7)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
 dev.off()
 
 
