@@ -10,11 +10,11 @@ library(scales)
 
 
 # Load social
-load("output/Rdata/Sigma0.01-FIXED-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.1.Rdata")
 
 
-g <- groups_graphs[[6]][[1]]
-threshMat <- groups_thresh[[6]][[1]]
+g <- groups_graphs[[7]][[1]]
+threshMat <- groups_thresh[[7]][[1]]
 
 
 diag(g) <- NA
@@ -34,15 +34,20 @@ edgelist$Weight <- E(graph)$weight
 
 # Nodelist
 nodelist <- data.frame(Id = rownames(threshMat))
-nodelist$Thresh1 <- threshMat[ , 1]
-nodelist$Thresh2 <- threshMat[ , 2]
-nodelist$ThreshRatio <- log(threshMat[ , 1] / threshMat[ , 2])
+nodelist <- nodelist %>% 
+  mutate(Thresh1 = threshMat[ , 1],
+         Thresh2 = threshMat[ , 2],
+         ThreshRatio = log(threshMat[ , 1] / threshMat[ , 2])) %>% 
+  arrange(ThreshRatio) %>% 
+  mutate(ThreshRatioRank = seq(1:length(ThreshRatio))) %>% 
+  arrange(Id)
 nodelist$ThreshRatioBounded <- nodelist$ThreshRatio
 nodelist$ThreshRatioBounded[nodelist$ThreshRatioBounded < -0.5] <- -0.5 
 nodelist$ThreshRatioBounded[nodelist$ThreshRatioBounded > 0.5] <- 0.5 
 
-write.csv(edgelist, file = "output/Networks/GroupSize50FIXEDedgelist.csv", row.names = FALSE)
-write.csv(nodelist, file = "output/Networks/GroupSize50FIXEDnodelist.csv", row.names = FALSE)
+
+write.csv(edgelist, file = "output/Networks/GroupSize70edgelist.csv", row.names = FALSE)
+write.csv(nodelist, file = "output/Networks/GroupSize70nodelist.csv", row.names = FALSE)
 
 # Try plotting with igraph
 library(igraph)

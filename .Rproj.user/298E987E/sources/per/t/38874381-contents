@@ -331,7 +331,8 @@ interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
     scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
     # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
-                         colours = brewer.pal(5,"BuPu"), 
+                         # colours = brewer.pal(5,"BuPu"), 
+                         colours = c(brewer.pal(4, "PRGn")[1:2], "#ffffff", brewer.pal(4, "PRGn")[3:4]),
                          na.value = "white", 
                          limit = c(-0.5, 0.5),
                          oob = squish) +
@@ -340,8 +341,8 @@ interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
       axis.title = element_blank(),
       aspect.ratio = 1,
       # Hide the legend (optional)
-      legend.position = "right",
-      legend.key.height = units(2, "in"),
+      legend.position = "none",
+      legend.key.height = unit(2, "in"),
       panel.border = element_rect(size = 1.5),
       title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))

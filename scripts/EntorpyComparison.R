@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-filename <- "Sigma0.05-Eps0.01-Bias1.1"
+filename <- "Sigma0.05AndSigma0.01-Eps0.01-Bias1.1"
 
 ####################
 # Compare entropies
@@ -29,7 +29,7 @@ entropy <- do.call("rbind", entropy)  %>%
   mutate(Model = "Social")
 
 # Load non-social
-load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
+load("output/Rdata/Sigma0.01-FIXED-Bias1.1.Rdata")
 
 entropy1 <- unlist(groups_entropy, recursive = FALSE)
 entropy1 <- do.call("rbind", entropy1)  %>% 
@@ -39,33 +39,58 @@ entropy1 <- do.call("rbind", entropy1)  %>%
   group_by(n) %>% 
   summarise(Mean = mean(Dind),
             SE = sd(Dind) / sqrt(length(Dind))) %>% 
-  mutate(Model = "Fixed")
+  mutate(Model = "Fixed_0.01")
+
+# Load non-social
+load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
+
+entropy2 <- unlist(groups_entropy, recursive = FALSE)
+entropy2 <- do.call("rbind", entropy2)  %>% 
+  mutate(set = paste(n, replicate, sep = "-"))%>% 
+  select(-Dsym, -Dtask) %>% 
+  filter(n != 1) %>% 
+  group_by(n) %>% 
+  summarise(Mean = mean(Dind),
+            SE = sd(Dind) / sqrt(length(Dind))) %>% 
+  mutate(Model = "Fixed_0.05")
 
 # Join
 entropy <- rbind(entropy, entropy1)
+entropy <- rbind(entropy, entropy2)
 
 ####################
 # Plot
 ####################
-gg_entropy <- ggplot(data = entropy, aes(x = n, group = Model)) +
+gg_entropy <- ggplot(data = entropy, aes(x = n, group = Model, color = Model, linetype = Model)) +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE, color = Model), 
                 width = 0.7) +
-  geom_line(aes(y = Mean, color = Model, linetype = Model)) +
-  geom_point(aes(y = Mean, color = Model), 
+  geom_line(aes(y = Mean)) +
+  geom_point(aes(y = Mean), 
              size = 2) +
   theme_classic(base_size = 10) +
   ylab("DOL Entropy") +
   scale_y_continuous(limits = c(0, 1),
                      breaks = seq(0, 1, 0.2)) +
   scale_x_continuous(breaks = unique(entropy$n)) +
-  scale_color_manual(values = c("black", "mediumseagreen")) +
-  scale_linetype_manual(values = c("dashed", "solid")) +
-  theme(aspect.ratio = 1,
-        axis.text = element_text(color = "black"))
+  scale_color_manual(name = "Model",
+                     values = c("black", "black", "mediumseagreen"), 
+                     label = c(bquote("Fixed, " ~ sigma ~ "= 0.01"), bquote("Fixed, " ~ sigma ~ "= 0.05"), "Social")) +
+  scale_linetype_manual(name = "Model",
+                        values = c("dashed", "dotted", "solid"),
+                        label = c(bquote("Fixed, " ~ sigma ~ "= 0.01"), bquote("Fixed, " ~ sigma ~ "= 0.05"), "Social")) +
+  theme(legend.position = "right",
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 8),
+        legend.key.width = unit(0.8, "cm"),
+        legend.key.height = unit(0.4, "cm"),
+        axis.text.y = element_text(size = 10, margin = margin(5, 6, 5, -2), color = "black"),
+        axis.text.x = element_text(size = 10, margin = margin(6, 5, -2, 5), color = "black"),
+        axis.title = element_text(size = 11, margin = margin(0, 0, 0, 0)),
+        aspect.ratio = 1)
 
 gg_entropy
 
-ggsave(gg_entropy, file = paste0("output/SpecializationPlots/", filename, ".png"), height = 3, width = 3.5, units = "in", dpi = 800)
+ggsave(gg_entropy, file = paste0("output/SpecializationPlots/", filename, ".png"), height = 3, width = 4.5, units = "in", dpi = 800)
 
 
 ####################

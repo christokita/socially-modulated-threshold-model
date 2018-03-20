@@ -20,14 +20,14 @@ reps           <- 30 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.0 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0.0003 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
