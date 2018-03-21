@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1521652644168.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B1CD94D6",
+    "lastKnownWriteTime" : 63642825392134,
+    "last_content_update" : 1521652644168,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "C1C4CFC6",
+        "caption" : "all_edgelist",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=all_edgelist&cache_key=C1C4CFC6",
+        "displayedObservations" : "48000",
+        "environment" : "",
+        "object" : "all_edgelist",
+        "preview" : "0",
+        "totalObservations" : "48000",
+        "variables" : "5"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
