@@ -294,7 +294,8 @@ interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
     dimensions <- dim(this_graph)
     labs <- colnames(this_graph)
     this_graph <- as.vector(this_graph)
-    this_graph <- scale(this_graph)
+    # this_graph <- scale(this_graph) # normalize relative to the average
+    this_graph <- this_graph / ( (2 * 1 / (dimensions[1] - 1))  + (1 / (dimensions[1] - 1))^2) #relative to expected by random
     this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
     colnames(this_graph) <- labs
     rownames(this_graph) <- labs
@@ -334,7 +335,8 @@ interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
                          # colours = brewer.pal(5,"BuPu"), 
                          colours = c(brewer.pal(4, "PRGn")[1:2], "#ffffff", brewer.pal(4, "PRGn")[3:4]),
                          na.value = "white", 
-                         limit = c(-0.5, 0.5),
+                         # limit = c(-0.5, 0.5),
+                         limit = c(0.95, 1.05),
                          oob = squish) +
     theme(axis.text = element_blank(),
       axis.ticks = element_blank(),
