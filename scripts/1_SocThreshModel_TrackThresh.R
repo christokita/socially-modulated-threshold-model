@@ -13,7 +13,7 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(100) #vector of number of individuals to simulate
+Ns             <- c(50) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 30000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
@@ -21,7 +21,7 @@ reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.0 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -134,7 +134,7 @@ row.names(thresh1time) <- NULL
 thresh1time <- as.data.frame(thresh1time)
 thresh1time <- thresh1time %>% 
   mutate(t = 0:(nrow(.)-1)) %>% 
-  gather("Id", "Threshold", 1:100)
+  gather("Id", "Threshold", 1:50)
 
 threshMat <- threshMat %>% 
   as.data.frame(.) %>% 
@@ -143,8 +143,6 @@ threshMat <- threshMat %>%
   select(-Thresh1, -Thresh2)
 
 thresh1time <- merge(thresh1time, threshMat, by = "Id")
-thresh1time$ThreshRatio[thresh1time$ThreshRatio > 10] <- 10
-thresh1time$ThreshRatio[thresh1time$ThreshRatio < -10] <- -10
 
 
 # base_breaks_x <- function(x){
@@ -198,7 +196,7 @@ gg_thresh <- ggplot(data = thresh1time,
                          midpoint = 0, 
                          limits = c(-1, 1),
                          oob = squish) +
-  # scale_y_continuous(limits = c(4, 16), breaks = seq(0,20, 5)) +
+  # scale_y_continuous(limits = c(0, 20), breaks = seq(0,20, 5)) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
