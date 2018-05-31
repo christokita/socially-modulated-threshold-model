@@ -14,20 +14,20 @@ source("scripts/__Util__MASTER.R")
 # Base parameters
 Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
+gens           <- 30000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
-reps           <- 30 #number of replications per simulation (for ensemble)
+reps           <- 10 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.01 #relative weighting of social interactions for adjusting thresholds
 q              <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -234,7 +234,7 @@ if(1 %in% Ns) {
   groups_taskCorr <- groups_taskCorr[-1]
 }
 
-filename <- "Sigma0.0-Epsilon0.0003-Bias1.1"
+filename <- "Sigma0.0-Epsilon0.01-Bias1.1_LongRun"
 
 save(groups_entropy, groups_stim, groups_taskCorr, groups_taskDist, groups_graphs,
      groups_taskStep, groups_taskTally, groups_thresh,
