@@ -1,0 +1,504 @@
+################################################################################
+#
+# Analyze Networks of Social Interactions
+#
+################################################################################
+
+rm(list = ls())
+source("scripts/__Util__MASTER.R")
+library(RColorBrewer)
+library(scales)
+library(igraph)
+
+filename <- "Sigma0.0-Epsilon0.01-Bias1.1"
+
+# Cutoff for threshold ratio to allow easier plotting
+ThreshCutoffValue <- 10
+ThreshCutoffReplacement <- Inf
+ThreshCutoffReplacementColor <- 10
+
+####################
+# Load data
+####################
+# Load social
+load("output/Rdata/Sigma0.0-Epsilon0.01-Bias1.1.Rdata")
+
+soc_groups_graphs <- groups_graphs
+soc_groups_threshMat <- groups_thresh
+soc_graphs <- unlist(groups_graphs, recursive = FALSE)
+soc_threshMat <- unlist(groups_thresh, recursive = FALSE)
+soc_actMat <- unlist(groups_taskDist, recursive = FALSE)
+
+social_graphs <- lapply(1:length(soc_graphs), function(i) {
+  # Calculated degree
+  degree <- rowSums(soc_graphs[[i]])
+  degree <- as.data.frame(degree)
+  degree$Id <- row.names(degree)
+  # Calculate thresholds
+  thresh <- soc_threshMat[[i]] %>% 
+    as.data.frame(.) %>% 
+    mutate(ThreshRatio = log(Thresh1 / Thresh2),
+           Id = row.names(.)) %>% 
+    mutate(ThreshRatioRaw = ThreshRatio)
+  thresh$ThreshRatio[thresh$ThreshRatio > ThreshCutoffValue] <- ThreshCutoffReplacement
+  thresh$ThreshRatio[thresh$ThreshRatio < -ThreshCutoffValue] <- -ThreshCutoffReplacement
+  thresh$ThreshRatioColor <- thresh$ThreshRatio
+  thresh$ThreshRatioColor[thresh$ThreshRatio > ThreshCutoffValue] <- ThreshCutoffReplacementColor
+  thresh$ThreshRatioColor[thresh$ThreshRatio < -ThreshCutoffValue] <- -ThreshCutoffReplacementColor
+  # Calculate actibity
+  activity <- soc_actMat[[i]] %>% 
+    as.data.frame(.) %>% 
+    mutate(ActRatio = log(Task1 / Task2),
+           ActTotal = Task1 + Task2,
+           Id = row.names(.))
+  # Merge and return
+  mergedNodes <- merge(degree, thresh)
+  mergedNodes <- merge(mergedNodes, activity)
+  return(mergedNodes)
+})
+
+social_graphs <- do.call("rbind", social_graphs)
+
+# Load fixed
+load("output/Rdata/Sigma0.05-FIXED-Bias1.1.Rdata")
+
+fix_groups_graphs <- groups_graphs
+fix_groups_threshMat <- groups_thresh
+fix_graphs <- unlist(groups_graphs, recursive = FALSE)
+fix_threshMat <- unlist(groups_thresh, recursive = FALSE)
+fix_actMat <- unlist(groups_taskDist, recursive = FALSE)
+
+fixed_graphs <- lapply(1:length(fix_graphs), function(i) {
+  # Calculated degree
+  degree <- rowSums(fix_graphs[[i]])
+  degree <- as.data.frame(degree)
+  degree$Id <- row.names(degree)
+  # Calculate thresholds
+  thresh <- fix_threshMat[[i]] %>% 
+    as.data.frame(.) %>% 
+    mutate(ThreshRatio = log(Thresh1 / Thresh2),
+           Id = row.names(.)) %>% 
+    mutate(ThreshRatioRaw = ThreshRatio)
+  thresh$ThreshRatio[thresh$ThreshRatio > ThreshCutoffValue] <- ThreshCutoffReplacement
+  thresh$ThreshRatio[thresh$ThreshRatio < -ThreshCutoffValue] <- -ThreshCutoffReplacement
+  thresh$ThreshRatioColor <- thresh$ThreshRatio
+  thresh$ThreshRatioColor[thresh$ThreshRatio > ThreshCutoffValue] <- ThreshCutoffReplacementColor
+  thresh$ThreshRatioColor[thresh$ThreshRatio < -ThreshCutoffValue] <- -ThreshCutoffReplacementColor
+  # Calculate actibity
+  activity <- fix_actMat[[i]] %>% 
+    as.data.frame(.) %>% 
+    mutate(ActRatio = log(Task1 / Task2),
+           ActTotal = Task1 + Task2,
+           Id = row.names(.))
+  # Merge and return
+  mergedNodes <- merge(degree, thresh)
+  mergedNodes <- merge(mergedNodes, activity)
+  return(mergedNodes)
+})
+
+fixed_graphs <- do.call("rbind", fixed_graphs)
+
+
+####################
+# Compare social network features
+####################
+
+###### Network "dispersion" (? - standard deviation over mean degree) ###### 
+soc_dispersion <- lapply(soc_graphs, function(graph) {
+  # Group size
+  n <- nrow(graph)
+  # Degrees
+  degrees <- rowSums(graph)
+  deg_mean <- mean(degrees)
+  deg_sd <- sd(degrees)
+  # compile and return
+  to_return <- data.frame(n = n, DegreeMean = deg_mean, DegreeSD = deg_sd)
+})
+dispersion <- do.call("rbind", soc_dispersion)
+dispersion <- dispersion %>% 
+  mutate(Dispersion = DegreeSD / DegreeMean)
+dispersionSummary <- dispersion %>% 
+  mutate(Model = "Social") %>% 
+  group_by(n, Model) %>% 
+  summarise(Dispersion = mean(Dispersion),
+            DegreeMean = mean(DegreeMean),
+            DegreeSD = mean(DegreeSD))
+
+fixed_dispersion <- lapply(fix_graphs, function(graph) {
+  # Group size
+  n <- nrow(graph)
+  # Degrees
+  degrees <- rowSums(graph)
+  deg_mean <- mean(degrees)
+  deg_sd <- sd(degrees)
+  # compile and return
+  to_return <- data.frame(n = n, DegreeMean = deg_mean, DegreeSD = deg_sd)
+})
+fixed_dispersion <- do.call("rbind", fixed_dispersion)
+fixed_dispersion <- fixed_dispersion %>% 
+  mutate(Dispersion = DegreeSD / DegreeMean)
+fixed_dispersionSummary <- fixed_dispersion %>% 
+  mutate(Model = "Fixed") %>% 
+  group_by(n, Model) %>% 
+  summarise(Dispersion = mean(Dispersion),
+            DegreeMean = mean(DegreeMean),
+            DegreeSD = mean(DegreeSD))
+
+dispersionSummary <- rbind(dispersionSummary, fixed_dispersionSummary)
+rm(fixed_dispersion, fixed_dispersionSummary)
+
+gg_dispersion <- ggplot(data = dispersionSummary, aes(x = n, y = Dispersion, group = Model, color = Model)) +
+  geom_line(aes(linetype = Model)) +
+  geom_point(size = 2) +
+  theme_classic(base_size = 10) +
+  scale_color_manual(values = c("black", "mediumseagreen")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black")) 
+gg_dispersion
+
+
+###### Network homophily ###### 
+weighted_ratios <- lapply(1:length(soc_graphs), function(i) {
+  # Social
+  # Get graph and thresh matrix for simulation
+  graph <- soc_graphs[[i]]
+  thresh <- as.data.frame(soc_threshMat[[i]])
+  # Calculate thresh ratio
+  threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+  # Calculate weighted neighbor sum for each individual
+  weighted_sum <- graph %*% threshRatio
+  # Calculate weighted neighbor sum for each individual
+  strength <- rowSums(graph)
+  disparity <- rowSums((graph / strength)^2)
+  # Construct dataframe to return
+  to_return <- data.frame(Id = row.names(weighted_sum), 
+                          n = length(weighted_sum),
+                          ThreshRatio = threshRatio,
+                          WeightNeighbor = weighted_sum,
+                          Disparity = disparity,
+                          Model = "Social")
+  row.names(to_return) <- NULL
+  # Fixed
+  # Get graph and thresh matrix for simulation
+  graph <- fix_graphs[[i]]
+  thresh <- as.data.frame(fix_threshMat[[i]])
+  # Calculate thresh ratio
+  threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+  # Calculate weighted neighbor sum for each individual
+  weighted_sum <- graph %*% threshRatio
+  # Calculate weighted neighbor sum for each individual
+  strength <- rowSums(graph)
+  disparity <- rowSums((graph / strength)^2)
+  # Construct dataframe to return
+  to_return2 <- data.frame(Id = row.names(weighted_sum), 
+                          n = length(weighted_sum),
+                          ThreshRatio = threshRatio,
+                          WeightNeighbor = weighted_sum,
+                          Disparity = disparity,
+                          Model = "Fixed")
+  row.names(to_return) <- NULL
+  # Return
+  to_return$Model <- as.character(to_return$Model)
+  to_return <- rbind(to_return, to_return2)
+  return(to_return)
+})
+weighted_ratios <- do.call("rbind", weighted_ratios)
+
+test <- weighted_ratios %>% filter(Model == "Social")
+
+gg_weighted_ratios <- ggplot(data = test, aes(x = ThreshRatio, y = WeightNeighbor)) +
+  geom_point() +
+  theme_classic(base_size = 10) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black"))  +
+  facet_wrap(~n, scales = "free_y")
+gg_weighted_ratios
+
+weighted_summary <- weighted_ratios %>% 
+  group_by(n, Model) %>% 
+  summarise(CorrelationThresholds = cor(ThreshRatio, WeightNeighbor))
+
+gg_weighted_corr <- ggplot(data = weighted_summary, aes(x = n, y = CorrelationThresholds, group = Model, color = Model)) +
+  geom_line(aes(linetype = Model)) +
+  geom_point(size = 2) +
+  theme_classic(base_size = 10) +
+  scale_color_manual(values = c("black", "mediumseagreen")) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black")) 
+gg_weighted_corr
+
+
+###### Network assortivity ######
+# From Newmann (2003)
+assortivity <- lapply(1:length(soc_graphs), function(i) {
+  # Social
+  # Get graph and thresh matrix for simulation
+  graph <- soc_graphs[[i]]
+  thresh <- as.data.frame(soc_threshMat[[i]])
+  # Calculate thresh ratio
+  threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+  # Normalize graph
+  norm_graph <- graph / sum(graph)
+  # Calculate
+  sigma_a <- sd(rowSums(norm_graph))
+  pearson <- lapply(1:length(threshRatio), function(n) {
+    x <- threshRatio[n]
+    to_sum <- c()
+    for (m in n:length(threshRatio)) {
+      y <- threshRatio[m]
+      e_xy <- norm_graph[n, m]  #symmetric
+      a_x <- sum(norm_graph[n, ])
+      value <- x * y * (e_xy - 2 * a_x)
+      to_sum <- c(to_sum, value)
+    }
+    sum_value <- sum(to_sum)
+    return(sum_value)
+  })
+  pearson <- sum(unlist(pearson)) / sigma_a / sigma_a
+  
+})
+assortivity <- do.call("rbind", assortivity)
+
+
+
+
+###### Network disparity ###### 
+dis_test <- weighted_ratios %>% filter(Model == "Fixed")
+
+gg_disparity <- ggplot(data = dis_test, aes(x = ThreshRatio, y = Disparity)) +
+  geom_point(size = 0.2) +
+  theme_classic(base_size = 10) +
+  theme(aspect.ratio = 1,
+        axis.text = element_text(color = "black"))  +
+  facet_wrap(~n, scales = "free")
+gg_disparity
+
+
+###### Interaction Matrix Plot ###### 
+
+type_groups_graphs <- soc_groups_graphs
+type_groups_threshMat <- soc_groups_threshMat
+
+interaction_graphs <- lapply(1:length(type_groups_graphs), function(i) {
+  # Get graphs
+  graphs <- type_groups_graphs[[i]]
+  replicates <- length(graphs)
+  # For each each compute interaction matrix
+  # Get graph and make adjacency matrix
+  size_graph <- lapply(1:length(graphs), function(j) {
+    # Format: set diagonal, rescale, and make adj matrix
+    this_graph <- graphs[[j]]
+    diag(this_graph) <- NA
+    dimensions <- dim(this_graph)
+    labs <- colnames(this_graph)
+    this_graph <- as.vector(this_graph)
+    # this_graph <- scale(this_graph) # normalize relative to the average
+    not_chosen <- 1 - ( 1 / (dimensions[1] - 1) )
+    expected_random <-  1 - not_chosen^2
+    this_graph <- (this_graph - expected_random) / expected_random #relative to expected by random (i.e., 1 - chance of not being chosen^2)
+    this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
+    colnames(this_graph) <- labs
+    rownames(this_graph) <- labs
+    # Calculate thresh ratio
+    # ind <- replicates * i + j
+    thresh <- as.data.frame(type_groups_threshMat[[i]][j])
+    thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+    ratio <- order(thresh$ThreshRatio)
+    # Create order by threshold ratio
+    this_graph <- this_graph[ratio, ratio]
+    colnames(this_graph) <- paste0("t-", 1:dimensions[1])
+    rownames(this_graph) <- paste0("t-", 1:dimensions[1])
+    # return
+    return(this_graph)
+  })
+  # Avearge across all to make 'typical' adjacency matrix
+  avg_g <- Reduce("+", size_graph) / length(size_graph)
+  # Create graph object
+  g <- graph_from_adjacency_matrix(avg_g, mode = c("directed"), weighted = TRUE, diag = TRUE)
+  # Get node and edge list
+  node_list <- get.data.frame(g, what = "vertices")
+  edge_list <- get.data.frame(g, what = "edges")
+  # Create dataframe for plotting
+  plot_data <- edge_list %>% mutate(
+    to = factor(to, levels = node_list$name),
+    from = factor(from, levels = node_list$name))
+  # Plot
+  groupsize <- ncol(avg_g)
+  gg_avg_adj <- ggplot(plot_data, aes(x = rev(from), y = to, fill = weight)) +
+    geom_raster() +
+    theme_bw() +
+    # Because we need the x and y axis to display every node,
+    # not just the nodes that have connections to each other,
+    # make sure that ggplot does not drop unused factor levels
+    scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
+    scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
+    # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
+    scale_fill_gradientn(name = "Relative Interaction\nFrequency",
+                         # colours = c(brewer.pal(7,"PiYG")),
+                         colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
+                         # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
+                         na.value = "black", 
+                         limit = c(-0.05, 0.05),
+                         # limit = c(0.95, 1.05),
+                         oob = squish) +
+    theme(axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title = element_blank(),
+      aspect.ratio = 1,
+      # Hide the legend (optional)
+      legend.position = "none",
+      legend.key.height = unit(0.38, "in"),
+      panel.border = element_rect(size = 1.5),
+      title = element_blank()) +
+    ggtitle(paste0("Group Size = ", groupsize))
+  # return graph
+  return(gg_avg_adj)
+  # return(avg_g)
+})
+
+png(filename = paste0("output/Networks/IntMat_", filename, ".png"), width = 5, height = 2.5, units = "in", res = 600)
+multiplot(plotlist = interaction_graphs, layout = matrix(c(seq(1:length(interaction_graphs))), nrow=2, byrow=TRUE))
+dev.off()
+
+# Subset of graphs plot for figure
+png(filename = paste0("output/Networks/FIGURE_IntMat_Single_", filename, ".png"), width = 2, height = 2, units = "in", res = 600)
+multiplot(plotlist = interaction_graphs[c(7)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
+dev.off()
+
+# Subset of graphs plot for figure
+png(filename = paste0("output/Networks/FIGURE_IntMat_", filename, ".png"), width = 4, height = 1, units = "in", res = 600)
+multiplot(plotlist = interaction_graphs[c(2, 4, 6, 8)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
+dev.off()
+
+
+
+
+
+###### Signed Interaction Matrix Plot ###### 
+# Only color by significantly different than random
+type_groups_graphs <- fix_groups_graphs
+type_groups_threshMat <- fix_groups_threshMat
+
+interaction_sign_graphs <- lapply(1:length(type_groups_graphs), function(i) {
+  # Get graphs
+  graphs <- type_groups_graphs[[i]]
+  replicates <- length(graphs)
+  # For each each compute interaction matrix
+  # Get graph and make adjacency matrix
+  size_graph <- lapply(1:length(graphs), function(j) {
+    # Format: set diagonal, rescale, and make adj matrix
+    this_graph <- graphs[[j]]
+    diag(this_graph) <- NA
+    thresh <- as.data.frame(type_groups_threshMat[[i]][j])
+    thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+    ratio <- order(thresh$ThreshRatio)
+    # Create order by threshold ratio
+    this_graph <- this_graph[ratio, ratio]
+    colnames(this_graph) <- 1:nrow(this_graph)
+    rownames(this_graph) <- colnames(this_graph)
+    g <- graph.adjacency(adjmatrix = this_graph, weighted = T)
+    edgelist_graph <- as.data.frame(get.edgelist(g))
+    names(edgelist_graph) <- c("From", "To")
+    edgelist_graph$Weight <- E(g)$weight 
+    edgelist_graph$Interaction <- paste0(edgelist_graph$From, "-", edgelist_graph$To)
+    # return
+    return(edgelist_graph)
+  })
+  #Calculate baseline probability of interaction
+  dimensions <- dim(graphs[[1]])
+  not_chosen <- 1 - ( 1 / (dimensions[1] - 1) )
+  expected_random <-  1 - not_chosen^2
+  # Bind
+  all_edgelist <- do.call("rbind", size_graph)
+  # Get pvalues of interaction rate relative to expected by random
+  nonNA_edgelist <- all_edgelist %>% 
+    group_by(Interaction) %>% 
+    filter(!is.na(Weight)) %>% 
+    mutate(pvalue = t.test(x = Weight, mu = expected_random)[3])
+  # Get the CI for those that are significantly different and then determine if greater or less than expected
+  sigDiff_edgelist <- nonNA_edgelist %>% 
+    mutate(Significant = pvalue < 0.05) %>% 
+    filter(Significant == TRUE) %>% 
+    group_by(Interaction) %>% 
+    mutate(CImin = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random,
+           CImax = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random) %>% 
+    mutate(DiffDirection = ifelse(test = CImin > 0 & CImax > 0, yes = 1, no = -1)) %>% 
+    select(Interaction, DiffDirection) %>% 
+    unique(.) 
+  # Merge back together and then form graph
+  calc_edgelist <- merge(all_edgelist, sigDiff_edgelist, all = TRUE)
+  calc_edgelist$DiffDirection[is.na(calc_edgelist$DiffDirection) & !is.na(calc_edgelist$Weight)] <- 0
+  calc_edgelist <- calc_edgelist %>% 
+    select(From, To, Interaction, DiffDirection) %>% 
+    unique(.) %>% 
+    mutate(From = as.numeric(as.character(From)),
+           To = as.numeric(as.character(To))) %>% 
+    arrange(From, To)
+  avg_g <- matrix(data = calc_edgelist$DiffDirection, nrow = dimensions[1], byrow = T)
+  colnames(avg_g) <- paste0("t-", 1:dimensions[1])
+  rownames(avg_g) <- paste0("t-", 1:dimensions[1])
+  # Create graph object
+  g <- graph_from_adjacency_matrix(avg_g, mode = c("directed"), weighted = TRUE, diag = TRUE)
+  # Get node and edge list
+  node_list <- get.data.frame(g, what = "vertices")
+  edge_list <- get.data.frame(g, what = "edges")
+  # Create dataframe for plotting
+  plot_data <- edge_list %>% mutate(
+    to = factor(to, levels = rev(node_list$name)),
+    from = factor(from, levels = node_list$name))
+  # Plot
+  groupsize <- ncol(avg_g)
+  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
+    geom_raster() +
+    theme_bw() +
+    # Because we need the x and y axis to display every node,
+    # not just the nodes that have connections to each other,
+    # make sure that ggplot does not drop unused factor levels
+    scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
+    scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
+    # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
+    scale_fill_gradientn(name = "Relative Interaction\nFrequency",
+                         colours = c("#9E9E9E", "#ffffff", "#79248C"),
+                         na.value = "white", 
+                         limit = c(-1, 1),
+                         # limit = c(0.95, 1.05),
+                         oob = squish) +
+    theme(axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title = element_blank(),
+          aspect.ratio = 1,
+          # Hide the legend (optional)
+          legend.position = "none",
+          legend.key.height = unit(0.38, "in"),
+          panel.border = element_rect(size = 1.5),
+          panel.grid = element_blank(),
+          title = element_blank()) +
+    ggtitle(paste0("Group Size = ", groupsize))
+  # return graph
+  return(gg_avg_adj)
+  # return(avg_g)
+})
+
+# Plot : SIGNED interaction matrices
+png(filename = paste0("output/Networks/RawPlots/SignedIntMat_", filename, ".png"), width = 5, height = 2.5, units = "in", res = 600)
+multiplot(plotlist = interaction_sign_graphs, layout = matrix(c(seq(1:length(interaction_graphs))), nrow=2, byrow=TRUE))
+dev.off()
+
+png(filename = paste0("output/Networks/RawPlots/FIGURE_SignedIntMat_Single_", filename, ".png"), width = 2, height = 2, units = "in", res = 600)
+multiplot(plotlist = interaction_sign_graphs[c(7)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
+dev.off()
+
+# Subset of graphs plot for figure
+png(filename = paste0("output/Networks/RawPlots/FIGURE_SignedIntMat_", filename, ".png"), width = 4, height = 1, units = "in", res = 600)
+multiplot(plotlist = interaction_sign_graphs[c(2, 4, 6, 8)], layout = matrix(c(seq(1:length(interaction_graphs[c(1, 2, 5, 8)]))), nrow = 1, byrow=TRUE))
+dev.off()
+
+###### Distribution of degree ###### 
+degree_dist <- lapply(1:length(soc_groups_graphs), function(i) {
+  # Get graphs
+  graphs <- soc_groups_graphs[[i]]
+  replicates <- length(graphs)
+  
+})

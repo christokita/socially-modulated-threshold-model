@@ -395,7 +395,7 @@ interaction_sign_graphs <- lapply(1:length(type_groups_graphs), function(i) {
 filename <- "Sigma0.05-FIXED-Bias1.1"
 # Plot : SIGNED interaction matrices
 # png(filename = paste0("output/Networks/RawPlots/SignedIntMat_", filename, ".png"), width = 5, height = 2.5, units = "in", res = 600)
-# multiplot(plotlist = interaction_sign_graphs, layout = matrix(c(seq(1:length(interaction_sign_graphs))), nrow=2, byrow=TRUE))
+multiplot(plotlist = interaction_sign_graphs, layout = matrix(c(seq(1:length(interaction_sign_graphs))), nrow=2, byrow=TRUE))
 # dev.off()
 # 
 # png(filename = paste0("output/Networks/RawPlots/FIGURE_SignedIntMat_Single_", filename, ".png"), width = 2, height = 2, units = "in", res = 600)

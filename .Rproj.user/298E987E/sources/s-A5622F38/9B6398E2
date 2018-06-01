@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1527895117674.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9B6398E2",
+    "lastKnownWriteTime" : 1522263066,
+    "last_content_update" : 1527895143976,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/AnalyzeNetworks.R",
+    "project_path" : "scripts/AnalyzeNetworks.R",
+    "properties" : {
+        "cursorPosition" : "232,0",
+        "scrollLine" : "214",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
