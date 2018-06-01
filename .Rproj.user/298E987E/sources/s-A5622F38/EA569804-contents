@@ -180,27 +180,27 @@ weighted_ratios <- lapply(1:length(soc_graphs), function(i) {
                           Model = "Social")
   row.names(to_return) <- NULL
   # Fixed
-  # Get graph and thresh matrix for simulation
-  graph <- fix_graphs[[i]]
-  thresh <- as.data.frame(fix_threshMat[[i]])
-  # Calculate thresh ratio
-  threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-  # Calculate weighted neighbor sum for each individual
-  weighted_sum <- graph %*% threshRatio
-  # Calculate weighted neighbor sum for each individual
-  strength <- rowSums(graph)
-  disparity <- rowSums((graph / strength)^2)
-  # Construct dataframe to return
-  to_return2 <- data.frame(Id = row.names(weighted_sum), 
-                          n = length(weighted_sum),
-                          ThreshRatio = threshRatio,
-                          WeightNeighbor = weighted_sum,
-                          Disparity = disparity,
-                          Model = "Fixed")
-  row.names(to_return) <- NULL
-  # Return
-  to_return$Model <- as.character(to_return$Model)
-  to_return <- rbind(to_return, to_return2)
+  # # Get graph and thresh matrix for simulation
+  # graph <- fix_graphs[[i]]
+  # thresh <- as.data.frame(fix_threshMat[[i]])
+  # # Calculate thresh ratio
+  # threshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+  # # Calculate weighted neighbor sum for each individual
+  # weighted_sum <- graph %*% threshRatio
+  # # Calculate weighted neighbor sum for each individual
+  # strength <- rowSums(graph)
+  # disparity <- rowSums((graph / strength)^2)
+  # # Construct dataframe to return
+  # to_return2 <- data.frame(Id = row.names(weighted_sum), 
+  #                         n = length(weighted_sum),
+  #                         ThreshRatio = threshRatio,
+  #                         WeightNeighbor = weighted_sum,
+  #                         Disparity = disparity,
+  #                         Model = "Fixed")
+  # row.names(to_return) <- NULL
+  # # Return
+  # to_return$Model <- as.character(to_return$Model)
+  # to_return <- rbind(to_return, to_return2)
   return(to_return)
 })
 weighted_ratios <- do.call("rbind", weighted_ratios)
