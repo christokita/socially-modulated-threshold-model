@@ -69,7 +69,7 @@ interaction_sign_graphs <- lapply(1:length(type_groups_graphs), function(i) {
   })
   #Calculate baseline probability of interaction
   dimensions <- dim(graphs[[1]])
-  not_chosen <- 1 - ( 1 / (dimensions[1] - 1) )
+  not_chosen <- 1 - ( ( 1 / (dimensions[1] - 1) ) * 0.5)
   expected_random <-  1 - not_chosen^2
   # Bind
   all_edgelist <- do.call("rbind", size_graph)
@@ -81,13 +81,21 @@ interaction_sign_graphs <- lapply(1:length(type_groups_graphs), function(i) {
   # Get the CI for those that are significantly different and then determine if greater or less than expected
   sigDiff_edgelist <- nonNA_edgelist %>% 
     mutate(Significant = pvalue < 0.05) %>% 
-    filter(Significant == TRUE) %>% 
+    filter(Significant == TRUE) 
+  if (nrow(sigDiff_edgelist) > 0) {
+    sigDiff_edgelist <- sigDiff_edgelist %>% 
     group_by(Interaction) %>% 
     mutate(CImin = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random,
            CImax = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random) %>% 
     mutate(DiffDirection = ifelse(test = CImin > 0 & CImax > 0, yes = 1, no = -1)) %>% 
     select(Interaction, DiffDirection) %>% 
     unique(.) 
+    } else {
+      sigDiff_edgelist <- sigDiff_edgelist %>% 
+        mutate(DiffDirection = NA) %>% 
+        select(Interaction, DiffDirection) %>% 
+        unique(.)
+    }
   # Merge back together and then form graph
   calc_edgelist <- merge(all_edgelist, sigDiff_edgelist, all = TRUE)
   calc_edgelist$DiffDirection[is.na(calc_edgelist$DiffDirection) & !is.na(calc_edgelist$Weight)] <- 0
