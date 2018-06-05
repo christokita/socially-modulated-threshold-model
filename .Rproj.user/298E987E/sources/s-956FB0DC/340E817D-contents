@@ -23,7 +23,7 @@ reps           <- 1 #number of replications per simulation (for ensemble)
 ThreshM        <- rep(10, m) #population threshold means 
 ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.8333, m) #vector of stimuli increase rates  
+deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
@@ -108,10 +108,15 @@ for (i in 1:length(Ns)) {
                                bias = beta)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
-      threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
-                                          ThresholdMatrix = threshMat, 
-                                          X_sub_g = X_g, 
-                                          epsilon = epsilon)
+      # threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
+      #                                     ThresholdMatrix = threshMat, 
+      #                                     X_sub_g = X_g, 
+      #                                     epsilon = epsilon)
+      threshMat <- adjust_thresholds_social_capped(SocialNetwork = g_adj,
+                                                   ThresholdMatrix = threshMat, 
+                                                   X_sub_g = X_g, 
+                                                   epsilon = epsilon,
+                                                   ThresholdMax = 2 * ThreshM[1])
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]
       
@@ -141,51 +146,11 @@ thresh1time <- thresh1time %>%
 threshMat <- threshMat %>% 
   as.data.frame(.) %>% 
   mutate(ThreshRatio = log(Thresh1 / Thresh2),
-         Id = row.names(.)) %>% 
-  select(-Thresh1, -Thresh2)
+         Id = row.names(.))
 threshMat$ThreshRatio[threshMat$ThreshRatio > 10] <- 10
 threshMat$ThreshRatio[threshMat$ThreshRatio < -10] <- -10
 
 thresh1time <- merge(thresh1time, threshMat, by = "Id")
-
-
-# base_breaks_x <- function(x){
-#   b <- pretty(x)
-#   adjust_for_ticks <- max(b) * 0.0025
-#   d <- data.frame(y=-Inf, yend=-Inf, x=min(b) - adjust_for_ticks, xend=max(b) + adjust_for_ticks)
-#   list(geom_segment(data=d, aes(x=x, y=y, xend=xend, yend=yend),size = 1, inherit.aes=FALSE),
-#        scale_x_continuous(breaks=b))
-# }
-# base_breaks_y <- function(x){
-#   b <- pretty(x)
-#   adjust_for_ticks <- max(b) * 0.0025
-#   d <- data.frame(x = -Inf, xend = -Inf, y=min(b) - adjust_for_ticks, yend = max(b) + adjust_for_ticks)
-#   list(geom_segment(data=d, aes(x = x, y = y, xend = xend, yend = yend), size = 1, inherit.aes = FALSE),
-#        scale_y_continuous(breaks=b))
-# }
-# 
-# test <- thresh1time[thresh1time$Id %in% c("v-22", "v-20", "v-25", "v-40"),]
-# gg_thresh <- ggplot(data = thresh1time, 
-#                     aes(x = t, y = Threshold)) +
-#   theme_bw(base_size = 10) +
-#   geom_line(aes(group = Id, colour = ThreshRatio), size = 0.5) +
-#   scale_colour_gradient2(name = "ln(Threshold Ratio)",
-#                          high = "#d7191c",
-#                          mid = "#cecece", 
-#                          low = "#2c7bb6", 
-#                          midpoint = 0, 
-#                          limits = c(-2, 2),
-#                          oob = squish) +
-#   base_breaks_x(thresh1time$t) +
-#   base_breaks_y(thresh1time$Threshold) +
-#   theme(aspect.ratio = 1,
-#         panel.border = element_blank(),
-#         panel.grid.major = element_blank(),
-#         panel.grid.minor = element_blank(),
-#         legend.position = "none",
-#         axis.ticks.length = unit(4, "pt"),
-#         axis.text = element_text(color = "black"))
-# gg_thresh
 
 
 gg_thresh <- ggplot(data = thresh1time, 
@@ -194,13 +159,13 @@ gg_thresh <- ggplot(data = thresh1time,
   geom_line(aes(group = Id, colour = ThreshRatio), size = 0.2) +
   scale_colour_gradient2(name = "ln(Threshold Ratio)",
                          high = "#d7191c",
-                         mid = "#ffffbf", 
-                         # mid = "#cecece", 
+                         # mid = "#ffffbf", 
+                         mid = "#cecece",
                          low = "#2c7bb6", 
                          midpoint = 0, 
                          limits = c(-5, 5),
                          oob = squish) +
-  # scale_y_continuous(limits = c(0, 20), breaks = seq(0,20, 5)) +
+  scale_y_continuous(expand = c(0.0, 0)) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),
