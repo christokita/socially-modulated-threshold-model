@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1528298045971.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "6DD538BB",
+    "lastKnownWriteTime" : 4636149248,
+    "last_content_update" : 1528298045971,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "DA7EABD8",
+        "caption" : "taskTally",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=taskTally&cache_key=DA7EABD8",
+        "displayedObservations" : 10000,
+        "environment" : "",
+        "object" : "taskTally",
+        "preview" : 0,
+        "totalObservations" : 10000,
+        "variables" : 6
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
