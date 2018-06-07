@@ -12,23 +12,23 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(100) #vector of number of individuals to simulate
+Ns             <- c(30) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(10, m) #population threshold means 
+ThreshM        <- rep(50, m) #population threshold means 
 ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.8, m) #vector of stimuli increase rates  
+deltas         <- rep(0.833, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 0.5 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
+p              <- 1 #baseline probablity of initiating an interaction per time step
+epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -127,10 +127,15 @@ for (i in 1:length(Ns)) {
                                bias = beta)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
-      threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
-                                          ThresholdMatrix = threshMat, 
-                                          X_sub_g = X_g, 
-                                          epsilon = epsilon)
+      # threshMat <- adjustThresholdsSocial(SocialNetwork = g_adj,
+      #                                     ThresholdMatrix = threshMat,
+      #                                     X_sub_g = X_g,
+      #                                     epsilon = epsilon)
+      threshMat <- adjust_thresholds_social_capped(SocialNetwork = g_adj,
+                                                   ThresholdMatrix = threshMat,
+                                                   X_sub_g = X_g,
+                                                   epsilon = epsilon,
+                                                   ThresholdMax = 2*ThreshM[1])
       
       # Capture current task performance tally
       tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)

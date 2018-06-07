@@ -13,17 +13,17 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(50) #vector of number of individuals to simulate
+Ns             <- c(30) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 20000 #number of generations to run simulation 
+gens           <- 40000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(10, m) #population threshold means 
+ThreshM        <- rep(50, m) #population threshold means 
 ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.8, m) #vector of stimuli increase rates  
+deltas         <- rep(0.833, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
@@ -141,7 +141,7 @@ row.names(thresh1time) <- NULL
 thresh1time <- as.data.frame(thresh1time)
 thresh1time <- thresh1time %>% 
   mutate(t = 0:(nrow(.)-1)) %>% 
-  gather("Id", "Threshold", 1:50)
+  gather("Id", "Threshold", 1:30)
 
 threshMat <- threshMat %>% 
   as.data.frame(.) %>% 

@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1270072126",
+    "hash" : "2120025737",
     "id" : "E42657F5",
-    "lastKnownWriteTime" : 1528298767,
-    "last_content_update" : 1528298767937,
+    "lastKnownWriteTime" : 1528387550,
+    "last_content_update" : 1528387550275,
     "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/1_SocThreshModel.R",
     "project_path" : "scripts/1_SocThreshModel.R",
     "properties" : {
-        "cursorPosition" : "245,0",
-        "scrollLine" : "221"
+        "cursorPosition" : "16,19",
+        "scrollLine" : "12"
     },
     "relative_order" : 4,
     "source_on_save" : false,

@@ -28,60 +28,21 @@ seedThresholds <- function(n, m, ThresholdMeans = NULL, ThresholdSDs = NULL) {
 ####################
 # Deterministic Threshold
 ####################
-calcThresholdDetermMat <- function(TimeStep, ThresholdMatrix, StimulusMatrix) {
+calcThresholdDetermMat <- function(time_step, threshold_matrix, stimulus_matrix) {
   # select proper stimulus for this time step
-  stimulusThisStep <- StimulusMatrix[TimeStep, ]
+  no_of_stim <- ncol(threshold_matrix)
+  stim_this_step <- as.matrix(stimulus_matrix[time_step, 1:no_of_stim])
   # calculate threshold probabilities for one individual
-  thresholdP <- lapply(1:nrow(ThresholdMatrix), function(i) {
-    # select row for individual in threshold matrix
-    indThresh <- ThresholdMatrix[i, ]
-    # create task vector to be output and bound
-    taskThresh <- rep(0, length(indThresh))
-    # loop through each task within individual
-    for (j in 1:length(taskThresh)) {
-      stim <- stimulusThisStep[j]
-      thresh <- indThresh[j]
-      if (stim > thresh) {
-        taskThresh[j] <- 1
-      }
-    }
-    return(taskThresh)
+  threshold_prob <- lapply(1:ncol(threshold_matrix), function(j) {
+    # Check if stimulus exceeds threshold
+    thresh_result <- threshold_matrix[ , j] > stim_this_step[j]
+    return(as.numeric(thresh_result))
   })
   # bind and return
-  thresholdP <- do.call("rbind", thresholdP)
-  colnames(thresholdP) <- paste0("ThreshProb", 1:ncol(thresholdP))
-  rownames(thresholdP) <- paste0("v-", 1:nrow(thresholdP))
-  return(thresholdP)
-}
-
-####################
-# Deterministic Threshold with social information
-####################
-calcThresholdDetermSocial <- function(TimeStep, ThresholdMatrix, StimulusMatrix, epsilon, SocialInfoMatrix) {
-  # select proper stimulus for this time step
-  stimulusThisStep <- StimulusMatrix[TimeStep, ]
-  # calculate threshold probabilities for one individual
-  thresholdP <- lapply(1:nrow(ThresholdMatrix), function(i) {
-    # select row for individual in threshold matrix
-    indThresh <- ThresholdMatrix[i, ]
-    indSocial <- SocialInfoMatrix[i, ]
-    # create task vector to be output and bound
-    taskThresh <- rep(0, length(indThresh))
-    # loop through each task within individual
-    for (j in 1:length(taskThresh)) {
-      stim <- stimulusThisStep[j]
-      thresh <- indThresh[j] - (epsilon * indSocial[j])
-      if (stim > thresh) {
-        taskThresh[j] <- 1
-      }
-    }
-    return(taskThresh)
-  })
-  # bind and return
-  thresholdP <- do.call("rbind", thresholdP)
-  colnames(thresholdP) <- paste0("ThreshProb", 1:ncol(thresholdP))
-  rownames(thresholdP) <- paste0("v-", 1:nrow(thresholdP))
-  return(thresholdP)
+  threshold_prob <- do.call("cbind", threshold_prob)
+  colnames(threshold_prob) <- paste0("ThreshProb", 1:ncol(threshold_prob))
+  rownames(threshold_prob) <- paste0("v-", 1:nrow(threshold_prob))
+  return(threshold_prob)
 }
 
 ####################

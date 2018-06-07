@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "DBD8F95C",
-    "lastKnownWriteTime" : 1528209393,
-    "last_content_update" : 1528209393744,
+    "lastKnownWriteTime" : 1528394730,
+    "last_content_update" : 1528394730358,
     "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/__Util_ThresholdFunctions.R",
     "project_path" : "scripts/__Util_ThresholdFunctions.R",
     "properties" : {
-        "cursorPosition" : "122,53",
-        "scrollLine" : "110"
+        "cursorPosition" : "36,41",
+        "scrollLine" : "26"
     },
     "relative_order" : 5,
     "source_on_save" : false,
