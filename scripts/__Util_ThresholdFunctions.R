@@ -8,34 +8,34 @@
 ####################
 # Seed task thresholds
 ####################
-seedThresholds <- function(n, m, ThresholdMeans = NULL, ThresholdSDs = NULL) {
+seed_thresholds <- function(n, m, threshold_means = NULL, threshold_sds = NULL) {
   # Loop through tasks and sample thresholds from normal dist
-  threshMat <- lapply(1:length(ThresholdMeans), function(i) {
+  thresh_mat <- lapply(1:length(threshold_means), function(i) {
     threshList <- rtnorm(n = n, 
-                         mean = ThresholdMeans[i], 
-                         sd = ThresholdSDs[i], 
+                         mean = threshold_means[i], 
+                         sd = threshold_sds[i], 
                          lower = 0)
     return(threshList)
   })
-  threshMat <- do.call("cbind", threshMat)
+  thresh_mat <- do.call("cbind", thresh_mat)
   # Fix names
-  colnames(threshMat) <- paste0("Thresh", 1:length(ThresholdMeans))
-  rownames(threshMat) <- paste0("v-", 1:n)
+  colnames(thresh_mat) <- paste0("Thresh", 1:length(threshold_means))
+  rownames(thresh_mat) <- paste0("v-", 1:n)
   # Return
-  return(threshMat)
+  return(thresh_mat)
 }
 
 ####################
 # Deterministic Threshold
 ####################
-calcThresholdDetermMat <- function(time_step, threshold_matrix, stimulus_matrix) {
+calc_determ_thresh <- function(time_step, threshold_matrix, stimulus_matrix) {
   # select proper stimulus for this time step
   no_of_stim <- ncol(threshold_matrix)
   stim_this_step <- as.matrix(stimulus_matrix[time_step, 1:no_of_stim])
   # calculate threshold probabilities for one individual
   threshold_prob <- lapply(1:ncol(threshold_matrix), function(j) {
     # Check if stimulus exceeds threshold
-    thresh_result <- threshold_matrix[ , j] > stim_this_step[j]
+    thresh_result <-  stim_this_step[j] > threshold_matrix[ , j]
     return(as.numeric(thresh_result))
   })
   # bind and return
@@ -48,45 +48,42 @@ calcThresholdDetermMat <- function(time_step, threshold_matrix, stimulus_matrix)
 ####################
 # Adjust thresholds due to social interactions
 ####################
-adjustThresholdsSocial <- function(SocialNetwork, ThresholdMatrix, X_sub_g, epsilon) {
+adjust_thresh_social <- function(social_network, threshold_matrix, state_matrix, epsilon) {
   # Calculate "sum" of task states/probs of neighbors
-  NeighborSums <- t(SocialNetwork) %*% X_sub_g #active neighbors by category
-  totalSums <- rowSums(NeighborSums) #total active neighbors
-  # Loop through individuals
-  for (i in 1:nrow(X_sub_g)) {
-    for (j in 1:ncol(X_sub_g)) {
-      activeInd <- NeighborSums[i, j]
-      adjust <- epsilon * ((totalSums[i] - activeInd)  - activeInd)
-      ThresholdMatrix[i, j] <- ThresholdMatrix[i, j] + adjust
-      if (ThresholdMatrix[i, j] < 0) {
-        ThresholdMatrix[i, j] <- 0
-      } 
-    }
-  }
-  return(ThresholdMatrix)
+  active_neighbors <- t(social_network) %*% state_matrix #active neighbors by category
+  total_neighbors <- rowSums(active_neighbors) #total active neighbors
+  # Calculate interacting individuals NOT performing that task
+  not_sums <- total_neighbors - active_neighbors
+  # Calculate net threshold effect
+  net_effect <- not_sums - active_neighbors
+  net_effect <- net_effect * epsilon
+  # Adjust thresholds and return
+  threshold_matrix <- threshold_matrix + net_effect
+  # Catch minimum thresholds
+  threshold_matrix[threshold_matrix < 0] <- 0
+  # Return
+  return(threshold_matrix)
 }
 
 ####################
 # Adjust thresholds due to social interactions--with maximum level
 ####################
-adjust_thresholds_social_capped <- function(SocialNetwork, ThresholdMatrix, X_sub_g, epsilon, ThresholdMax) {
+adjust_thresholds_social_capped <- function(social_network, threshold_matrix, state_matrix, epsilon, threshold_max) {
   # Calculate "sum" of task states/probs of neighbors
-  NeighborSums <- t(SocialNetwork) %*% X_sub_g #active neighbors by category
-  totalSums <- rowSums(NeighborSums) #total active neighbors
-  # Loop through individuals
-  for (i in 1:nrow(X_sub_g)) {
-    for (j in 1:ncol(X_sub_g)) {
-      activeInd <- NeighborSums[i, j]
-      adjust <- epsilon * ((totalSums[i] - activeInd)  - activeInd)
-      ThresholdMatrix[i, j] <- ThresholdMatrix[i, j] + adjust
-      if (ThresholdMatrix[i, j] < 0) {
-        ThresholdMatrix[i, j] <- 0
-      } else if (ThresholdMatrix[i, j] > ThresholdMax) {
-        ThresholdMatrix[i, j] <- ThresholdMax
-      }
-    }
-  }
-  return(ThresholdMatrix)
+  active_neighbors <- t(social_network) %*% state_matrix #active neighbors by category
+  total_neighbors <- rowSums(active_neighbors) #total active neighbors
+  # Calculate interacting individuals NOT performing that task
+  not_sums <- total_neighbors - active_neighbors
+  # Calculate net threshold effect
+  net_effect <- not_sums - active_neighbors
+  net_effect <- net_effect * epsilon
+  # Adjust thresholds and return
+  threshold_matrix <- threshold_matrix + net_effect
+  # Catch minimum and maximum thresholds
+  threshold_matrix[threshold_matrix < 0] <- 0
+  threshold_matrix[threshold_matrix > threshold_max] <- threshold_max
+  # Return
+  return(threshold_matrix)
 }
 
 

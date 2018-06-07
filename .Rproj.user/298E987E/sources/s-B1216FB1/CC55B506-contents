@@ -8,15 +8,15 @@
 ####################
 # Seed Stimuls
 ####################
-seed_stimuls <- function(intitial_stim, gens) {
+seedStimuls <- function(InitialSVector, gens) {
   # Calculate number of blank spots to make
-  rep_length <- (length(intitial_stim)) * gens #intiial row does not count as gen
+  repLength <- (length(InitialSVector)) * gens #intiial row does not count as gen
   # Build matrix
-  stim <- matrix(data = c(intitial_stim, rep(NA, rep_length)),
+  stim <- matrix(data = c(InitialSVector, rep(NA, repLength)),
                  byrow = TRUE, 
                  nrow = (gens + 1))
   # Fix Names
-  colnames(stim) <- paste0(rep("s", length(intitial_stim)), 1:length(intitial_stim))
+  colnames(stim) <- paste0(rep("s", length(InitialSVector)), 1:length(InitialSVector))
   rownames(stim) <- paste0("Gen", 0:gens)
   # Return
   return(stim)
@@ -26,7 +26,7 @@ seed_stimuls <- function(intitial_stim, gens) {
 # Stimulus Level
 ####################
 # Frequency dependent
-update_stim <- function(stimulus, delta, alpha, Ni, n) {
+globalStimUpdate <- function(stimulus, delta, alpha, Ni, n) {
   # Calculate
   s <- stimulus + delta - ( alpha * ( Ni / n ))
   # If negative, make zero
