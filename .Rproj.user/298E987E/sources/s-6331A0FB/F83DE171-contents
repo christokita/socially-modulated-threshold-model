@@ -88,11 +88,11 @@ for (i in 1:length(Ns)) {
       # Update stimuli
       for (j in 1:ncol(stimMat)) {
         # update stim
-        stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
-                                              delta = deltas[j], 
-                                              alpha = alpha, 
-                                              Ni = sum(X_g[ , j]), 
-                                              n = n)
+        stimMat[t + 1, j] <- update_stim(stimulus = stimMat[t, j],
+                                         delta = deltas[j], 
+                                         alpha = alpha, 
+                                         Ni = sum(X_g[ , j]), 
+                                         n = n)
       }
       # Calculate task demand based on global stimuli
       P_g <- calc_determ_thresh(time_step = t + 1, # first row is generation 0
