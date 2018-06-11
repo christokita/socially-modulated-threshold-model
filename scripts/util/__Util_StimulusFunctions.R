@@ -25,29 +25,19 @@ seed_stimuls <- function(intitial_stim, gens) {
 ####################
 # Stimulus Level
 ####################
-# Frequency dependent
-update_stim <- function(stimulus, delta, alpha, Ni, n) {
+# Frequency depende
+update_stim <- function(stim_matrix, deltas, alpha, state_matrix, time_step) {
+  # Get preliminary info
+  n <- nrow(state_matrix)
+  stim_values <- stim_matrix[time_step, ]
+  active_count <- colSums(state_matrix)
   # Calculate
-  s <- stimulus + delta - ( alpha * ( Ni / n ))
-  # If negative, make zero
-  if(s < 0.0001) {
-    s <- 0
-  }
-  return(s)
+  new_values <- stim_values + deltas - (alpha * (active_count/ n))
+  new_values[new_values < 0] <- 0
+  # Insert
+  stim_matrix[time_step + 1, ] <- new_values
+  return(stim_matrix)
 }
-
-# # Frequency dependent
-# update_stim <- function(stim_matrix, time_step, deltas, alpha, state_matrix, n) {
-#   # 
-#   
-#   # Calculate
-#   s <- stimulus + delta - ( alpha * ( Ni / n ))
-#   # If negative, make zero
-#   if(s < 0.0001) {
-#     s <- 0
-#   }
-#   return(s)
-# }
 
 # Density dependent (per capita)
 globalStimUpdate_PerCap <- function(stimulus, delta, alpha, Ni, n, m, quitP) {

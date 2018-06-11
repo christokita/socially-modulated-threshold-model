@@ -66,6 +66,7 @@ mutualEntropy <- function(TotalStateMat) {
   D_ind  <- I_xy / H_y
   # Dataframe
   D <- data.frame(Dsym = D_sym, Dtask = D_task, Dind = D_ind)
+  D <- as.matrix(D)
   # Return 
   return(D)
 }

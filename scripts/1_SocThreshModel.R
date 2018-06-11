@@ -72,8 +72,8 @@ for (i in 1:length(Ns)) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     
     # Seed task (external) stimuli
-    stimMat <- seedStimuls(InitialSVector = InitialStim, 
-                           gens = gens)
+    stimMat <- seed_stimuls(intitial_stim = InitialStim, 
+                            gens = gens)
     
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 

@@ -4,7 +4,6 @@
 #
 ##################################################
 
-
 ####################
 # Seed task thresholds
 ####################
@@ -86,6 +85,26 @@ adjust_thresholds_social_capped <- function(social_network, threshold_matrix, st
   return(threshold_matrix)
 }
 
+####################
+# Summarize threshold tracking matrix
+####################
+summarise_threshold_tracking <- function(tracked_threshold, n, time_steps) {
+  # Get column names
+  id_names <- names(tracked_threshold[[1]])
+  # Unlist
+  threshtime <- matrix(unlist(tracked_threshold),
+                       ncol = length(tracked_threshold[[1]]),
+                       byrow = TRUE,
+                       dimnames = list(c(NULL), c(id_names)))
+  # Reshape
+  row.names(threshtime) <- NULL
+  threshtime <- as.data.frame(threshtime)
+  threshtime <- threshtime %>% 
+    gather("Id", "Threshold") 
+  threshtime$t <- rep(0:time_steps, n)
+  # Return
+  return(threshtime)
+}
 
 
 

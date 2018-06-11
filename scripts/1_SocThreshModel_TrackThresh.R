@@ -5,7 +5,7 @@
 ################################################################################
 
 rm(list = ls())
-source("scripts/__Util__MASTER.R")
+source("scripts/util/__Util__MASTER.R")
 
 
 ####################
@@ -15,8 +15,7 @@ source("scripts/__Util__MASTER.R")
 # Base parameters
 Ns             <- c(40) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 20000 #number of generations to run simulation 
-corrStep       <- 200 #number of time steps for calculation of correlation 
+gens           <- 2000 #number of generations to run simulation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
@@ -74,11 +73,11 @@ for (i in 1:length(Ns)) {
     colnames(g_tot) <- paste0("v-", 1:n)
     rownames(g_tot) <- paste0("v-", 1:n)
     
-    # Prep correlation tracking matrix
+    # Prep threshold tracking matrix
     thresh1time <- list()
     thresh2time <- list()
     thresh1time[[1]] <- threshMat[,1]
-    thresh2time[[2]] <- threshMat[,2]
+    thresh2time[[1]] <- threshMat[,2]
     
     ####################
     # Simulate
@@ -87,14 +86,11 @@ for (i in 1:length(Ns)) {
     for (t in 1:gens) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
-      for (j in 1:ncol(stimMat)) {
-        # update stim
-        stimMat[t + 1, j] <- update_stim(stimulus = stimMat[t, j],
-                                         delta = deltas[j], 
-                                         alpha = alpha, 
-                                         Ni = sum(X_g[ , j]), 
-                                         n = n)
-      }
+      stimMat <- update_stim(stim_matrix = stimMat, 
+                             deltas = deltas, 
+                             alpha = alpha, 
+                             state_matrix = X_g, 
+                             time_step = t)
       # Calculate task demand based on global stimuli
       P_g <- calc_determ_thresh(time_step        = t + 1, # first row is generation 0
                                 threshold_matrix = threshMat, 
@@ -141,8 +137,8 @@ thresh1time <- do.call("rbind", thresh1time)
 row.names(thresh1time) <- NULL
 thresh1time <- as.data.frame(thresh1time)
 thresh1time <- thresh1time %>% 
-  mutate(t = 0:(nrow(.)-1)) %>% 
-  gather("Id", "Threshold", 1:40)
+  gather("Id", "Threshold")
+thresh1time$t <- rep(0:gens, n)
 
 threshMat <- threshMat %>% 
   as.data.frame(.) %>% 

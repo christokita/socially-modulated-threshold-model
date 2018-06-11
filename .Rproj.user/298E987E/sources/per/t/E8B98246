@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1528752271437.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2065951059",
+    "id" : "E8B98246",
+    "lastKnownWriteTime" : 1528752289,
+    "last_content_update" : 1528752289274,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/util/__Util_ThresholdFunctions.R",
+    "project_path" : "scripts/util/__Util_ThresholdFunctions.R",
+    "properties" : {
+        "cursorPosition" : "104,2",
+        "scrollLine" : "87"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
