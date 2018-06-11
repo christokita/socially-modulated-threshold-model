@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "720524733",
+    "hash" : "0",
     "id" : "32793CFD",
     "lastKnownWriteTime" : 1502808630,
     "last_content_update" : 1502808630,
     "path" : "~/Documents/Research/Tarnita Lab/Incipient Groups DOL/DOLThresholdModel/scripts/4_ProbThresh_SpecializationFitParallel.R",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "228,6",
-        "scrollLine" : "0"
+        "cursorPosition" : "69,60",
+        "scrollLine" : "53"
     },
     "relative_order" : 4,
     "source_on_save" : false,

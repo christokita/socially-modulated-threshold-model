@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1528753167027.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3871475049",
+    "id" : "D99115E4",
+    "lastKnownWriteTime" : 1528753208,
+    "last_content_update" : 1528753208607,
+    "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/1_SocThreshModel.R",
+    "project_path" : "scripts/1_SocThreshModel.R",
+    "properties" : {
+        "cursorPosition" : "111,43",
+        "scrollLine" : "102"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

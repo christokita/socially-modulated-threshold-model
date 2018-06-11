@@ -5,7 +5,7 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "2065951059",
+    "hash" : "0",
     "id" : "E8B98246",
     "lastKnownWriteTime" : 1528752289,
     "last_content_update" : 1528752289274,
@@ -13,7 +13,7 @@
     "project_path" : "scripts/util/__Util_ThresholdFunctions.R",
     "properties" : {
         "cursorPosition" : "104,2",
-        "scrollLine" : "87"
+        "scrollLine" : "0"
     },
     "relative_order" : 5,
     "source_on_save" : false,
