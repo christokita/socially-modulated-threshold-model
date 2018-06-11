@@ -13,9 +13,9 @@ source("scripts/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(10) #vector of number of individuals to simulate
+Ns             <- c(40) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
+gens           <- 20000 #number of generations to run simulation 
 corrStep       <- 200 #number of time steps for calculation of correlation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
@@ -23,12 +23,12 @@ reps           <- 1 #number of replications per simulation (for ensemble)
 ThreshM        <- rep(50, m) #population threshold means 
 ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.833, m) #vector of stimuli increase rates  
+deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 1 #baseline probablity of initiating an interaction per time step
+p              <- 0.5 #baseline probablity of initiating an interaction per time step
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
@@ -84,7 +84,8 @@ for (i in 1:length(Ns)) {
     # Simulate
     ####################
     # Run simulation
-    for (t in 1:gens) {
+    for (t in 1:gens) { 
+      # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       for (j in 1:ncol(stimMat)) {
         # update stim
@@ -95,28 +96,28 @@ for (i in 1:length(Ns)) {
                                          n = n)
       }
       # Calculate task demand based on global stimuli
-      P_g <- calc_determ_thresh(time_step = t + 1, # first row is generation 0
+      P_g <- calc_determ_thresh(time_step        = t + 1, # first row is generation 0
                                 threshold_matrix = threshMat, 
-                                stimulus_matrix = stimMat)
+                                stimulus_matrix  = stimMat)
       # Update task performance
-      X_g <- updateTaskPerformance(P_sub_g    = P_g,
-                                   TaskMat    = X_g,
-                                   QuitProb   = quitP)
+      X_g <- update_task_performance(task_probs   = P_g,
+                                     state_matrix = X_g,
+                                     quit_prob    = quitP)
       # Update social network (previously this was before probability/task update)
       g_adj <- temporalNetwork(X_sub_g = X_g,
                                prob_interact = p,
                                bias = beta)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
-      threshMat <- adjust_thresh_social(social_network = g_adj,
-                                        threshold_matrix = threshMat,
-                                        state_matrix = X_g,
-                                        epsilon = epsilon)
-      # threshMat <- adjust_thresholds_social_capped(SocialNetwork = g_adj,
-      #                                              ThresholdMatrix = threshMat,
-      #                                              X_sub_g = X_g,
-      #                                              epsilon = epsilon,
-      #                                              ThresholdMax = 2 * ThreshM[1])
+      # threshMat <- adjust_thresh_social(social_network = g_adj,
+      #                                   threshold_matrix = threshMat,
+      #                                   state_matrix = X_g,
+      #                                   epsilon = epsilon)
+      threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
+                                                   threshold_matrix = threshMat,
+                                                   state_matrix = X_g,
+                                                   epsilon = epsilon,
+                                                   threshold_max = 2 * ThreshM[1])
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]
       
@@ -141,7 +142,7 @@ row.names(thresh1time) <- NULL
 thresh1time <- as.data.frame(thresh1time)
 thresh1time <- thresh1time %>% 
   mutate(t = 0:(nrow(.)-1)) %>% 
-  gather("Id", "Threshold", 1:10)
+  gather("Id", "Threshold", 1:40)
 
 threshMat <- threshMat %>% 
   as.data.frame(.) %>% 
@@ -165,7 +166,7 @@ gg_thresh <- ggplot(data = thresh1time,
                          midpoint = 0, 
                          limits = c(-5, 5),
                          oob = squish) +
-  # scale_y_continuous(expand = c(0.0, 0), limits = c(5, 15)) +
+  scale_y_continuous(expand = c(0.0, 0), limits = c(0, 100)) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),

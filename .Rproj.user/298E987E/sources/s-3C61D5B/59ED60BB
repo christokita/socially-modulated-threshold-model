@@ -5,13 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3617656217",
+    "hash" : "0",
     "id" : "59ED60BB",
-    "lastKnownWriteTime" : 1509227830,
-    "last_content_update" : 1509227830,
+    "lastKnownWriteTime" : 1528483515,
+    "last_content_update" : 1528483515997,
     "path" : "~/Documents/Research/Tarnita Lab/Social Interaction DOL/SocialModel/scripts/__Util_TaskStateFunctions.R",
     "project_path" : "scripts/__Util_TaskStateFunctions.R",
     "properties" : {
+        "cursorPosition" : "40,1",
+        "scrollLine" : "0"
     },
     "relative_order" : 4,
     "source_on_save" : false,

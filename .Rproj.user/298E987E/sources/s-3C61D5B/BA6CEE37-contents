@@ -36,6 +36,19 @@ update_stim <- function(stimulus, delta, alpha, Ni, n) {
   return(s)
 }
 
+# # Frequency dependent
+# update_stim <- function(stim_matrix, time_step, deltas, alpha, state_matrix, n) {
+#   # 
+#   
+#   # Calculate
+#   s <- stimulus + delta - ( alpha * ( Ni / n ))
+#   # If negative, make zero
+#   if(s < 0.0001) {
+#     s <- 0
+#   }
+#   return(s)
+# }
+
 # Density dependent (per capita)
 globalStimUpdate_PerCap <- function(stimulus, delta, alpha, Ni, n, m, quitP) {
   # Calculate

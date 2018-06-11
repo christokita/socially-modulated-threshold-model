@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1528486221465.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "905737119",
+    "id" : "5D73804E",
+    "lastKnownWriteTime" : 1494512552,
+    "last_content_update" : 1494512552,
+    "path" : "~/Documents/Research/Tarnita Lab/Incipient Groups DOL/DOLThresholdModel/scripts/deprecated/1D_DetThresh_SelfReinforce.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
