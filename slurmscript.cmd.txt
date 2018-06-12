@@ -8,3 +8,4 @@
 #SBATCH --mail-user=ctokita@princeton.edu
 
 cd
+Rscript scripts/2_Cluster_SocialThreshModel.R

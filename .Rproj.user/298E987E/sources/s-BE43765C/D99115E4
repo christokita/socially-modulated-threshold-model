@@ -5,7 +5,7 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3871475049",
+    "hash" : "0",
     "id" : "D99115E4",
     "lastKnownWriteTime" : 1528753208,
     "last_content_update" : 1528753208607,
@@ -13,7 +13,7 @@
     "project_path" : "scripts/1_SocThreshModel.R",
     "properties" : {
         "cursorPosition" : "111,43",
-        "scrollLine" : "102"
+        "scrollLine" : "0"
     },
     "relative_order" : 6,
     "source_on_save" : false,

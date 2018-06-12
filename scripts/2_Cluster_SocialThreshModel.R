@@ -5,13 +5,12 @@
 ################################################################################
 
 rm(list = ls())
-setwd('.')
 
 ####################
 # Install missing packages before everything
 ####################
 source("scripts/util/__Util_MiscFunctions.R")
-needed_packages <- c("reshape2", "igraph", "ggplot2", "msm", "dplyr", "tidyr", "gtools", "parallel", "snowfall")
+needed_packages <- c("reshape2", "igraph", "ggplot2", "msm", "dplyr", "tidyr", "gtools", "parallel", "snowfall", "rlecuyer")
 install_missing_packages(needed_packages)
 
 ####################
@@ -26,7 +25,7 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 reps           <- 10 #number of replications per simulation (for ensemble)
@@ -34,7 +33,7 @@ chunk_size     <- 5 #number of simulations sent to single core
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
-ThreshSD       <- ThreshM * 0 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0.0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -205,3 +204,9 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
 })
 
 sfStop()
+
+####################
+# Save data
+####################
+filename <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, ".Rdata")
+save(parallel_simulations, file = filename)
