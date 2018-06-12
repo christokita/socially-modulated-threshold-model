@@ -57,7 +57,7 @@ run_in_parallel <- run_in_parallel %>%
   arrange(n)
 
 # Prepare for parallel
-no_cores <- detectCores() - 1
+no_cores <- detectCores() 
 sfInit(parallel = TRUE, cpus = no_cores)
 sfExportAll()
 sfLibrary(dplyr)
@@ -67,13 +67,14 @@ sfLibrary(ggplot2)
 sfLibrary(msm)
 sfLibrary(gtools)
 sfLibrary(snowfall)
+sfLibrary(tidyr)
 sfClusterSetupRNGstream(seed = 323)
 
 ####################
 # Run ensemble simulation
 ####################
 # Loop through group size (and chucnks)
-improveSpec <- sfLapply(1:nrow(run_in_parallel), function(k) {
+parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   # Set group size 
   n <- run_in_parallel[k, 1]
   chunk <- run_in_parallel[k, 2]
@@ -162,21 +163,20 @@ improveSpec <- sfLapply(1:nrow(run_in_parallel), function(k) {
     # Post run calculations
     ####################
     # Bind together task tally
-    print(sim)
     col_names <- colnames(taskTally[[1]])
     taskTally <- matrix(unlist(taskTally), 
                         ncol = length(taskTally[[1]]), 
                         byrow = TRUE, 
                         dimnames = list(c(NULL), c(col_names)))
-    taskTally <- as.matrix(transform(taskTally, n = n, replicate = sim, chunk = chunk))
+    test <- label_parallel_runs(matrix = taskTally, n = n, simulation = sim, chunk = chunk)
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
-    entropy <- as.matrix(transform(entropy, n = n, replicate = sim, chunk = chunk))
+    entropy <- label_parallel_runs(matrix = entropy, n = n, simulation = sim, chunk = chunk)
     # Calculate total task distribution
     totalTaskDist <- X_tot / gens
-    totalTaskDist <- as.matrix(transform(totalTaskDist, n = n, replicate = sim, chunk = chunk))
+    totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
     # Create tasktally table
-    stimMat <- as.matrix(transform(stimMat, n = n, replicate = sim,  chunk = chunk))
+    stimMat <- label_parallel_runs(matrix = stimMat, n = n, simulation = sim, chunk = chunk)
     # Thresh tracking matrices
     thresh1time <- summarise_threshold_tracking(tracked_threshold = thresh1time, n = n, time_steps = gens)
     thresh2time <- summarise_threshold_tracking(tracked_threshold = thresh2time, n = n, time_steps = gens)
