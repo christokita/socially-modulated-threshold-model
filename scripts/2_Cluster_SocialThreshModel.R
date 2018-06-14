@@ -9,9 +9,9 @@ rm(list = ls())
 ####################
 # Install missing packages before everything
 ####################
-source("scripts/util/__Util_MiscFunctions.R")
-needed_packages <- c("reshape2", "igraph", "ggplot2", "msm", "dplyr", "tidyr", "gtools", "parallel", "snowfall", "rlecuyer")
-install_missing_packages(needed_packages)
+# source("scripts/util/__Util_MiscFunctions.R")
+# needed_packages <- c("reshape2", "igraph", "ggplot2", "msm", "dplyr", "tidyr", "gtools", "parallel", "snowfall", "rlecuyer")
+# install_missing_packages(needed_packages)
 
 ####################
 # Source necessary scripts/libraries
@@ -27,8 +27,8 @@ library(snowfall)
 # Base parameters
 Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
-reps           <- 100 #number of replications per simulation (for ensemble)
+gens           <- 20000 #number of generations to run simulation 
+reps           <- 50 #number of replications per simulation (for ensemble)
 chunk_size     <- 25 #number of simulations sent to single core 
 
 # Threshold Parameters
@@ -56,7 +56,7 @@ run_in_parallel <- run_in_parallel %>%
   arrange(n)
 
 # Prepare for parallel
-no_cores <- detectCores() 
+no_cores <- detectCores()
 sfInit(parallel = TRUE, cpus = no_cores)
 sfExportAll()
 sfLibrary(dplyr)
