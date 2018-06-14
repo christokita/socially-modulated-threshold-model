@@ -25,11 +25,11 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
-reps           <- 10 #number of replications per simulation (for ensemble)
-chunk_size     <- 5 #number of simulations sent to single core 
+reps           <- 100 #number of replications per simulation (for ensemble)
+chunk_size     <- 25 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
