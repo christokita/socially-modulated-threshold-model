@@ -22,7 +22,7 @@ Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individ
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
-chunk_size     <- 20 #number of simulations sent to single core 
+chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
@@ -42,13 +42,15 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 # Prep for Parallelization
 ####################
 # Create directory for depositing data
+storage_path <- "/scratch/gpfs/ctokita/"
+dir.create(storage_path)
 dir_name <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta)
-full_path <- paste0("output/Rdata/", dir_name)
+full_path <- paste0(storage_path, "/", dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
               "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
 for (sub_dir in sub_dirs) {
-  dir.create(paste0("output/Rdata/", dir_name, "/", sub_dir), showWarnings = FALSE)
+  dir.create(paste0(full_path, "/", sub_dir), showWarnings = FALSE)
 }
 
 # Break up parameter replications into smaller batches\
