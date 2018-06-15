@@ -88,7 +88,7 @@ adjust_thresholds_social_capped <- function(social_network, threshold_matrix, st
 ####################
 # Summarize threshold tracking matrix
 ####################
-summarise_threshold_tracking <- function(tracked_threshold, n, time_steps) {
+summarise_threshold_tracking <- function(tracked_threshold, n, time_steps, chunk, simulation) {
   # Get column names
   id_names <- names(tracked_threshold[[1]])
   # Unlist
@@ -102,6 +102,9 @@ summarise_threshold_tracking <- function(tracked_threshold, n, time_steps) {
   threshtime <- threshtime %>% 
     gather("Id", "Threshold") 
   threshtime$t <- rep(0:time_steps, n)
+  threshtime$n <- n
+  threshtime$simulation <- simulation
+  threshtime$chunk <- chunk
   # Return
   return(threshtime)
 }

@@ -22,13 +22,13 @@ Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individ
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
-chunk_size     <- 50 #number of simulations sent to single core 
+chunk_size     <- 20 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(10, m) #population threshold means 
 ThreshSD       <- ThreshM * 0.0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.6, m) #vector of stimuli increase rates  
+deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
@@ -41,8 +41,17 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Prep for Parallelization
 ####################
-# Break up parameter replications into smaller batches
+# Create directory for depositing data
+dir_name <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta)
+full_path <- paste0("output/Rdata/", dir_name)
+dir.create(full_path)
+sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
+              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
+for (sub_dir in sub_dirs) {
+  dir.create(paste0("output/Rdata/", dir_name, "/", sub_dir), showWarnings = FALSE)
+}
 
+# Break up parameter replications into smaller batches\
 chunk_run  <- 1:(reps / chunk_size)
 run_in_parallel <- expand.grid(n = Ns, run = chunk_run)
 run_in_parallel <- run_in_parallel %>% 
@@ -160,7 +169,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                         ncol = length(taskTally[[1]]), 
                         byrow = TRUE, 
                         dimnames = list(c(NULL), c(col_names)))
-    test <- label_parallel_runs(matrix = taskTally, n = n, simulation = sim, chunk = chunk)
+    taskTally <- label_parallel_runs(matrix = taskTally, n = n, simulation = sim, chunk = chunk)
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     entropy <- label_parallel_runs(matrix = entropy, n = n, simulation = sim, chunk = chunk)
@@ -168,10 +177,14 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     totalTaskDist <- X_tot / gens
     totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
     # Create tasktally table
+    stimMat <- cbind(stimMat, 0:(nrow(stimMat) - 1))
+    colnames(stimMat)[ncol(stimMat)] <- "t"
     stimMat <- label_parallel_runs(matrix = stimMat, n = n, simulation = sim, chunk = chunk)
+    # Create thresh table
+    threshMat <- label_parallel_runs(matrix = threshMat, n = n, simulation = sim, chunk = chunk)
     # Thresh tracking matrices
-    thresh1time <- summarise_threshold_tracking(tracked_threshold = thresh1time, n = n, time_steps = gens)
-    thresh2time <- summarise_threshold_tracking(tracked_threshold = thresh2time, n = n, time_steps = gens)
+    thresh1time <- summarise_threshold_tracking(tracked_threshold = thresh1time, n = n, time_steps = gens, chunk = chunk, simulation = sim)
+    thresh2time <- summarise_threshold_tracking(tracked_threshold = thresh2time, n = n, time_steps = gens, chunk = chunk, simulation = sim)
     # Add total task distributions, entropy values, and graphs to lists
     ens_taskDist[[sim]]    <- totalTaskDist
     ens_entropy[[sim]]     <- entropy
@@ -182,24 +195,48 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     ens_thresh2Time[[sim]] <- thresh2time
     ens_graphs[[sim]]      <- g_tot / gens
   }
-  # Join together
-  all_data <- list()
-  all_data[["task_distribution"]] <- ens_taskDist
-  all_data[["entropy"]] <- ens_entropy
-  all_data[["task_tally"]] <- ens_taskTally
-  all_data[["stimulus"]] <- ens_stim
-  all_data[["threshold_matrix"]] <- ens_thresh
-  all_data[["threshold1_time"]] <- ens_thresh1Time
-  all_data[["threshold2_time"]] <- ens_thresh2Time
-  all_data[["socail_network"]] <- ens_graphs
-  # Return
-  return(all_data)
+  # Bind and write
+  save_parallel_data(data = ens_taskDist, 
+                     path = full_path, 
+                     sub_directory = "TaskDist",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_entropy, 
+                     path = full_path, 
+                     sub_directory = "Entropy",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_taskTally, 
+                     path = full_path, 
+                     sub_directory = "TaskTally",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_stim, 
+                     path = full_path, 
+                     sub_directory = "Stim",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_thresh, 
+                     path = full_path, 
+                     sub_directory = "Thresh",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_thresh1Time, 
+                     path = full_path, 
+                     sub_directory = "Thresh1Time",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_thresh2Time, 
+                     path = full_path, 
+                     sub_directory = "Thresh2Time",
+                     n = n, 
+                     chunk = chunk)
+  save(ens_graphs, 
+       file = paste0(full_path, "/Graphs/", n, "-", chunk, ".Rdata"))
+  # Return all_clear
+  return(paste0("DONE: n = ", n, 
+                ", Sims ", ((chunk-1) * chunk_size)+1, "-", chunk * chunk_size))
 })
 
 sfStop()
 
-####################
-# Save data
-####################
-filename <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, ".Rdata")
-save(parallel_simulations, file = filename)

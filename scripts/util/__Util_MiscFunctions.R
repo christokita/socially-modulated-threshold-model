@@ -26,3 +26,12 @@ label_parallel_runs <- function(matrix, n, simulation, chunk) {
   colnames(matrix) <- c(col_names, 'n', 'sim', 'chunk')
   return(matrix)
 }
+
+####################
+# Save parallel computing data
+####################
+save_parallel_data <- function(data, path, sub_directory, n, chunk) {
+  binded_data <- do.call('rbind', data)
+  write_path <- paste0(path, "/", sub_directory, "/", n, "-", chunk, ".Rdata")
+  save(binded_data, file = write_path)
+}
