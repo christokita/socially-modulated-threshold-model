@@ -3,6 +3,7 @@
 #SBATCH -n 1
 #SBATCH -c 12
 #SBATCH -t 12:00:00
+#SBATCH --mem-per-cpu=8G
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ctokita@princeton.edu
