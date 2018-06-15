@@ -13,14 +13,14 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(40) #vector of number of individuals to simulate
+Ns             <- c(100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 2000 #number of generations to run simulation 
+gens           <- 20000 #number of generations to run simulation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -162,7 +162,7 @@ gg_thresh <- ggplot(data = thresh1time,
                          midpoint = 0, 
                          limits = c(-5, 5),
                          oob = squish) +
-  scale_y_continuous(expand = c(0.0, 0), limits = c(0, 100)) +
+  scale_y_continuous(expand = c(0.0, 0), limits = c(0, 2 * ThreshM[1])) +
   theme(aspect.ratio = 1,
         panel.border = element_blank(),
         panel.grid.major = element_blank(),

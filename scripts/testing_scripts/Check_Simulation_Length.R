@@ -18,7 +18,7 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20, 30, 40, 50, 70, 100) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 50, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
