@@ -34,5 +34,5 @@ save_parallel_data <- function(data, path, sub_directory, n, chunk) {
   n <- str_pad(string = n, width = 2, pad = "0")
   chunk <- str_pad(string = chunk, width = 2, pad = "0")
   write_path <- paste0(path, "/", sub_directory, "/", n, "-", chunk, ".Rdata")
-  save(binded_data, file = write_path)
+  save(data, file = write_path)
 }

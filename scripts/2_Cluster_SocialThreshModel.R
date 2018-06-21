@@ -18,10 +18,10 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10) #vector of number of individuals to simulate
+Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
-reps           <- 10 #number of replications per simulation (for ensemble)
+gens           <- 50000 #number of generations to run simulation 
+reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
@@ -42,7 +42,8 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 # Prep for Parallelization
 ####################
 # Create directory for depositing data
-storage_path <- "/scratch/gpfs/ctokita/"
+# storage_path <- "/scratch/gpfs/ctokita"
+storage_path <- "output/Rdata/"
 dir_name <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta)
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
@@ -70,6 +71,7 @@ sfLibrary(msm)
 sfLibrary(gtools)
 sfLibrary(snowfall)
 sfLibrary(tidyr)
+sfLibrary(stringr)
 sfClusterSetupRNGstream(seed = 323)
 
 ####################
@@ -233,7 +235,12 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                      n = n, 
                      chunk = chunk)
   save(ens_graphs, 
-       file = paste0(full_path, "/Graphs/", n, "-", chunk, ".Rdata"))
+       file = paste0(full_path,
+                     "/Graphs/", 
+                     str_pad(string = n, width = 2, pad = "0"), 
+                     "-", 
+                     str_pad(string = chunk, width = 2, pad = "0"), 
+                     ".Rdata"))
   # Return all_clear
   rm(ens_taskDist, ens_entropy, ens_taskTally, ens_stim, 
      ens_thresh, ens_thresh1Time, ens_thresh2Time, ens_graphs)
