@@ -25,7 +25,7 @@ reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 10 #number of simulations sent to single core 
 
 # Threshold Parameters
-ThreshM        <- rep(50, m) #population threshold means 
+ThreshM        <- rep(10, m) #population threshold means 
 ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
@@ -33,11 +33,9 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.05 #relative weighting of social interactions for adjusting thresholds
+p              <- 0.5 #baseline probablity of initiating an interaction per time step
+epsilon        <- 0.02 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
-
-
 
 # Where to check time values
 avg_window <- 100
@@ -126,11 +124,15 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                bias = beta)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
-      threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
-                                                   threshold_matrix = threshMat,
-                                                   state_matrix = X_g,
-                                                   epsilon = epsilon,
-                                                   threshold_max = 2 * ThreshM[1])
+      # threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
+      #                                              threshold_matrix = threshMat,
+      #                                              state_matrix = X_g,
+      #                                              epsilon = epsilon,
+      #                                              threshold_max = 2 * ThreshM[1])
+      threshMat <- adjust_thresh_social(social_network = g_adj,
+                                        threshold_matrix = threshMat,
+                                        state_matrix = X_g,
+                                        epsilon = epsilon)
       # Update total task performance profile
       X_tot <- X_tot + X_g
       # Capture stats if it is appropriate window
@@ -187,5 +189,5 @@ sfStop()
 parallel_simulations <- do.call("rbind", parallel_simulations)
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-save(parallel_simulations, file =  paste0(storage_path, "CheckSimLength_Thresh", ThreshM[1], "_Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, ".Rdata"))
+save(parallel_simulations, file =  paste0(storage_path, "CheckSimLength_NoLimit_Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, ".Rdata"))
 

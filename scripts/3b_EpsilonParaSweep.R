@@ -1,25 +1,30 @@
 ################################################################################
 #
-# Model incorporating both thresholds and network dynamics
+# Social interaction model: Sweep epsilon and group size parameter space
 #
 ################################################################################
 
 rm(list = ls())
-source("scripts/util/__Util__MASTER.R")
 
+####################
+# Source necessary scripts/libraries
+####################
+source("scripts/util/__Util__MASTER.R")
+library(parallel)
+library(snowfall)
 
 ####################
 # Set global variables
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70) #vector of number of individuals to simulate
+Ns             <- seq(2, 100, 2) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 30000 #number of generations to run simulation 
-reps           <- 1 #number of replications per simulation (for ensemble)
+gens           <- 10000 #number of generations to run simulation 
+reps           <- 5 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(25, m) #population threshold means 
+ThreshM        <- rep(50, m) #population threshold means 
 ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
@@ -28,59 +33,68 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 0.5 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.05 #relative weighting of social interactions for adjusting thresholds
+epsilons       <- seq(0, 0.5, 0.01) #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
+####################
+# Prep for Parallelization
+####################
+# Create parameter combinations for parallelization
+run_in_parallel <- expand.grid(n = Ns, epsilon = epsilons)
+run_in_parallel <- run_in_parallel %>% 
+  arrange(n)
+
+# Prepare for parallel
+no_cores <- detectCores()
+sfInit(parallel = TRUE, cpus = no_cores)
+sfExportAll()
+sfLibrary(dplyr)
+sfLibrary(reshape2)
+sfLibrary(igraph)
+sfLibrary(ggplot2)
+sfLibrary(msm)
+sfLibrary(gtools)
+sfLibrary(snowfall)
+sfLibrary(tidyr)
+sfClusterSetupRNGstream(seed = 323)
 
 ####################
-# Run simulation multiple times
+# Run ensemble simulation
 ####################
-
-# Loop through group sizes
-for (i in 1:length(Ns)) {
-  # Set group size
-  n <- Ns[i]
-  
+# Loop through group size (and chucnks)
+parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
+  # Set group size 
+  n <- run_in_parallel[k, 1]
+  epsilon <- run_in_parallel[k, 2]
+  # Prep lists for collection of simulation outputs from this group size
+  ens_entropy     <- list()
   # Run Simulations
   for (sim in 1:reps) {
-    
     ####################
     # Seed structures and intial matrices
     ####################
-
     # Set initial probability matrix (P_g)
     P_g <- matrix(data = rep(0, n * m), ncol = m)
-    
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
                             gens = gens)
-    
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
                                  threshold_means = ThreshM,
                                  threshold_sds = ThreshSD)
-    
     # Start task performance
     X_g <- matrix(data = rep(0, length(P_g)), ncol = ncol(P_g))
-    
     # Create cumulative task performance matrix
     X_tot <- X_g
-    
     # Create cumulative adjacency matrix
     g_tot <-  matrix(data = rep(0, n * n), ncol = n)
     colnames(g_tot) <- paste0("v-", 1:n)
     rownames(g_tot) <- paste0("v-", 1:n)
     
-    # Prep threshold tracking matrix
-    thresh1time <- list()
-    thresh2time <- list()
-    thresh1time[[1]] <- threshMat[,1]
-    thresh2time[[1]] <- threshMat[,2]
-    
     ####################
-    # Simulate
+    # Simulate individual run
     ####################
     # Run simulation
     for (t in 1:gens) { 
@@ -105,74 +119,48 @@ for (i in 1:length(Ns)) {
                                bias = beta)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
-      # threshMat <- adjust_thresh_social(social_network = g_adj,
-      #                                   threshold_matrix = threshMat,
-      #                                   state_matrix = X_g,
-      #                                   epsilon = epsilon)
       threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
                                                    threshold_max = 2 * ThreshM[1])
-      thresh1time[[t + 1]] <- threshMat[,1]
-      thresh2time[[t + 1]] <- threshMat[,2]
-      
       # Update total task performance profile
       X_tot <- X_tot + X_g
-      
     }
-
-    # Print simulation completed
-    print(paste0("DONE: N = ", n, ", Simulation ", sim))
+    ####################
+    # Post run calculations
+    ####################
+    # Calculate Entropy
+    entropy <- as.data.frame(mutualEntropy(TotalStateMat = X_tot))
+    entropy$n <- n
+    entropy$beta <- beta
+    # Add entropy values to list
+    ens_entropy[[sim]] <- entropy
+    # Clean
+    rm(X_tot, stimMat, threshMat, g_tot, g_adj, P_g, X_g)
   }
-  
-}
+  # Bind together and summarise
+  entropy_sum <- do.call("rbind", ens_entropy)
+  entropy_sum <- entropy_sum %>% 
+    group_by(n, beta) %>% 
+    summarise(Dsym_mean = mean(Dsym),
+              Dysm_SD = sd(Dsym),
+              Dtask_mean = mean(Dtask),
+              Dtask_SD = sd(Dtask),
+              Dind_mean = mean(Dind),
+              Dind_SD = sd(Dind))
+  entropy_sum <- as.data.frame(entropy_sum)
+  return(entropy_sum)
+  sys.sleep(1)
+})
 
-library(RColorBrewer)
-library(scales)
-library(tidyr)
-library(ggthemes)
+sfStop()
 
-thresh1time <- do.call("rbind", thresh1time)
-row.names(thresh1time) <- NULL
-thresh1time <- as.data.frame(thresh1time)
-thresh1time <- thresh1time %>% 
-  gather("Id", "Threshold")
-thresh1time$t <- rep(0:gens, n)
+# Bind and save
+parallel_data <- do.call('rbind', parallel_simulations)
 
-threshMat <- threshMat %>% 
-  as.data.frame(.) %>% 
-  mutate(ThreshRatio = log(Thresh1 / Thresh2),
-         Id = row.names(.))
-threshMat$ThreshRatio[threshMat$ThreshRatio > 10] <- 10
-threshMat$ThreshRatio[threshMat$ThreshRatio < -10] <- -10
-
-thresh1time <- merge(thresh1time, threshMat, by = "Id")
-
-
-gg_thresh <- ggplot(data = thresh1time, 
-                    aes(x = t, y = Threshold)) +
-  theme_classic(base_size = 10) +
-  geom_line(aes(group = Id, colour = ThreshRatio), size = 0.2) +
-  scale_colour_gradient2(name = "ln(Threshold Ratio)",
-                         high = "#d7191c",
-                         mid = "#ffffbf",
-                         # mid = "#cecece",
-                         low = "#2c7bb6", 
-                         midpoint = 0, 
-                         limits = c(-5, 5),
-                         oob = squish) +
-  scale_y_continuous(expand = c(0.0, 0), limits = c(0, 2 * ThreshM[1])) +
-  theme(aspect.ratio = 1,
-        panel.border = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "none",
-        axis.ticks.length = unit(4, "pt"),
-        axis.text = element_text(color = "black"))
-gg_thresh
-
-
-entropy <- mutualEntropy(TotalStateMat = X_tot)
-
-# ggsave("output/ThresholdTime/Size100_Sigma0.0_TripleTimeLength.png", scale = 0.6, dpi = 600)
+# Create directory for depositing data
+storage_path <- "/scratch/gpfs/ctokita/"
+file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
+full_path <- paste0(storage_path, file_name, '.Rdata')
+save(parallel_data, file = full_path)

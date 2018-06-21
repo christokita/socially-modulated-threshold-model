@@ -10,8 +10,9 @@ require(igraph)
 require(ggplot2)
 require(msm)
 require(dplyr)
-library(tidyr)
+require(tidyr)
 require(gtools)
+require(stringr)
 source("scripts/util/__Util_ForceAtlas2.R")
 
 # Source Composite Functions

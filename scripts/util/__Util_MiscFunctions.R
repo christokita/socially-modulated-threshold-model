@@ -31,7 +31,8 @@ label_parallel_runs <- function(matrix, n, simulation, chunk) {
 # Save parallel computing data
 ####################
 save_parallel_data <- function(data, path, sub_directory, n, chunk) {
-  binded_data <- do.call('rbind', data)
+  n <- str_pad(string = n, width = 2, pad = "0")
+  chunk <- str_pad(string = chunk, width = 2, pad = "0")
   write_path <- paste0(path, "/", sub_directory, "/", n, "-", chunk, ".Rdata")
   save(binded_data, file = write_path)
 }
