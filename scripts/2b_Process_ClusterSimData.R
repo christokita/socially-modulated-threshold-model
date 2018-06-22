@@ -39,10 +39,11 @@ for (folder in bind_folders) {
   files <- list.files(paste0(directory_path, folder), full.names = TRUE)
   for (file in files) {
     load(file)
+    data <- do.call('rbind', data)
     if (!exists("compiled_data")) {
-      compiled_data <- binded_data
+      compiled_data <- data
     } else {
-      compiled_data <- rbind(compiled_data, binded_data)
+      compiled_data <- rbind(compiled_data, data)
     }
   }
   compiled_data <- as.data.frame(compiled_data)
@@ -90,7 +91,7 @@ for (folder in list_folders) {
         # Load data
         load(file)
         # Bind together
-        ifelse(!exists("listed_data"),  listed_data <- binded_data, listed_data <- rbind(listed_data, binded_data))
+        ifelse(!exists("listed_data"),  listed_data <- data, listed_data <- rbind(listed_data, data))
       }
       save(listed_data, file = paste0(full_output_path, i, ".Rdata"))
       rm(listed_data)

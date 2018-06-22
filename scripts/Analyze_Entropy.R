@@ -42,11 +42,23 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
                 width = 0) +
   geom_point(aes(y = Mean),
-             size = 2) +
+             size = 1) +
   theme_classic() +
   ylab("Division of Labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_color_manual(values = c("#1f78b4")) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
+        legend.position = "none",
+        legend.title = element_text(size = 7, 
+                                    face = "bold"),
+        legend.text = element_text(size = 6),
+        # legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(5, "mm"),
+        axis.ticks = element_line(size = 0.3),
+        axis.line = element_line(size = 0.3),
         aspect.ratio = 1)
 gg_entropy
+
+ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-Beta1.1.png", 
+       height = 45, width = 45, units = "mm", dpi = 800)
