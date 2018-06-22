@@ -42,8 +42,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 # Prep for Parallelization
 ####################
 # Create directory for depositing data
-# storage_path <- "/scratch/gpfs/ctokita"
-storage_path <- "output/Rdata/"
+storage_path <- "/scratch/gpfs/ctokita/"
 dir_name <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta)
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)

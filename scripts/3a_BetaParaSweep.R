@@ -20,8 +20,8 @@ library(snowfall)
 # Base parameters
 Ns             <- seq(2, 100, 2) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 10000 #number of generations to run simulation 
-reps           <- 5 #number of replications per simulation (for ensemble)
+gens           <- 50000 #number of generations to run simulation 
+reps           <- 100 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
@@ -57,6 +57,7 @@ sfLibrary(msm)
 sfLibrary(gtools)
 sfLibrary(snowfall)
 sfLibrary(tidyr)
+sfLibrary(stringr)
 sfClusterSetupRNGstream(seed = 323)
 
 ####################
@@ -160,7 +161,8 @@ sfStop()
 parallel_data <- do.call('rbind', parallel_simulations)
 
 # Create directory for depositing data
-storage_path <- "/scratch/gpfs/ctokita/"
+# storage_path <- "/scratch/gpfs/ctokita/"
+storage_path <- "output/"
 file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
 full_path <- paste0(storage_path, file_name, '.Rdata')
 save(parallel_data, file = full_path)

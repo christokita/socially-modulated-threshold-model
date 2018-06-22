@@ -20,14 +20,16 @@ temporalNetwork <- function(X_sub_g, prob_interact, bias) {
       # set up list of potential connections
       potential <- seq(1:dimension)
       baseline_prob <- rep(1, length(potential))
+      # catch for if there is only two individuals
+      if (length(baseline_prob) == 2) { 
+        potential <- c(potential, 0)
+        baseline_prob <- c(baseline_prob, 0)
+      }
       # loop through column individuals
-      #
-      # FIX: fix baseline_prob vetor. technically fine, but reweight probs before feeding into sample. 
-      #
       # If inactive, all connections equal prob
       if (length(task) == 0) {
-        potential <- potential[-i] #remove self
-        baseline_prob <- baseline_prob[-i] #remove self
+        potential <- potential[-i] # remove self
+        baseline_prob <- baseline_prob[-i] # remove self
         connection <- sample(x = potential, size = 1, prob = baseline_prob)
         g_adj[i, connection] <- 1
         g_adj[connection, i] <- 1
@@ -35,8 +37,8 @@ temporalNetwork <- function(X_sub_g, prob_interact, bias) {
         # find which individuals are perfoming same task and relatively weight probabilities
         same <- which(X_sub_g[ , task] == 1)
         baseline_prob[same] <- baseline_prob[same] * bias
-        potential <- potential[-i] #remove self
-        baseline_prob <- baseline_prob[-i] #remove self
+        potential <- potential[-i] # remove self
+        baseline_prob <- baseline_prob[-i] # remove self
         connection <- sample(x = potential, size = 1, prob = baseline_prob)
         g_adj[i, connection] <- 1
         g_adj[connection, i] <- 1
