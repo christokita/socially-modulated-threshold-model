@@ -21,10 +21,10 @@ temporalNetwork <- function(X_sub_g, prob_interact, bias) {
       potential <- seq(1:dimension)
       baseline_prob <- rep(1, length(potential))
       # catch for if there is only two individuals
-      if (length(baseline_prob) == 2) { 
-        potential <- c(potential, 0)
-        baseline_prob <- c(baseline_prob, 0)
-      }
+      # if (length(baseline_prob) == 2) { 
+      #   potential <- c(potential, 0)
+      #   baseline_prob <- c(baseline_prob, 0)
+      # }
       # loop through column individuals
       # If inactive, all connections equal prob
       if (length(task) == 0) {
