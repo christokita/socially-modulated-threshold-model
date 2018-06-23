@@ -45,6 +45,12 @@ run_in_parallel <- expand.grid(n = Ns, epsilon = epsilons)
 run_in_parallel <- run_in_parallel %>% 
   arrange(n)
 
+# Create directory for depositing data
+storage_path <- "/scratch/gpfs/ctokita/"
+file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
+full_path <- paste0(storage_path, file_name, '/')
+dir.create(full_path, showWarnings = FALSE)
+
 # Prepare for parallel
 no_cores <- detectCores()
 sfInit(parallel = TRUE, cpus = no_cores)
@@ -151,17 +157,22 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
               Dind_mean = mean(Dind),
               Dind_SD = sd(Dind))
   entropy_sum <- as.data.frame(entropy_sum)
-  return(entropy_sum)
+  save(entropy_sum, file = paste0(full_path, 
+                                  "n", 
+                                  str_pad(string = n, width =  3, pad =  "0"),
+                                  "-epsilon",
+                                  epsilon, 
+                                  ".Rdata"))
   sys.sleep(1)
 })
 
 sfStop()
 
 # Bind and save
-parallel_data <- do.call('rbind', parallel_simulations)
+# parallel_data <- do.call('rbind', parallel_simulations)
 
-# Create directory for depositing data
-storage_path <- "/scratch/gpfs/ctokita/"
-file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
-full_path <- paste0(storage_path, file_name, '.Rdata')
-save(parallel_data, file = full_path)
+# # Create directory for depositing data
+# storage_path <- "/scratch/gpfs/ctokita/"
+# file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
+# full_path <- paste0(storage_path, file_name, '.Rdata')
+# save(parallel_data, file = full_path)
