@@ -43,13 +43,19 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 # Create parameter combinations for parallelization
 run_in_parallel <- expand.grid(n = Ns, epsilon = epsilons)
 run_in_parallel <- run_in_parallel %>% 
-  arrange(n)
+  arrange(n) 
 
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
 file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
 full_path <- paste0(storage_path, file_name, '/')
 dir.create(full_path, showWarnings = FALSE)
+
+# Check if there is already some runs done
+files <- list.files(full_path)
+completed_runs <- data.frame(n = as.numeric(gsub(x = files, "n([0-9]+)-.*", "\\1", perl = T)))
+completed_runs$epsilon <- as.numeric(gsub(x = files, ".*-epsilon([\\.0-9]+).Rdata$", "\\1", perl = T))
+run_in_parallel <- anti_join(run_in_parallel, completed_runs, by = c("n", "epsilon"))
 
 # Prepare for parallel
 no_cores <- detectCores()
@@ -163,7 +169,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                   "-epsilon",
                                   epsilon, 
                                   ".Rdata"))
-  sys.sleep(1)
+  Sys.sleep(1)
 })
 
 sfStop()

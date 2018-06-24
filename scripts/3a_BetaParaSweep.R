@@ -51,6 +51,12 @@ file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon
 full_path <- paste0(storage_path, file_name, '/')
 dir.create(full_path, showWarnings = FALSE)
 
+# Check if there is already some runs done
+files <- list.files(full_path)
+completed_runs <- data.frame(n = as.numeric(gsub(x = files, "n([0-9]+)-.*", "\\1", perl = T)))
+completed_runs$beta <- as.numeric(gsub(x = files, ".*-beta([\\.0-9]+).Rdata$", "\\1", perl = T))
+run_in_parallel <- anti_join(run_in_parallel, completed_runs, by = c("n", "beta"))
+
 # Prepare for parallel
 no_cores <- detectCores()
 sfInit(parallel = TRUE, cpus = no_cores)
@@ -163,7 +169,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                   "-beta",
                                   beta, 
                                   ".Rdata"))
-  sys.sleep(1)
+  Sys.sleep(1)
 })
 
 sfStop()
