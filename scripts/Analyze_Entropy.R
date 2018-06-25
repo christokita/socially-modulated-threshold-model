@@ -46,16 +46,16 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   theme_classic() +
   ylab("Division of Labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_color_manual(values = c("#41ab5d", "#005a32"), 
+  scale_color_manual(values = c("#005a32", "#41ab5d"), 
                      labels = c("1.2", "1.1"),
                      name = expression("Interaction bias"(Beta))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
-        legend.position = "right",
+        legend.position = "none",
         legend.title = element_text(size = 7, 
                                     face = "bold"),
-        legend.text = element_text(size = 6,),
-        # legend.key.height = unit(5, "mm"),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(4, "mm"),
         legend.key.width = unit(5, "mm"),
         axis.ticks = element_line(size = 0.3),
         axis.line = element_line(size = 0.3),
