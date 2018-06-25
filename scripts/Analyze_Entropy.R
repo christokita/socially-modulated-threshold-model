@@ -13,12 +13,12 @@ library(scales)
 # Load data
 ####################
 load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
-compiled_data$Model <- "Social"
+compiled_data$Model <- "Social_Beta1.1"
 entropy_data <- compiled_data
 rm(compiled_data)
 
-load("output/Rdata/_ProcessedData/Entropy/Sigma0a")
-compiled_data$Model <- "Fixed_Sigma0.05"
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.2.Rdata")
+compiled_data$Model <- "Social_Beta"
 entropy_data <- rbind(entropy_data, compiled_data)
 rm(compiled_data)
 
@@ -46,13 +46,15 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   theme_classic() +
   ylab("Division of Labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_color_manual(values = c("#1f78b4")) +
+  scale_color_manual(values = c("#41ab5d", "#005a32"), 
+                     labels = c("1.2", "1.1"),
+                     name = expression("Interaction bias"(Beta))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
-        legend.position = "none",
+        legend.position = "right",
         legend.title = element_text(size = 7, 
                                     face = "bold"),
-        legend.text = element_text(size = 6),
+        legend.text = element_text(size = 6,),
         # legend.key.height = unit(5, "mm"),
         legend.key.width = unit(5, "mm"),
         axis.ticks = element_line(size = 0.3),
