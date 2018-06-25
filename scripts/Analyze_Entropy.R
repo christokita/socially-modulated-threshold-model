@@ -17,7 +17,7 @@ compiled_data$Model <- "Social"
 entropy_data <- compiled_data
 rm(compiled_data)
 
-load("output/Rdata/_ProcessedData/Entropy/Sigma0.05-Epsilon0-Beta1.1.Rdata")
+load("output/Rdata/_ProcessedData/Entropy/Sigma0a")
 compiled_data$Model <- "Fixed_Sigma0.05"
 entropy_data <- rbind(entropy_data, compiled_data)
 rm(compiled_data)
