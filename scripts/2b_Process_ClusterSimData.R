@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-directory_path <- "output/Rdata/Sigma0-Epsilon0.1-Beta1.2/"
+directory_path <- "output/Rdata/Sigma0-Epsilon0.1-Beta1.1/"
 output_path <- "output/Rdata/_ProcessedData/"
 run_info <- gsub("^.*(Sigma.*)/$", "\\1", directory_path, perl = TRUE)
 
@@ -91,7 +91,7 @@ for (folder in list_folders) {
         # Load data
         load(file)
         # Bind together
-        ifelse(!exists("listed_data"),  listed_data <- data, listed_data <- rbind(listed_data, data))
+        ifelse(!exists("listed_data"),  listed_data <- data, listed_data <- c(listed_data, data))
       }
       save(listed_data, file = paste0(full_output_path, i, ".Rdata"))
       rm(listed_data)
