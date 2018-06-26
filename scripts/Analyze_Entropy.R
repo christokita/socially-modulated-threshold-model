@@ -36,6 +36,8 @@ entropy <- entropy_data %>%
 ####################
 # Plot
 ####################
+pal <- brewer.pal(9, "YlGn")[c(9, 6, 4, 2)]
+
 gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_line(aes(y = Mean),
             size = 0.4) +
@@ -46,7 +48,7 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   theme_classic() +
   ylab("Division of Labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_color_manual(values = c("#005a32", "#41ab5d"), 
+  scale_color_manual(values = pal, 
                      labels = c("1.2", "1.1"),
                      name = expression("Interaction bias"(Beta))) +
   theme(axis.text = element_text(colour = "black", size = 6),
@@ -62,5 +64,5 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
         aspect.ratio = 1)
 gg_entropy
 
-ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-Beta1.1.png", 
+ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.png", 
        height = 45, width = 45, units = "mm", dpi = 800)

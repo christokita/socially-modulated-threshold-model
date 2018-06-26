@@ -9,6 +9,7 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
+p <- 0.5 #prob of interact
 
 ####################
 # Load and process data
@@ -46,8 +47,8 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     dimensions <- dim(this_graph)
     labs <- colnames(this_graph)
     this_graph <- as.vector(this_graph)
-    # this_graph <- scale(this_graph) # normalize relative to the average
-    not_chosen <- 1 - ( 1 / (dimensions[1] - 1) )
+    this_graph <- scale(this_graph) # normalize relative to the average
+    not_chosen <- 1 - (( 1 / (dimensions[1] - 1)) * p)
     expected_random <-  1 - not_chosen^2
     this_graph <- (this_graph - expected_random) / expected_random #relative to expected by random (i.e., 1 - chance of not being chosen^2)
     this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
@@ -60,8 +61,8 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     ratio <- order(thresh$ThreshRatio)
     # Create order by threshold ratio
     this_graph <- this_graph[ratio, ratio]
-    colnames(this_graph) <- paste0("t-", 1:dimensions[1])
-    rownames(this_graph) <- paste0("t-", 1:dimensions[1])
+    colnames(this_graph) <- paste0("v-", 1:dimensions[1])
+    rownames(this_graph) <- paste0("v-", 1:dimensions[1])
     # return
     return(this_graph)
   })
