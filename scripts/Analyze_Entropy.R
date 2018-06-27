@@ -9,12 +9,25 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
+
+############### Sweep across beta values ###############
+
 ####################
 # Load data
 ####################
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.01.Rdata")
+compiled_data$Model <- "Social_Beta1.01"
+entropy_data <- compiled_data
+rm(compiled_data)
+
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.05.Rdata")
+compiled_data$Model <- "Social_Beta1.05"
+entropy_data <- rbind(entropy_data, compiled_data)
+rm(compiled_data)
+
 load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
 compiled_data$Model <- "Social_Beta1.1"
-entropy_data <- compiled_data
+entropy_data <- rbind(entropy_data, compiled_data)
 rm(compiled_data)
 
 load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.2.Rdata")
@@ -36,7 +49,7 @@ entropy <- entropy_data %>%
 ####################
 # Plot
 ####################
-pal <- brewer.pal(9, "YlGn")[c(9, 6, 4, 2)]
+pal <- brewer.pal(5, "Greens")[2:5]
 
 gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_line(aes(y = Mean),
@@ -66,3 +79,6 @@ gg_entropy
 
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.png", 
        height = 45, width = 45, units = "mm", dpi = 800)
+
+
+############### Sweep across epsilon values ###############
