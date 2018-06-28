@@ -15,7 +15,7 @@ library(RColorBrewer)
 ####################
 # Load data
 ####################
-load("output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
+load("output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1.Rdata")
 
 ####################
 # Plot: Beta sweep
