@@ -15,7 +15,7 @@ library(scales)
 ####################
 # Load data
 ####################
-path <- "output/SimLength/CheckSimLength_Thresh50_Sigma0-Epsilon0.05-Beta1.1.Rdata"
+path <- "output/SimLength/CheckSimLength_Thresh50_Sigma0-Epsilon0.07-Beta1.1.Rdata"
 load(path)
 
 file_name <- gsub("^.*(Thresh[\\. 0-9]*.*)\\.Rdata$", "\\1", path, perl = T)
