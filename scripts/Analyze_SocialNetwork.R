@@ -9,13 +9,14 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
-p <- 0.5 #prob of interact
+p <- 1 #prob of interact
+run <- "Sigma0-Epsilon0.01-Beta1.1"
 
 ####################
 # Load and process data
 ####################
 # Load social networks
-files <- list.files("output/Rdata/_ProcessedData/Graphs/Sigma0-Epsilon0.1-Beta1.1/", full.names = TRUE)
+files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", run, "/"), full.names = TRUE)
 soc_networks <- list()
 for (i in 1:length(files)) {
   load(files[i])
@@ -23,7 +24,7 @@ for (i in 1:length(files)) {
 }
 
 # Load threshold matrices
-files <- list.files("output/Rdata/_ProcessedData/Thresh/Sigma0-Epsilon0.1-Beta1.1/", full.names = TRUE)
+files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", run, "/"), full.names = TRUE)
 thresh_data <- list()
 for (i in 1:length(files)) {
   load(files[i])
@@ -77,34 +78,46 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
   plot_data <- edge_list %>% mutate(
     to = factor(to, levels = node_list$name),
     from = factor(from, levels = node_list$name))
-  # Plot
+  # Get info for plot
   groupsize <- ncol(avg_g)
-  gg_avg_adj <- ggplot(plot_data, aes(x = rev(from), y = to, fill = weight)) +
-    geom_raster() +
+  if (groupsize < 30) {
+    breaks <- c(1, seq(5, length(plot_data$to), 5))
+  } else if(groupsize < 55) {
+    breaks <- c(1, seq(10, length(plot_data$to), 10))
+  } else {
+    breaks <- c(1, seq(20, length(plot_data$to), 20))
+  }
+  # Plot
+  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
+    geom_tile() +
     theme_bw() +
     # Because we need the x and y axis to display every node,
     # not just the nodes that have connections to each other,
     # make sure that ggplot does not drop unused factor levels
-    scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
-    scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
-    # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
+    scale_x_discrete(drop = FALSE, expand = c(0, 0), 
+                     position = "top",
+                     breaks = levels(plot_data$to)[breaks]) +
+    scale_y_discrete(drop = FALSE, expand = c(0, 0), 
+                     limits = rev(levels(plot_data$to)),
+                     breaks = levels(plot_data$to)[breaks]) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
-                         # colours = c(brewer.pal(7,"PiYG")),
                          colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
                          # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
-                         na.value = "black", 
+                         na.value = "white", 
                          limit = c(-0.05, 0.05),
                          # limit = c(0.95, 1.05),
                          oob = squish) +
-    theme(axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title = element_blank(),
+    xlab("Individual") +
+    ylab("Individual") +
+    theme(axis.text = element_text(colour = "black", size = 6),
+          axis.title = element_text(size = 7),
+          axis.ticks = element_line(size = 0.3),
           aspect.ratio = 1,
           # Hide the legend (optional)
           legend.position = "none",
           legend.key.height = unit(0.38, "in"),
-          panel.border = element_rect(size = 1.5),
-          title = element_blank()) +
+          panel.background = element_rect(size = 0.3, fill = NA),
+          plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
   return(gg_avg_adj)
@@ -150,19 +163,24 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   nonNA_edgelist <- all_edgelist %>% 
     group_by(Interaction) %>% 
     filter(!is.na(Weight)) %>% 
-    mutate(pvalue = t.test(x = Weight, mu = expected_random)[3])
-  # Get the CI for those that are significantly different and then determine if greater or less than expected
-  sigDiff_edgelist <- nonNA_edgelist %>% 
+    mutate(pvalue = t.test(x = Weight, mu = expected_random)[3]) %>% 
     mutate(Significant = pvalue < 0.05) %>% 
-    filter(Significant == TRUE) %>% 
+    filter(Significant == TRUE)
+  # Get the CI for those that are significantly different and then determine if greater or less than expected
+  if (nrow(nonNA_edgelist) > 0) {
+    sigDiff_edgelist <- nonNA_edgelist %>% 
     group_by(Interaction) %>% 
     mutate(CImin = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random,
            CImax = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random) %>% 
     mutate(DiffDirection = ifelse(test = CImin > 0 & CImax > 0, yes = 1, no = -1)) %>% 
     select(Interaction, DiffDirection) %>% 
     unique(.) 
+    calc_edgelist <- merge(all_edgelist, sigDiff_edgelist, all = TRUE)
+  } else {
+    calc_edgelist <- all_edgelist
+    calc_edgelist$DiffDirection <- NA
+  }
   # Merge back together and then form graph
-  calc_edgelist <- merge(all_edgelist, sigDiff_edgelist, all = TRUE)
   calc_edgelist$DiffDirection[is.na(calc_edgelist$DiffDirection) & !is.na(calc_edgelist$Weight)] <- 0
   calc_edgelist <- calc_edgelist %>% 
     select(From, To, Interaction, DiffDirection) %>% 
@@ -182,16 +200,28 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   plot_data <- edge_list %>% mutate(
     to = factor(to, levels = rev(node_list$name)),
     from = factor(from, levels = node_list$name))
-  # Plot
+  # Get info for plot
   groupsize <- ncol(avg_g)
+  if (groupsize < 30) {
+    breaks <- c(1, seq(5, length(plot_data$to), 5))
+  } else if(groupsize < 55) {
+    breaks <- c(1, seq(10, length(plot_data$to), 10))
+  } else {
+    breaks <- c(1, seq(20, length(plot_data$to), 20))
+  }
+  # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
     geom_raster() +
     theme_bw() +
     # Because we need the x and y axis to display every node,
     # not just the nodes that have connections to each other,
     # make sure that ggplot does not drop unused factor levels
-    scale_x_discrete(drop = FALSE, expand = c(0, 0)) +
-    scale_y_discrete(drop = FALSE, expand = c(0, 0)) +
+    scale_x_discrete(drop = FALSE, expand = c(0, 0), 
+                     position = "top",
+                     breaks = levels(plot_data$to)[breaks]) +
+    scale_y_discrete(drop = FALSE, expand = c(0, 0), 
+                     limits = rev(levels(plot_data$to)),
+                     breaks = levels(plot_data$to)[breaks]) +
     # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
                          colours = c("#9E9E9E", "#ffffff", "#79248C"),
@@ -199,16 +229,17 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
                          limit = c(-1, 1),
                          # limit = c(0.95, 1.05),
                          oob = squish) +
-    theme(axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          axis.title = element_blank(),
+    xlab("Individual") +
+    ylab("Individual") +
+    theme(axis.text = element_text(colour = "black", size = 6),
+          axis.title = element_text(size = 7),
+          axis.ticks = element_line(size = 0.3),
           aspect.ratio = 1,
           # Hide the legend (optional)
           legend.position = "none",
           legend.key.height = unit(0.38, "in"),
-          panel.border = element_rect(size = 1.5),
-          panel.grid = element_blank(),
-          title = element_blank()) +
+          panel.background = element_rect(size = 0.3, fill = NA),
+          plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
   return(gg_avg_adj)

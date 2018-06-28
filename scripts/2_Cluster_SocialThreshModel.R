@@ -181,7 +181,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   save(ens_graphs, 
        file = paste0(full_path,
                      "/Graphs/", 
-                     str_pad(string = n, width = 2, pad = "0"), 
+                     str_pad(string = n, width = 3, pad = "0"), 
                      "-", 
                      str_pad(string = chunk, width = 2, pad = "0"), 
                      ".Rdata"))
