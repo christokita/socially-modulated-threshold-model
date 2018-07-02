@@ -34,7 +34,7 @@ quitP          <- 0.2 #probability of quitting task once active
 # Social Network Parameters
 p              <- 0.5 #baseline probablity of initiating an interaction per time step
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-betas          <- seq(1.1, 1.14, 0.01) #probability of interacting with individual in same state relative to others
+betas          <- seq(1.15, 1.19, 0.01) #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -47,7 +47,7 @@ run_in_parallel <- run_in_parallel %>%
 
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
+file_name <- paste0("_GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
 full_path <- paste0(storage_path, file_name, '/')
 dir.create(full_path, showWarnings = FALSE)
 
@@ -70,7 +70,7 @@ sfLibrary(gtools)
 sfLibrary(snowfall)
 sfLibrary(tidyr)
 sfLibrary(stringr)
-sfClusterSetupRNGstream(seed = 323)
+# sfClusterSetupRNGstream(seed = 115)
 
 ####################
 # Run ensemble simulation

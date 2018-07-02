@@ -11,6 +11,7 @@ rm(list = ls())
 ####################
 source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
+library(scales)
 
 ####################
 # Load data
@@ -61,8 +62,9 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
   theme_bw() +
   scale_x_continuous(breaks = seq(0, 100, 20), 
                      expand = c(0,0)) +
-  scale_y_continuous(breaks = seq(0, 0.25, 0.05), 
-                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), 
+                     expand = c(0,0),
+                     limits = c(0, 0.6)) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
@@ -80,5 +82,5 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
         aspect.ratio = 1)
 gg_eps
 
-ggsave(gg_eps, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
+ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
 
