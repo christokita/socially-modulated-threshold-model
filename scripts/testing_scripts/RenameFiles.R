@@ -4,7 +4,7 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
-run <- "Sigma0-Epsilon0.1-Beta1.1"
+run <- "Sigma0-Epsilon0.1-Beta1.2"
 
 ####################
 # Go through folders and pad file names
