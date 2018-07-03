@@ -124,6 +124,12 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
   # return(avg_g)
 })
 
+# Save
+plots <- seq(4, 7, 1)
+for (plot in plots) {
+  
+}
+
 
 ####################
 # Graph relative interactrion rates: simplified rate
@@ -211,7 +217,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   }
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
-    geom_raster() +
+    geom_tile() +
     theme_bw() +
     # Because we need the x and y axis to display every node,
     # not just the nodes that have connections to each other,
@@ -220,7 +226,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
                      position = "top",
                      breaks = levels(plot_data$to)[breaks]) +
     scale_y_discrete(drop = FALSE, expand = c(0, 0), 
-                     limits = rev(levels(plot_data$to)),
+                     limits = levels(plot_data$to),
                      breaks = levels(plot_data$to)[breaks]) +
     # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
@@ -239,6 +245,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
           legend.position = "none",
           legend.key.height = unit(0.38, "in"),
           panel.background = element_rect(size = 0.3, fill = NA),
+          panel.grid = element_blank(),
           plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
