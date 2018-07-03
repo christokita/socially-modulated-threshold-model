@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Social interaction model: Sweep beta and group size parameter space
+# Social interaction model: Sweep epsilon and group size parameter space
 #
 ################################################################################
 
@@ -32,30 +32,30 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 0.5 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-betas          <- seq(1.1, 1.14, 0.01) #probability of interacting with individual in same state relative to others
+p              <- 1 #baseline probablity of initiating an interaction per time step
+epsilons       <- seq(0.5, 0.6, 0.025) #relative weighting of social interactions for adjusting thresholds
+beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 ####################
 # Prep for Parallelization
 ####################
 # Create parameter combinations for parallelization
-run_in_parallel <- expand.grid(n = Ns, beta = betas)
+run_in_parallel <- expand.grid(n = Ns, epsilon = epsilons)
 run_in_parallel <- run_in_parallel %>% 
-  arrange(n)
+  arrange(n) 
 
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-file_name <- paste0("_GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
+file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
 full_path <- paste0(storage_path, file_name, '/')
 dir.create(full_path, showWarnings = FALSE)
 
 # Check if there is already some runs done
 files <- list.files(full_path)
 completed_runs <- data.frame(n = as.numeric(gsub(x = files, "n([0-9]+)-.*", "\\1", perl = T)))
-completed_runs$beta <- as.numeric(gsub(x = files, ".*-beta([\\.0-9]+).Rdata$", "\\1", perl = T))
-run_in_parallel <- anti_join(run_in_parallel, completed_runs, by = c("n", "beta"))
+completed_runs$epsilon <- as.numeric(gsub(x = files, ".*-epsilon([\\.0-9]+).Rdata$", "\\1", perl = T))
+run_in_parallel <- anti_join(run_in_parallel, completed_runs, by = c("n", "epsilon"))
 
 # Prepare for parallel
 no_cores <- detectCores()
@@ -70,7 +70,7 @@ sfLibrary(gtools)
 sfLibrary(snowfall)
 sfLibrary(tidyr)
 sfLibrary(stringr)
-# sfClusterSetupRNGstream(seed = 110)
+# sfClusterSetupRNGstream(seed = 020)
 
 ####################
 # Run ensemble simulation
@@ -79,7 +79,7 @@ sfLibrary(stringr)
 parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   # Set group size 
   n <- run_in_parallel[k, 1]
-  beta <- run_in_parallel[k, 2]
+  epsilon <- run_in_parallel[k, 2]
   # Prep lists for collection of simulation outputs from this group size
   ens_entropy     <- list()
   # Run Simulations
@@ -166,8 +166,8 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   save(entropy_sum, file = paste0(full_path, 
                                   "n", 
                                   str_pad(string = n, width =  3, pad =  "0"),
-                                  "-beta",
-                                  beta, 
+                                  "-epsilon",
+                                  epsilon, 
                                   ".Rdata"))
   Sys.sleep(1)
 })
@@ -177,8 +177,8 @@ sfStop()
 # Bind and save
 # parallel_data <- do.call('rbind', parallel_simulations)
 
-# Create directory for depositing data
+# # Create directory for depositing data
 # storage_path <- "/scratch/gpfs/ctokita/"
-# file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
+# file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
 # full_path <- paste0(storage_path, file_name, '.Rdata')
 # save(parallel_data, file = full_path)

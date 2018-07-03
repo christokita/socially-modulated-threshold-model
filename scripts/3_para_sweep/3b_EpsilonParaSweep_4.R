@@ -33,7 +33,7 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilons       <- seq(0.75, 1.0, 0.05) #relative weighting of social interactions for adjusting thresholds
+epsilons       <- seq(0.375, 0.475, 0.025) #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -47,7 +47,7 @@ run_in_parallel <- run_in_parallel %>%
 
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-file_name <- paste0("_GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
+file_name <- paste0("GroupSizeEpsilonSweep_Sigma", ThreshSD[1], "-Beta", beta)
 full_path <- paste0(storage_path, file_name, '/')
 dir.create(full_path, showWarnings = FALSE)
 

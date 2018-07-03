@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ctokita@princeton.edu
 
 cd
-Rscript scripts/3_para_sweep/3a_BetaParaSweep_105to109.R
+Rscript scripts/3_para_sweep/3a_BetaParaSweep_3.R

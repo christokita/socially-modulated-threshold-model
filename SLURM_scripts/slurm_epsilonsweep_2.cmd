@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ctokita@princeton.edu
 
 cd
-Rscript scripts/3_para_sweep/3b_EpsilonParaSweep_025to045.R
+Rscript scripts/3_para_sweep/3b_EpsilonParaSweep_2.R
