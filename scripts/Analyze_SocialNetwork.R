@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.01-Beta1.1"
+run <- "Sigma0-Epsilon0.1-Beta1.1"
 
 ####################
 # Load and process data
@@ -88,7 +88,7 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     breaks <- c(1, seq(20, length(plot_data$to), 20))
   }
   # Plot
-  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
+  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, color = weight)) +
     geom_tile() +
     theme_bw() +
     # Because we need the x and y axis to display every node,
@@ -101,6 +101,13 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
                      limits = rev(levels(plot_data$to)),
                      breaks = levels(plot_data$to)[breaks]) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
+                         colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
+                         # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
+                         na.value = "white", 
+                         limit = c(-0.05, 0.05),
+                         # limit = c(0.95, 1.05),
+                         oob = squish) +
+    scale_color_gradientn(name = "Relative Interaction\nFrequency",
                          colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
                          # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
                          na.value = "white", 
@@ -127,7 +134,12 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
 # Save
 plots <- seq(4, 7, 1)
 for (plot in plots) {
-  
+  gg_inter <- interaction_graphs[[plot]]
+  ggsave(gg_inter, 
+         filename = paste0("output/Networks/RawPlots/", run, "_n", plot*5 ,".png"), 
+         width = 45, 
+         height = 45,
+         units = "mm")
 }
 
 
