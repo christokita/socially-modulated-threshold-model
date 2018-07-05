@@ -80,13 +80,14 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     from = factor(from, levels = node_list$name))
   # Get info for plot
   groupsize <- ncol(avg_g)
-  if (groupsize < 30) {
-    breaks <- c(1, seq(5, length(plot_data$to), 5))
-  } else if(groupsize < 55) {
-    breaks <- c(1, seq(10, length(plot_data$to), 10))
-  } else {
-    breaks <- c(1, seq(20, length(plot_data$to), 20))
-  }
+  # if (groupsize < 20) {
+  #   breaks <- c(1, seq(5, length(plot_data$to), 5))
+  # } else if(groupsize < 35) {
+  #   breaks <- c(1, seq(10, length(plot_data$to), 15))
+  # } else {
+  #   breaks <- c(1, seq(20, length(plot_data$to), 20))
+  # }
+  breaks <- c(1, length(unique(plot_data$to)))
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, color = weight)) +
     geom_tile() +
@@ -116,14 +117,18 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
                          oob = squish) +
     xlab("Individual") +
     ylab("Individual") +
-    theme(axis.text = element_text(colour = "black", size = 6),
-          axis.title = element_text(size = 7),
-          axis.ticks = element_line(size = 0.3),
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          # axis.text = element_text(colour = "black", size = 6),
+          # axis.title = element_text(size = 7),
+          # axis.ticks = element_line(size = 0.3),
           aspect.ratio = 1,
           # Hide the legend (optional)
           legend.position = "none",
           legend.key.height = unit(0.38, "in"),
-          panel.background = element_rect(size = 0.3, fill = NA),
+          # panel.background = element_rect(size = 0.3, fill = NA),
+          panel.border = element_rect(size = 0.3, fill = NA),
           plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
@@ -136,9 +141,9 @@ plots <- seq(4, 7, 1)
 for (plot in plots) {
   gg_inter <- interaction_graphs[[plot]]
   ggsave(gg_inter, 
-         filename = paste0("output/Networks/RawPlots/", run, "_n", plot*5 ,".png"), 
-         width = 45, 
-         height = 45,
+         filename = paste0("output/Networks/RawPlots/", run, "_n", plot*5 ,".svg"), 
+         width = 20, 
+         height = 20,
          units = "mm")
 }
 
