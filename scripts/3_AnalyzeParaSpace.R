@@ -14,13 +14,9 @@ library(RColorBrewer)
 library(scales)
 
 ####################
-# Load data
-####################
-load("output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1.Rdata")
-
-####################
 # Plot: Beta sweep
 ####################
+load("output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
 pal <- brewer_pal("seq", "YlGnBu")
 pal <- pal(9)
 
@@ -54,6 +50,7 @@ ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.png", hei
 ####################
 # Plot: Epsilon sweep
 ####################
+load("output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1.Rdata")
 pal <- brewer_pal("seq", "YlGnBu")
 pal <- pal(9)
 
@@ -62,9 +59,8 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
   theme_bw() +
   scale_x_continuous(breaks = seq(0, 100, 20), 
                      expand = c(0,0)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.2), 
-                     expand = c(0,0),
-                     limits = c(0, 0.6)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), 
+                     expand = c(0,0)) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
