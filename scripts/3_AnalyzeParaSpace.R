@@ -12,13 +12,14 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
+library(viridis)
 
 ####################
 # Plot: Beta sweep
 ####################
 load("output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
 pal <- brewer_pal("seq", "YlGnBu")
-pal <- pal(9)
+pal <- rev(pal(9))
 
 gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
   geom_tile() +
@@ -31,6 +32,12 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
+  # scale_fill_viridis(option = "viridis",
+  #                    name = "Behavioral\nspecialization",
+  #                    limits = c(0,1)) +
+  # scale_colour_viridis(option = "viridis",
+  #                      name = "Behavioral\nspecialization",
+  #                      limits = c(0,1)) +
   ylab(expression(beta)) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
@@ -44,8 +51,8 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
         aspect.ratio = 1)
 gg_beta
 
-ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
-
+ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_rev.png", height = 45, units = "mm", dpi = 400)
+ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.svg", height = 45, units = "mm")
 
 ####################
 # Plot: Epsilon sweep
@@ -79,4 +86,5 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
 gg_eps
 
 ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
+ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.svg", height = 45, units = "mm")
 
