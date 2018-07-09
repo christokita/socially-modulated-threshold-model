@@ -57,7 +57,7 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
                 width = 0) +
   geom_point(aes(y = Mean),
-             size = 1) +
+             size = 0.8) +
   theme_classic() +
   ylab("Division of Labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
@@ -72,13 +72,15 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
         legend.text = element_text(size = 6),
         legend.key.height = unit(4, "mm"),
         legend.key.width = unit(5, "mm"),
-        axis.ticks = element_line(size = 0.3),
-        axis.line = element_line(size = 0.3),
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        axis.line = element_line(size = 0.3, color = "black"),
         aspect.ratio = 1)
 gg_entropy
 
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.png", 
        height = 45, width = 45, units = "mm", dpi = 800)
+ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.svg", 
+       height = 45, width = 45, units = "mm")
 
 ####################
 # Only beta = 1.1
