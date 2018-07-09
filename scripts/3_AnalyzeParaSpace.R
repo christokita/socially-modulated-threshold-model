@@ -41,13 +41,13 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
   ylab(expression(beta)) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
-        legend.title = element_text(size = 7, 
-                                    face = "bold"),
+        legend.title = element_text(size = 7),
         legend.text = element_text(size = 6),
         legend.key.height = unit(5, "mm"),
         legend.key.width = unit(2, "mm"),
+        legend.position = "none",
         axis.ticks = element_line(size = 0.3),
-        panel.background = element_rect(fill = NA, size = 0.3),
+        panel.border = element_rect(fill = NA, size = 0.3),
         aspect.ratio = 1)
 gg_beta
 
@@ -80,8 +80,9 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
         legend.text = element_text(size = 6),
         legend.key.height = unit(5, "mm"),
         legend.key.width = unit(2, "mm"),
+        legend.position = "none",
         axis.ticks = element_line(size = 0.3),
-        panel.background = element_rect(fill = NA, size = 0.3),
+        panel.border = element_rect(fill = NA, size = 0.3),
         aspect.ratio = 1)
 gg_eps
 
