@@ -18,8 +18,8 @@ library(viridis)
 # Plot: Beta sweep
 ####################
 load("output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
-pal <- brewer_pal("seq", "YlGnBu")
-pal <- rev(pal(9))
+pal <- brewer_pal("seq", "GnBu")
+pal <- pal(9)
 
 gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
   geom_tile() +
@@ -32,10 +32,10 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
-  # scale_fill_viridis(option = "viridis",
+  # scale_fill_viridis(option = "plasma", direction = -1,
   #                    name = "Behavioral\nspecialization",
   #                    limits = c(0,1)) +
-  # scale_colour_viridis(option = "viridis",
+  # scale_colour_viridis(option = "plasma",  direction = -1,
   #                      name = "Behavioral\nspecialization",
   #                      limits = c(0,1)) +
   ylab(expression(beta)) +
@@ -58,7 +58,7 @@ ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.svg", hei
 # Plot: Epsilon sweep
 ####################
 load("output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1.Rdata")
-pal <- brewer_pal("seq", "YlGnBu")
+pal <- brewer_pal("seq", "GnBu")
 pal <- pal(9)
 
 gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
