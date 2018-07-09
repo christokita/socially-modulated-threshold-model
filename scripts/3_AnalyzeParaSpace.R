@@ -45,7 +45,7 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
         legend.text = element_text(size = 6),
         legend.key.height = unit(5, "mm"),
         legend.key.width = unit(2, "mm"),
-        legend.position = "none",
+        legend.position = "top",
         axis.ticks = element_line(size = 0.3),
         panel.border = element_rect(fill = NA, size = 0.3),
         aspect.ratio = 1)
