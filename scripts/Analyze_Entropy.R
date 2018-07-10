@@ -114,6 +114,7 @@ gg_solo <- ggplot(data = select_entropy, aes(x = n, colour = Model)) +
 gg_solo
 
 ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.svg", width = 45, height = 45, units = "mm")
+ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.png", width = 45, height = 45, units = "mm", dpi = 400)
 
 ############### Sweep across epsilon values ###############
 rm(list = ls())
