@@ -281,15 +281,106 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
 ####################
 # Single example group size plot
 ####################
+# Get graphs
+graphs <- soc_networks[[16]]
+replicates <- length(graphs)
+# For each each compute interaction matrix
+# Get graph and make adjacency matrix
+size_graph <- lapply(1:length(graphs), function(j) {
+  # Format: set diagonal, rescale, and make adj matrix
+  this_graph <- graphs[[j]]
+  # Calculate interaciton rate
+  diag(this_graph) <- NA
+  dimensions <- dim(this_graph)
+  labs <- colnames(this_graph)
+  this_graph <- as.vector(this_graph)
+  not_chosen <- 1 - (( 1 / (dimensions[1] - 1)) * p)
+  expected_random <-  1 - not_chosen^2
+  this_graph <- (this_graph - expected_random) / expected_random #relative to expected by random (i.e., 1 - chance of not being chosen^2)
+  this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
+  colnames(this_graph) <- labs
+  rownames(this_graph) <- labs
+  # Calculate thresh ratio
+  # ind <- replicates * i + j
+  thresh <- as.data.frame(thresh_data[[16]][j])
+  thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+  # ratio <- order(thresh$ThreshRatio)
+  ratio <- order(thresh$Thresh1)
+  # Create order by threshold ratio
+  this_graph <- this_graph[ratio, ratio]
+  colnames(this_graph) <- paste0("i-", 1:dimensions[1])
+  rownames(this_graph) <- paste0("i-", 1:dimensions[1])
+  # return
+  return(this_graph)
+})
+# Avearge across all to make 'typical' adjacency matrix
+avg_g <- Reduce("+", size_graph) / length(size_graph)
+# Create graph object
+g <- graph_from_adjacency_matrix(avg_g, mode = c("directed"), weighted = TRUE, diag = TRUE)
+# Get node and edge list
+node_list <- get.data.frame(g, what = "vertices")
+edge_list <- get.data.frame(g, what = "edges")
+# Create dataframe for plotting
+plot_data <- edge_list %>% mutate(
+  to = factor(to, levels = node_list$name),
+  from = factor(from, levels = node_list$name))
+# Get info for plot
+groupsize <- ncol(avg_g)
+breaks <- c(1, seq(20, 80, 20))
+# Plot
+gg_avg_example <- ggplot(plot_data, aes(x = from, y = to, fill = weight, color = weight)) +
+  geom_tile() +
+  theme_bw() +
+  # Because we need the x and y axis to display every node,
+  # not just the nodes that have connections to each other,
+  # make sure that ggplot does not drop unused factor levels
+  scale_x_discrete(drop = FALSE, expand = c(0, 0), 
+                   position = "top",
+                   breaks = levels(plot_data$to)[breaks]) +
+  scale_y_discrete(drop = FALSE, expand = c(0, 0), 
+                   limits = rev(levels(plot_data$to)),
+                   breaks = levels(plot_data$to)[breaks]) +
+  scale_fill_gradientn(name = "Relative\ninteraction\nfrequency",
+                       colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
+                       # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
+                       na.value = "white", 
+                       limit = c(-0.05, 0.05),
+                       # limit = c(0.95, 1.05),
+                       oob = squish) +
+  scale_color_gradientn(name = "Relative\ninteraction\nfrequency",
+                        colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
+                        # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
+                        na.value = "white", 
+                        limit = c(-0.05, 0.05),
+                        # limit = c(0.95, 1.05),
+                        oob = squish) +
+  xlab("Individual") +
+  ylab("Individual") +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        axis.ticks = element_line(size = 0.3),
+        aspect.ratio = 1,
+        # Hide the legend (optional)
+        legend.position = "none",
+        legend.key.width = unit(3, "mm"),
+        legend.key.height = unit(6, "mm"),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        # panel.background = element_rect(size = 0.3, fill = NA),
+        panel.border = element_rect(size = 0.3, fill = NA),
+        plot.title = element_blank()) +
+  ggtitle(paste0("Group Size = ", groupsize))
 
+gg_avg_example
+ggsave("output/Networks/ExampleNetworks/Adjacency_GroupSize70.svg", width = 48, height = 48, units = "mm")
 
 
 
 ####################
 # Output example graph
 ####################
-example_graph <- soc_networks[[14]][[1]]
-example_thresh <- as.data.frame(thresh_data[[14]][[1]])
+example_graph <- soc_networks[[16]][[1]]
+example_thresh <- as.data.frame(thresh_data[[16]][[1]])
 example_thresh$Id <- row.names(example_thresh)
 example_thresh$ThreshRatio <- log(example_thresh$Thresh1 / example_thresh$Thresh2)
 example_thresh$ThreshRatioBounded <- example_thresh$ThreshRatio
@@ -315,5 +406,5 @@ edgelist <- as.data.frame(edgelist)
 names(edgelist) <- c("Source", "Target")
 edgelist$Weight <- E(g)$weight 
 # Write
-write.csv(edgelist, file = "output/Networks/ExampleNetworks/GroupSize70edgelist.csv", row.names = FALSE)
-write.csv(example_thresh, file = "output/Networks/ExampleNetworks/GroupSize70nodelist.csv", row.names = FALSE)
+write.csv(edgelist, file = "output/Networks/ExampleNetworks/GroupSize80edgelist.csv", row.names = FALSE)
+write.csv(example_thresh, file = "output/Networks/ExampleNetworks/GroupSize80nodelist.csv", row.names = FALSE)
