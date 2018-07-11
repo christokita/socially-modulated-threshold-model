@@ -8,7 +8,7 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
 ####################
-# Load data and summarise
+# Average change in stim levels: beginning to end
 ####################
 files <- list.files("output/Rdata/_ProcessedData/Stim/Sigma0-Epsilon0.1-Beta1.1/", full.names = TRUE)
 stim_data <- lapply(files, function(file) {
@@ -70,3 +70,59 @@ gg_stimdiff <- ggplot(stim_data, aes(x = n, y = sMean)) +
 gg_stimdiff
 
 ggsave("output/StimLevels/ChangeInStimLevels.png", width = 45, height = 45, units = 'mm', dpi = 800)
+
+
+
+####################
+# Look at individual examples
+####################
+load(files[7])
+
+example <- as.data.frame(listed_data[[1]])
+example <- example %>% 
+  mutate(TotalStim = s1 + s2)
+
+gg_example <- ggplot(example, aes(x = t, y = TotalStim)) +
+  geom_line(size = 0.5) +
+  theme_classic() +
+  ylab("Change in Total Stim. Level") +
+  scale_x_continuous(breaks = seq(0, 50000, 10000)) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        axis.line = element_line(size = 0.3, color = "black"),
+        aspect.ratio = 1)
+
+gg_example
+
+####################
+# Average time series by group size
+####################
+files <- list.files("output/Rdata/_ProcessedData/Stim/Sigma0-Epsilon0.1-Beta1.1/", full.names = TRUE)
+stim_time <- lapply(files, function(file) {
+  # Load group size data
+  load(file)
+  n <- as.numeric(gsub(".*/([0-9]+)\\.Rdata", "\\1", file, perl = T))
+  print(paste("Loaded: Group Size", n))
+  # Summarise within each replicate
+  rep_data <- lapply(listed_data, function(replicate) {
+    replicate <- as.data.frame(replicate)
+    replicate <- replicate %>% 
+      mutate(sTotal = s1 + s2) %>% 
+      select(sTotal)
+    return(replicate)
+  })
+  # Bind and summarise
+  rep_data <- do.call('cbind', rep_data)
+  colnames(rep_data) <- paste0('sTotal', 1:ncol(rep_data))
+  to_return <- rep_data %>% 
+    mutate(sTotal = rowSums(.) / 100) %>% 
+    select(sTotal) %>% 
+    mutate(t = 0:(nrow(.)-1)) %>% 
+    mutate(n = n) %>% 
+    select(n, t, sTotal)
+  # Combine all stim data
+  return(to_return)
+})
+# Bind
+stim_time <- do.call("rbind", stim_data)
