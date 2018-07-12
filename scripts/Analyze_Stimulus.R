@@ -125,4 +125,27 @@ stim_time <- lapply(files, function(file) {
   return(to_return)
 })
 # Bind
-stim_time <- do.call("rbind", stim_data)
+stim_time <- do.call("rbind", stim_time)
+
+# Plot
+select_sizes <- stim_time %>% 
+  filter(n %in% seq(70, 100)) %>%
+  mutate(n = as.factor(n))
+
+pal <- brewer.pal(9, "PuRd")
+
+gg_stimtime <- ggplot(select_sizes, aes(x = t, y = sTotal, group = n, color = n)) +
+  geom_line(size = 0.5) +
+  theme_classic() +
+  ylab("Total stimulus") +
+  scale_x_continuous(breaks = seq(0, 50000, 10000)) +
+  scale_color_manual(values = pal) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        axis.line = element_line(size = 0.3, color = "black"),
+        aspect.ratio = 1)
+
+gg_stimtime
+
+ggsave("output/StimLevels/TimeSeries.png", width = 180, height = 180, units = "mm", dpi = 800)

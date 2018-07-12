@@ -1,25 +1,28 @@
 ################################################################################
 #
-# Model incorporating both thresholds and network dynamics
+# Social interaction model: set for running on Della cluster
 #
 ################################################################################
 
 rm(list = ls())
-source("scripts/util/__Util__MASTER.R")
 
+####################
+# Source necessary scripts/libraries
+####################
+source("scripts/util/__Util__MASTER.R")
 
 ####################
 # Set global variables
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(70) #vector of number of individuals to simulate
+Ns             <- c(75) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 30000 #number of generations to run simulation 
+gens           <- 50000 #number of generations to run simulation 
 reps           <- 1 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
-ThreshM        <- rep(25, m) #population threshold means 
+ThreshM        <- rep(50, m) #population threshold means 
 ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
@@ -27,60 +30,69 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 0.5 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.05 #relative weighting of social interactions for adjusting thresholds
+p              <- 1 #baseline probablity of initiating an interaction per time step
+epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
-
 ####################
-# Run simulation multiple times
+# Run ensemble simulation
 ####################
+# Prep meta-lists for collection of group size simulations
+groups_taskDist    <- list()
+groups_taskTally   <- list()
+groups_stim        <- list()
+groups_thresh      <- list()
+groups_entropy     <- list()
+groups_thresh1Time <- list()
+groups_thresh2Time <- list()
+groups_graphs      <- list()
 
 # Loop through group sizes
 for (i in 1:length(Ns)) {
   # Set group size
   n <- Ns[i]
-  
+  # Prep lists for collection of simulation outputs from this group size
+  ens_taskDist    <- list()
+  ens_taskTally   <- list()
+  ens_entropy     <- list()
+  ens_stim        <- list()
+  ens_thresh      <- list()
+  ens_thresh1Time <- list()
+  ens_thresh2Time <- list()
+  ens_graphs      <- list()
   # Run Simulations
   for (sim in 1:reps) {
-    
     ####################
     # Seed structures and intial matrices
     ####################
-
     # Set initial probability matrix (P_g)
     P_g <- matrix(data = rep(0, n * m), ncol = m)
-    
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
                             gens = gens)
-    
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
                                  threshold_means = ThreshM,
                                  threshold_sds = ThreshSD)
-    
     # Start task performance
     X_g <- matrix(data = rep(0, length(P_g)), ncol = ncol(P_g))
-    
     # Create cumulative task performance matrix
     X_tot <- X_g
-    
     # Create cumulative adjacency matrix
     g_tot <-  matrix(data = rep(0, n * n), ncol = n)
     colnames(g_tot) <- paste0("v-", 1:n)
     rownames(g_tot) <- paste0("v-", 1:n)
-    
-    # Prep threshold tracking matrix
+    # Prep lists for data collection within simulation
+    taskTally <- list()
     thresh1time <- list()
     thresh2time <- list()
-    thresh1time[[1]] <- threshMat[,1]
-    thresh2time[[1]] <- threshMat[,2]
+    thresh1time[[1]] <- threshMat[ ,1]
+    thresh2time[[1]] <- threshMat[ ,2]
     
     ####################
-    # Simulate
+    # Simulate individual run
     ####################
     # Run simulation
     for (t in 1:gens) { 
@@ -105,74 +117,63 @@ for (i in 1:length(Ns)) {
                                bias = beta)
       g_tot <- g_tot + g_adj
       # Adjust thresholds
-      # threshMat <- adjust_thresh_social(social_network = g_adj,
-      #                                   threshold_matrix = threshMat,
-      #                                   state_matrix = X_g,
-      #                                   epsilon = epsilon)
       threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
                                                    threshold_max = 2 * ThreshM[1])
+      # Capture threshold values
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]
-      
       # Update total task performance profile
       X_tot <- X_tot + X_g
-      
+      # Capture current task performance tally
+      tally <- matrix(c(t, colSums(X_g)), ncol = ncol(X_g) + 1)
+      colnames(tally) <- c("t", colnames(X_g))
+      taskTally[[t]] <- tally
     }
-
-    # Print simulation completed
-    print(paste0("DONE: N = ", n, ", Simulation ", sim))
+    
+    ####################
+    # Post run calculations
+    ####################
+    # Bind together task tally
+    col_names <- colnames(taskTally[[1]])
+    taskTally <- matrix(unlist(taskTally), 
+                        ncol = length(taskTally[[1]]), 
+                        byrow = TRUE, 
+                        dimnames = list(c(NULL), c(col_names)))
+    # Calculate Entropy
+    entropy <- mutualEntropy(TotalStateMat = X_tot)
+    # Calculate total task distribution
+    totalTaskDist <- X_tot / gens
+    # Create tasktally table
+    stimMat <- cbind(stimMat, 0:(nrow(stimMat) - 1))
+    colnames(stimMat)[ncol(stimMat)] <- "t"
+    # Add total task distributions, entropy values, and graphs to lists
+    ens_taskDist[[sim]]    <- totalTaskDist
+    ens_entropy[[sim]]     <- entropy
+    ens_taskTally[[sim]]   <- taskTally
+    ens_stim[[sim]]        <- stimMat
+    ens_thresh[[sim]]      <- threshMat 
+    ens_thresh1Time[[sim]] <- thresh1time
+    ens_thresh2Time[[sim]] <- thresh2time
+    ens_graphs[[sim]]      <- g_tot / gens
   }
-  
+  # Add to list of lists
+  groups_taskDist[[i]]    <- ens_taskDist
+  groups_taskTally[[i]]   <- ens_taskTally
+  groups_stim[[i]]        <- ens_stim
+  groups_thresh[[i]]      <- ens_thresh
+  groups_entropy[[i]]     <- ens_entropy
+  groups_thresh1Time[[i]] <- ens_thresh1Time
+  groups_thresh2Time[[i]] <- ens_thresh2Time
+  groups_graphs[[i]]      <- ens_graphs
 }
 
-library(RColorBrewer)
-library(scales)
-library(tidyr)
-library(ggthemes)
-
 thresh1time <- do.call("rbind", thresh1time)
-row.names(thresh1time) <- NULL
 thresh1time <- as.data.frame(thresh1time)
 thresh1time <- thresh1time %>% 
-  gather("Id", "Threshold")
-thresh1time$t <- rep(0:gens, n)
-
-threshMat <- threshMat %>% 
-  as.data.frame(.) %>% 
-  mutate(ThreshRatio = log(Thresh1 / Thresh2),
-         Id = row.names(.))
-threshMat$ThreshRatio[threshMat$ThreshRatio > 10] <- 10
-threshMat$ThreshRatio[threshMat$ThreshRatio < -10] <- -10
-
-thresh1time <- merge(thresh1time, threshMat, by = "Id")
-
-
-gg_thresh <- ggplot(data = thresh1time, 
-                    aes(x = t, y = Threshold)) +
-  theme_classic(base_size = 10) +
-  geom_line(aes(group = Id, colour = ThreshRatio), size = 0.2) +
-  scale_colour_gradient2(name = "ln(Threshold Ratio)",
-                         high = "#d7191c",
-                         mid = "#ffffbf",
-                         # mid = "#cecece",
-                         low = "#2c7bb6", 
-                         midpoint = 0, 
-                         limits = c(-5, 5),
-                         oob = squish) +
-  scale_y_continuous(expand = c(0.0, 0), limits = c(0, 2 * ThreshM[1])) +
-  theme(aspect.ratio = 1,
-        panel.border = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "none",
-        axis.ticks.length = unit(4, "pt"),
-        axis.text = element_text(color = "black"))
-gg_thresh
-
-
-entropy <- mutualEntropy(TotalStateMat = X_tot)
-
-# ggsave("output/ThresholdTime/Size100_Sigma0.0_TripleTimeLength.png", scale = 0.6, dpi = 600)
+  mutate(t = 0:(nrow(.)-1)) %>% 
+  gather("Id", "Threshold", 1:75) %>% 
+  select(t, Id, Threshold)
+thresh2time <- do.call('rbind', thresh2time)
