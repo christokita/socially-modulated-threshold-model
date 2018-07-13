@@ -34,7 +34,7 @@ save(entropy, file = "output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1
 ####################
 # Load Data: beta
 ####################
-directory <- "output/Rdata/_GroupSizeBetaSweep_Sigma0-Epsilon0.1/" 
+directory <- "output/Rdata/GroupSizeBetaSweep_Sigma0-Epsilon0.1/" 
 # List files 
 files <- list.files(directory, full.names = TRUE)
 for (file in files) {

@@ -8,7 +8,8 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
-library(hexbin)
+library(viridis)
+library(rje)
 
 p <- 1 #prob of interact
 run <- "Sigma0-Epsilon0.1-Beta1.1"
@@ -47,12 +48,12 @@ group_plots <- lapply(group_sizes, function(size) {
     replicates <- replicates %>% 
       group_by(t) %>% 
       mutate(threshold = as.integer(as.character(cut(Threshold, 
-                       breaks = c(-Inf, seq(0, 100, 0.5)), 
-                       labels = seq(0, 100, 0.5))))) %>% 
+                       breaks = c(-Inf, seq(0, 100, 0.25)), 
+                       labels = seq(0, 100, 0.25))))) %>% 
       group_by(threshold) %>% 
       mutate(time = as.integer(as.character(cut(t, 
-                     breaks = c(seq(0, 50000, 250), Inf),
-                     labels = seq(0, 50000, 250), 
+                     breaks = c(seq(0, 50000, 100), Inf),
+                     labels = seq(0, 50000, 100), 
                      right = FALSE)))) %>% 
       group_by(time, threshold) %>% 
       summarise(count = length(threshold))
@@ -61,23 +62,38 @@ group_plots <- lapply(group_sizes, function(size) {
   
   # Bind
   group_data <- do.call('rbind', group_data)
+  all_values <- expand.grid(time = unique(group_data$time), threshold = unique(group_data$threshold))
   group_data <- group_data %>% 
     group_by(time, threshold) %>% 
-    summarise(count = sum(count))
+    summarise(count = sum(count)) %>% 
+    merge(all_values, by = c("time", "threshold"), all = TRUE)
+  group_data$count[is.na(group_data$count)] <- 0
   group_data$freq <- group_data$count/max(group_data$count)
   
   # Plot
   myPalette <- colorRampPalette(brewer.pal(9, "PuBu"))
+  myPalette <- viridis_pal(option = "A", direction = -1)
+  max_color <- 0.03
   gg_threshtime <- ggplot(data = group_data,
                           aes(x = time, y = threshold, fill = freq, colour = freq)) +
     geom_tile() +
     theme_bw() +
-    scale_fill_gradientn(colours = myPalette(100), 
-                         limits = c(0, 0.05), 
+    scale_fill_gradientn(colours = c("white", "#EDD6CE", "#E2B3B6", 
+                                     "#D298A6", "#BD7C9B", "#A1618C", 
+                                     "#844C7D", "#5F3867", "#3C2650"),
+                         limits = c(0, max_color),
                          oob = squish) +
-    scale_colour_gradientn(colours = myPalette(100), 
-                           limits = c(0, 0.05), 
+    scale_colour_gradientn(colours = c("white", "#EDD6CE", "#E2B3B6", 
+                                       "#D298A6", "#BD7C9B", "#A1618C", 
+                                       "#844C7D", "#5F3867", "#3C2650"),
+                           limits = c(0, max_color),
                            oob = squish) +
+    # scale_fill_gradientn(colours = c("white", myPalette(100)),
+    #                      limits = c(0, max_color),
+    #                      oob = squish) +
+    # scale_colour_gradientn(colours =c("white", myPalette(100)),
+    #                        limits = c(0, max_color),
+    #                        oob = squish) +
     scale_x_continuous(name = "Time step",
                        breaks = seq(0, 50000, 10000),
                        label = comma,
@@ -93,7 +109,8 @@ group_plots <- lapply(group_sizes, function(size) {
           panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
           panel.grid = element_blank(),
           plot.margin = unit(c(0.2, 0.35, 0.1, 0.1), "cm"))
-  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".png"), width = 90, height = 40, units = "mm", dpi = 600)
+  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".png"), width = 70, height = 40, units = "mm", dpi = 600)
+  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".svg"), width = 70, height = 40, units = "mm", dpi = 600)
   # smoothScatter(x = group_data$t, y = group_data$Threshold,
   #               ylim = c(0, 100))
   # plot(hexbin(x = group_data$t, y = group_data$Threshold, xbins = 30))
