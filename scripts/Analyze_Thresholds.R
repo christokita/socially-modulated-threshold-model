@@ -53,7 +53,7 @@ pal <- pal(9)
 gg_threshvar <- ggplot(data = all_thresh, 
                        aes(x = Thresh1, y = n, fill = n, group = n)) +
   theme_invisible() +
-  geom_density_ridges(size = 0.2) +
+  geom_density_ridges(size = 0.2, stat = "binline", bins = 100) +
   xlab("Threshold value") +
   scale_x_continuous(breaks = seq(0, 100, 25), 
                      expand = c(0.03, 0)) +
@@ -63,6 +63,7 @@ gg_threshvar <- ggplot(data = all_thresh,
   scale_color_viridis() +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, color = "black"),
+        axis.title.y = element_text(size = 7, color = "black", face = 'italic'),
         legend.position = "none",
         axis.ticks = element_line(size = 0.2, color = "black"))
 

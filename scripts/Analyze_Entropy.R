@@ -59,13 +59,13 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  ylab("Division of Labor") +
+  ylab("Division of labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = pal, 
                      labels = c("1.2", "1.1"),
                      name = expression("Interaction bias"(Beta))) +
   theme(axis.text = element_text(colour = "black", size = 6),
-        axis.title = element_text(size = 7),
+        axis.title = element_text(size = 7, face = "italic"),
         legend.position = "none",
         legend.title = element_text(size = 7, 
                                     face = "bold"),
@@ -96,12 +96,12 @@ gg_solo <- ggplot(data = select_entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 1) +
   theme_classic() +
-  ylab("Division of Labor") +
+  ylab("Division of labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = "#636363", 
                      name = expression("Interaction bias"(Beta))) +
   theme(axis.text = element_text(colour = "black", size = 6),
-        axis.title = element_text(size = 7),
+        axis.title = element_text(size = 7, face = "italic"),
         legend.position = "none",
         legend.title = element_text(size = 7, 
                                     face = "bold"),
@@ -162,13 +162,13 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  ylab("Division of Labor") +
+  ylab("Division of labor") +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = pal, 
                      labels = c("1.2", "1.1"),
                      name = expression("Interaction bias"(Beta))) +
   theme(axis.text = element_text(colour = "black", size = 6),
-        axis.title = element_text(size = 7),
+        axis.title = element_text(size = 7, face = "italic"),
         legend.position = "none",
         legend.title = element_text(size = 7, 
                                     face = "bold"),
