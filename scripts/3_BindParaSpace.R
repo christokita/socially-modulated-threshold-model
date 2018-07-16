@@ -19,7 +19,7 @@ directory <- "output/Rdata/GroupSizeEpsilonSweep_Sigma0-Beta1.1/"
 files <- list.files(directory, full.names = TRUE)
 for (file in files) {
   load(file)
-  epsilon <- as.numeric(gsub(".*epsilon([\\.0-9]+).Rdata", "\\1", file, perl = TRUE))
+  epsilon <- as.numeric(gsub(".*-epsilon([0-9-\\.]+).Rdata", "\\1", file, perl = TRUE))
   entropy_sum$epsilon <- epsilon
   if (!exists("entropy")) {
     entropy <- entropy_sum
@@ -30,6 +30,7 @@ for (file in files) {
 
 save(entropy, file = "output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1.Rdata")
 
+rm(entropy)
 
 ####################
 # Load Data: beta
@@ -46,5 +47,5 @@ for (file in files) {
   }
 }
 
-save(entropy, file = "output/ParameterSpace/_GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
+save(entropy, file = "output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
 

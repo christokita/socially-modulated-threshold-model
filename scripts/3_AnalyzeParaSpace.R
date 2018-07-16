@@ -12,7 +12,6 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
-library(viridis)
 
 ####################
 # Plot: Beta sweep
@@ -26,7 +25,7 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
   theme_bw() +
   scale_x_continuous(breaks = seq(0, 100, 20), 
                      expand = c(0,0)) +
-  scale_y_continuous(breaks = seq(1, 1.25, 0.05), 
+  scale_y_continuous(breaks = seq(0.9, 1.25, 0.05), 
                      expand = c(0,0)) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
@@ -51,8 +50,13 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
         aspect.ratio = 1)
 gg_beta
 
-ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_rev.png", height = 45, units = "mm", dpi = 400)
-ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.svg", height = 45, units = "mm")
+if (0.9 %in% unique(entropy$beta)) {
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_expanded.png", height = 45, units = "mm", dpi = 400)
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_expanded.svg", height = 45, units = "mm")
+} else {
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.svg", height = 45, units = "mm")
+}
 
 ####################
 # Plot: Epsilon sweep
@@ -66,7 +70,7 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
   theme_bw() +
   scale_x_continuous(breaks = seq(0, 100, 20), 
                      expand = c(0,0)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.1), 
+  scale_y_continuous(breaks = seq(-1, 1, 0.1), 
                      expand = c(0,0)) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
@@ -86,6 +90,12 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
         aspect.ratio = 1)
 gg_eps
 
-ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
-ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.svg", height = 45, units = "mm")
+if (-0.1 %in% unique(entropy$epsilon)) {
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace_expanded.png", height = 45, units = "mm", dpi = 400)
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace_expanded.svg", height = 45, units = "mm")
+  
+} else {
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.svg", height = 45, units = "mm")
+}
 

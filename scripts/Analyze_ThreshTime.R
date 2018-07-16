@@ -23,12 +23,12 @@ files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh1Time/", run, "/")
 # Get group sizes
 group_sizes <- unique(gsub(".*/([0-9]+)-[0-9]+\\.Rdata", "\\1", files, perl = TRUE))
 
-group_sizes <- group_sizes[group_sizes %in% c("020", "025", 
+select_sizes <- group_sizes[group_sizes %in% c("020", "025", 
                                               "030", "035",
                                               "050")]
 
 # Loop through group sizes
-group_plots <- lapply(group_sizes, function(size) {
+group_plots <- lapply(select_sizes, function(size) {
   
   # Get subset of files that are for this group size
   group_files <- files[grep(paste0(".*/", size, "-[0-9]+\\.Rdata"), files)]
@@ -72,26 +72,23 @@ group_plots <- lapply(group_sizes, function(size) {
   
   # Plot
   myPalette <- colorRampPalette(brewer.pal(9, "PuBu"))
-  myPalette <- viridis_pal(option = "A", direction = -1)
+  # myPalette <- viridis_pal(option = "A", direction = -1)
+  end_col <- viridis(length(group_sizes))[which(group_sizes == size)]
   max_color <- 0.03
   gg_threshtime <- ggplot(data = group_data,
                           aes(x = time, y = threshold, fill = freq, colour = freq)) +
     geom_tile() +
     theme_bw() +
-    scale_fill_gradientn(colours = c("white", "#EDD6CE", "#E2B3B6", 
-                                     "#D298A6", "#BD7C9B", "#A1618C", 
-                                     "#844C7D", "#5F3867", "#3C2650"),
+    scale_fill_gradientn(colours = c("white", myPalette(100)),
                          limits = c(0, max_color),
                          oob = squish) +
-    scale_colour_gradientn(colours = c("white", "#EDD6CE", "#E2B3B6", 
-                                       "#D298A6", "#BD7C9B", "#A1618C", 
-                                       "#844C7D", "#5F3867", "#3C2650"),
+    scale_colour_gradientn(colours =c("white", myPalette(100)),
                            limits = c(0, max_color),
                            oob = squish) +
-    # scale_fill_gradientn(colours = c("white", myPalette(100)),
+    # scale_fill_gradientn(colours = c("white", end_col),
     #                      limits = c(0, max_color),
     #                      oob = squish) +
-    # scale_colour_gradientn(colours =c("white", myPalette(100)),
+    # scale_colour_gradientn(colours = c("white", end_col),
     #                        limits = c(0, max_color),
     #                        oob = squish) +
     scale_x_continuous(name = "Time step",
@@ -101,6 +98,7 @@ group_plots <- lapply(group_sizes, function(size) {
     scale_y_continuous(name = "Threshold",
                        breaks = seq(0, 100, 25),
                        limits = c(0, 100),
+                       labels = c("0", "", "50", "", "100"),
                        expand = c(0, 0)) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
@@ -109,8 +107,8 @@ group_plots <- lapply(group_sizes, function(size) {
           panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
           panel.grid = element_blank(),
           plot.margin = unit(c(0.2, 0.35, 0.1, 0.1), "cm"))
-  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".png"), width = 70, height = 40, units = "mm", dpi = 600)
-  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".svg"), width = 70, height = 40, units = "mm", dpi = 600)
+  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".png"), width = 90, height = 25, units = "mm", dpi = 600)
+  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".pdf"), width = 90, height = 25, units = "mm", dpi = 600)
   # smoothScatter(x = group_data$t, y = group_data$Threshold,
   #               ylim = c(0, 100))
   # plot(hexbin(x = group_data$t, y = group_data$Threshold, xbins = 30))
