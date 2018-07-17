@@ -39,7 +39,7 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
   #                      limits = c(0,1)) +
   ylab(expression(beta)) +
   theme(axis.text = element_text(colour = "black", size = 6),
-        axis.title = element_text(size = 7),
+        axis.title = element_text(size = 7, face = "italic"),
         legend.title = element_text(size = 7),
         legend.text = element_text(size = 6),
         legend.key.height = unit(5, "mm"),
@@ -51,11 +51,11 @@ gg_beta <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour 
 gg_beta
 
 if (0.9 %in% unique(entropy$beta)) {
-  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_expanded.png", height = 45, units = "mm", dpi = 400)
-  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_expanded.svg", height = 45, units = "mm")
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_expanded.png", height = 45, width = 45, units = "mm", dpi = 400)
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace_expanded.svg", height = 45, width = 45, units = "mm")
 } else {
-  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
-  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.svg", height = 45, units = "mm")
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.png", height = 45, width = 45, units = "mm", dpi = 400)
+  ggsave(gg_beta, file = "output/ParameterSpace/Plots/BetaGroupSizeSpace.svg", height = 45, width = 45, units = "mm")
 }
 
 ####################
@@ -78,9 +78,8 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
                          limits = c(0, 1)) +
   ylab(expression(epsilon)) +
   theme(axis.text = element_text(colour = "black", size = 6),
-        axis.title = element_text(size = 7),
-        legend.title = element_text(size = 7, 
-                                    face = "bold"),
+        axis.title = element_text(size = 7, face = "italic"),
+        legend.title = element_text(size = 7),
         legend.text = element_text(size = 6),
         legend.key.height = unit(5, "mm"),
         legend.key.width = unit(2, "mm"),
@@ -91,11 +90,11 @@ gg_eps <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colou
 gg_eps
 
 if (-0.1 %in% unique(entropy$epsilon)) {
-  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace_expanded.png", height = 45, units = "mm", dpi = 400)
-  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace_expanded.svg", height = 45, units = "mm")
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace_expanded.png", height = 45, width = 45, units = "mm", dpi = 400)
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace_expanded.svg", height = 45, width = 45, units = "mm")
   
 } else {
-  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.png", height = 45, units = "mm", dpi = 400)
-  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.svg", height = 45, units = "mm")
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.png", height = 45, width = 45, units = "mm", dpi = 400)
+  ggsave(gg_eps, file = "output/ParameterSpace/Plots/EpsilonGroupSizeSpace.svg", height = 45, width = 45, units = "mm")
 }
 

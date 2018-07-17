@@ -62,8 +62,8 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     ratio <- order(thresh$Thresh1)
     # Create order by threshold ratio
     this_graph <- this_graph[ratio, ratio]
-    colnames(this_graph) <- paste0("v-", 1:dimensions[1])
-    rownames(this_graph) <- paste0("v-", 1:dimensions[1])
+    colnames(this_graph) <- paste0("i-", 1:dimensions[1])
+    rownames(this_graph) <- paste0("i-", 1:dimensions[1])
     # return
     return(this_graph)
   })
@@ -219,8 +219,8 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
            To = as.numeric(as.character(To))) %>% 
     arrange(From, To)
   avg_g <- matrix(data = calc_edgelist$DiffDirection, nrow = dimensions[1], byrow = T)
-  colnames(avg_g) <- paste0("t-", 1:dimensions[1])
-  rownames(avg_g) <- paste0("t-", 1:dimensions[1])
+  colnames(avg_g) <- paste0("i-", 1:dimensions[1])
+  rownames(avg_g) <- paste0("i-", 1:dimensions[1])
   # Create graph object
   g <- graph_from_adjacency_matrix(avg_g, mode = c("directed"), weighted = TRUE, diag = TRUE)
   # Get node and edge list
@@ -233,14 +233,14 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   # Get info for plot
   groupsize <- ncol(avg_g)
   if (groupsize < 30) {
-    breaks <- c(1, seq(5, length(plot_data$to), 5))
+    breaks <- c(1, seq(5, length(unique(plot_data$to)), 5))
   } else if(groupsize < 55) {
-    breaks <- c(1, seq(10, length(plot_data$to), 10))
+    breaks <- c(1, seq(10, length(unique(plot_data$to)), 10))
   } else {
-    breaks <- c(1, seq(20, length(plot_data$to), 20))
+    breaks <- c(1, seq(20, length(unique(plot_data$to)), 20))
   }
   # Plot
-  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight)) +
+  gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, colour = weight)) +
     geom_tile() +
     theme_bw() +
     # Because we need the x and y axis to display every node,
@@ -248,12 +248,18 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     # make sure that ggplot does not drop unused factor levels
     scale_x_discrete(drop = FALSE, expand = c(0, 0), 
                      position = "top",
-                     breaks = levels(plot_data$to)[breaks]) +
+                     breaks = levels(plot_data$from)[breaks]) +
     scale_y_discrete(drop = FALSE, expand = c(0, 0), 
                      limits = levels(plot_data$to),
-                     breaks = levels(plot_data$to)[breaks]) +
+                     breaks = levels(plot_data$from)[breaks]) +
     # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
+                         colours = c("#9E9E9E", "#ffffff", "#79248C"),
+                         na.value = "white", 
+                         limit = c(-1, 1),
+                         # limit = c(0.95, 1.05),
+                         oob = squish) +
+    scale_color_gradientn(name = "Relative Interaction\nFrequency",
                          colours = c("#9E9E9E", "#ffffff", "#79248C"),
                          na.value = "white", 
                          limit = c(-1, 1),
@@ -268,7 +274,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
           # Hide the legend (optional)
           legend.position = "none",
           legend.key.height = unit(0.38, "in"),
-          panel.background = element_rect(size = 0.3, fill = NA),
+          panel.border = element_rect(size = 0.3, fill = NA),
           panel.grid = element_blank(),
           plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
@@ -277,4 +283,9 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   # return(avg_g)
 })
 
+
+# save with legend
+gg_simp <- simple_graphs[80/5]
+gg_simp
+ggsave("output/Networks/ExampleNetworks/SimpleAdjPlot_80.svg", width = 45, height = 45, units = "mm")
 
