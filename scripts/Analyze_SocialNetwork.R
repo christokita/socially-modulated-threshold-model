@@ -58,8 +58,8 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     # ind <- replicates * i + j
     thresh <- as.data.frame(thresh_data[[i]][j])
     thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-    # ratio <- order(thresh$ThreshRatio)
-    ratio <- order(thresh$Thresh1)
+    ratio <- order(thresh$ThreshRatio)
+    # ratio <- order(thresh$Thresh1)
     # Create order by threshold ratio
     this_graph <- this_graph[ratio, ratio]
     colnames(this_graph) <- paste0("i-", 1:dimensions[1])
@@ -80,14 +80,13 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     from = factor(from, levels = node_list$name))
   # Get info for plot
   groupsize <- ncol(avg_g)
-  # if (groupsize < 20) {
-  #   breaks <- c(1, seq(5, length(plot_data$to), 5))
-  # } else if(groupsize < 35) {
-  #   breaks <- c(1, seq(10, length(plot_data$to), 15))
-  # } else {
-  #   breaks <- c(1, seq(20, length(plot_data$to), 20))
-  # }
-  breaks <- c(1, length(unique(plot_data$to)))
+  if (groupsize < 20) {
+    breaks <- c(1, seq(5, length(unique(plot_data$to)), 5))
+  } else if(groupsize < 35) {
+    breaks <- c(1, seq(10, length(unique(plot_data$to)), 15))
+  } else {
+    breaks <- c(1, seq(20, length(unique(plot_data$to)), 20))
+  }
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, color = weight)) +
     geom_tile() +
@@ -97,10 +96,12 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     # make sure that ggplot does not drop unused factor levels
     scale_x_discrete(drop = FALSE, expand = c(0, 0), 
                      position = "top",
-                     breaks = levels(plot_data$to)[breaks]) +
+                     breaks = levels(plot_data$to)[breaks],
+                     labels = rep("", length(levels(plot_data$to)[breaks]))) +
     scale_y_discrete(drop = FALSE, expand = c(0, 0), 
                      limits = rev(levels(plot_data$to)),
-                     breaks = levels(plot_data$to)[breaks]) +
+                     breaks = levels(plot_data$to)[breaks],
+                     labels = rep("", length(levels(plot_data$to)[breaks]))) +
     scale_fill_gradientn(name = "Relative\ninteraction\nfrequency",
                          colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
                          # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
@@ -119,19 +120,19 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     ylab("Individual") +
     theme(axis.text = element_blank(),
           axis.title = element_blank(),
-          axis.ticks = element_blank(),
+          # axis.ticks = element_blank(),
           # axis.text = element_text(colour = "black", size = 6),
           # axis.title = element_text(size = 7),
-          # axis.ticks = element_line(size = 0.3),
+          axis.ticks = element_line(size = 0.3, colour = "black"),
           aspect.ratio = 1,
           # Hide the legend (optional)
-          legend.position = "right",
+          legend.position = "none",
           legend.key.width = unit(3, "mm"),
           legend.key.height = unit(6, "mm"),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
           # panel.background = element_rect(size = 0.3, fill = NA),
-          panel.border = element_rect(size = 0.3, fill = NA),
+          panel.border = element_rect(size = 0.3, fill = NA, colour = "black"),
           plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
@@ -150,10 +151,10 @@ for (plot in plots) {
          units = "mm")
 }
 
-# save with legend
-gg_inter <- interaction_graphs[1]
+# save specific plot
+gg_inter <- interaction_graphs[80/5]
 gg_inter
-ggsave("output/Networks/RawPlots/LegendPlot.svg", width = 45, height = 45, units = "mm")
+ggsave("output/Networks/RawPlots/GroupSize80.svg", width = 38, height = 38, units = "mm")
 
 ####################
 # Graph relative interactrion rates: simplified rate
@@ -267,15 +268,21 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
                          oob = squish) +
     xlab("Individual") +
     ylab("Individual") +
-    theme(axis.text = element_text(colour = "black", size = 6),
-          axis.title = element_text(size = 7),
-          axis.ticks = element_line(size = 0.3),
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(),
+          # axis.ticks = element_blank(),
+          # axis.text = element_text(colour = "black", size = 6),
+          # axis.title = element_text(size = 7),
+          axis.ticks = element_line(size = 0.3, colour = "black"),
           aspect.ratio = 1,
           # Hide the legend (optional)
           legend.position = "none",
-          legend.key.height = unit(0.38, "in"),
-          panel.border = element_rect(size = 0.3, fill = NA),
-          panel.grid = element_blank(),
+          legend.key.width = unit(3, "mm"),
+          legend.key.height = unit(6, "mm"),
+          legend.title = element_text(size = 7),
+          legend.text = element_text(size = 6),
+          # panel.background = element_rect(size = 0.3, fill = NA),
+          panel.border = element_rect(size = 0.3, fill = NA, colour = "black"),
           plot.title = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
@@ -287,5 +294,5 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
 # save with legend
 gg_simp <- simple_graphs[80/5]
 gg_simp
-ggsave("output/Networks/ExampleNetworks/SimpleAdjPlot_80.svg", width = 45, height = 45, units = "mm")
+ggsave("output/Networks/RawPlots/SimpleAdjPlot_80.svg", width = 38, height = 38, units = "mm")
 

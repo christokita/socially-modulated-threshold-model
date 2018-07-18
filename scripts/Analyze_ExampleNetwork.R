@@ -32,9 +32,9 @@ for (i in 1:length(files)) {
 # Output example graph
 ####################
 # Set threshold max/min
-thresh_limit <- 2
+thresh_limit <- 5
 # Set group size and replicate
-size <- 35
+size <- 80
 size <- size/5
 replicate <- 1
 # Get graph
@@ -78,6 +78,6 @@ edgelist <- as.data.frame(edgelist)
 names(edgelist) <- c("Source", "Target")
 edgelist$Weight <- E(g)$weight 
 # Write
-write.csv(edgelist, file = paste0("output/Networks/ExampleNetworks/GroupSize", 5*size, "edgelist.csv"), row.names = FALSE)
+write.csv(edgelist, file = paste0("output/Networks/ExampleNetworks/GroupSize", 5*size, "_50th_edgelist.csv"), row.names = FALSE)
 write.csv(example_thresh, file = paste0("output/Networks/ExampleNetworks/GroupSize", 5*size, "nodelist.csv"), row.names = FALSE)
 
