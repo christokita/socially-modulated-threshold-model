@@ -152,9 +152,10 @@ for (plot in plots) {
 }
 
 # save specific plot
-gg_inter <- interaction_graphs[80/5]
+gg_inter <- interaction_graphs[35/5]
 gg_inter
 ggsave("output/Networks/RawPlots/GroupSize80.svg", width = 38, height = 38, units = "mm")
+
 
 ####################
 # Graph relative interactrion rates: simplified rate
