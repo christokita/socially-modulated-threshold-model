@@ -70,37 +70,46 @@ gg_act_net
 ####################
 # Network plot vs. above/below average activity
 ####################
-interaction_graphs <- lapply(1:length(soc_networks), function(i) {
-  # Get graphs
-  graphs <- soc_networks[[i]]
-  replicates <- length(graphs)
-  # For each each compute interaction matrix
-  # Get graph and make adjacency matrix
-  size_graph <- lapply(1:length(graphs), function(j) {
-    # Format: set diagonal, rescale, and make adj matrix
-    this_graph <- graphs[[j]]
-    diag(this_graph) <- NA
-    dimensions <- dim(this_graph)
-    labs <- colnames(this_graph)
-    this_graph <- as.vector(this_graph)
-    not_chosen <- 1 - (( 1 / (dimensions[1] - 1)) * p)
-    expected_random <-  1 - not_chosen^2
-    this_graph <- (this_graph - expected_random) / expected_random #relative to expected by random (i.e., 1 - chance of not being chosen^2)
-    this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
-    colnames(this_graph) <- labs
-    rownames(this_graph) <- labs
-    # Calculate thresh ratio
-    # ind <- replicates * i + j
-    thresh <- as.data.frame(thresh_data[[i]][j])
-    thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-    ratio <- order(thresh$ThreshRatio)
-  })
-})
+# Set group size and replicate
+size <- 35
+size <- size/5
+replicate <- 1
 
-# Plot
-gg_act_net <- ggplot(data = task_activ, aes(x = Task1, y = degree, colour = n)) +
-  geom_point() +
-  theme_classic() +
-  facet_wrap(~n)
-gg_act_net
+# Get graph
+example_graph <- soc_networks[[size]][[replicate]]
+example_thresh <- as.data.frame(thresh_data[[size]][[replicate]])
+example_thresh$Id <- row.names(example_thresh)
 
+# Get task distribution
+example_task_dist <- task_dist[task_dist$n == size*5 & task_dist$replicate == replicate, ]
+example_task_dist$total_activity <- rowSums(example_task_dist[ , 1:2])
+mean_activity <- median(example_task_dist$total_activity)
+example_task_dist$activity_level <- ifelse(example_task_dist$total_activity > mean_activity, "Above", "Below")
+
+# Remove extra edges
+percentiles <- quantile(example_graph, na.rm = TRUE)
+fiftypercent <- percentiles[3]
+seventyfivepercent <- percentiles[4]
+example_graph[example_graph < fiftypercent] <- 0
+diag(example_graph) <- 0
+
+# Prep graph
+g <- graph_from_adjacency_matrix(example_graph, mode = "undirected", weighted = TRUE)
+edgelist <- get.edgelist(g)
+edgelist <- as.data.frame(edgelist)
+names(edgelist) <- c("Source", "Target")
+edgelist$Weight <- E(g)$weight 
+nodelist <- data.frame("Id" = row.names(example_graph))
+nodelist$total_activity <- example_task_dist$total_activity
+nodelist$activity_level <- example_task_dist$activity_level
+
+# Output
+write.csv(edgelist, file = paste0("output/Networks/ExampleNetworks/Activity_GroupSize", 5*size, ".csv"), row.names = FALSE)
+write.csv(nodelist, file = paste0("output/Networks/ExampleNetworks/Activity_GroupSize", 5*size, "nodelist.csv"), row.names = FALSE)
+
+
+# Plot with igraph
+V(g)$color <- ifelse(example_task_dist$activity_level == "Above", "#d6604d", "#bababa")
+graph_attr(g, "layout") <- layout_with_lgl
+layout <- layout.forceatlas2(g)
+plot(g, layout = layout)
