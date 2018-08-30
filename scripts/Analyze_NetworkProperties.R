@@ -63,5 +63,44 @@ for(i in 1:length(soc_networks)) {
 gg_act_net <- ggplot(data = task_activ, aes(x = Task1, y = degree, colour = n)) +
   geom_point() +
   theme_classic() +
-  facet_wrap(~n, scales = "free")
+  facet_wrap(~n)
 gg_act_net
+
+
+####################
+# Network plot vs. above/below average activity
+####################
+interaction_graphs <- lapply(1:length(soc_networks), function(i) {
+  # Get graphs
+  graphs <- soc_networks[[i]]
+  replicates <- length(graphs)
+  # For each each compute interaction matrix
+  # Get graph and make adjacency matrix
+  size_graph <- lapply(1:length(graphs), function(j) {
+    # Format: set diagonal, rescale, and make adj matrix
+    this_graph <- graphs[[j]]
+    diag(this_graph) <- NA
+    dimensions <- dim(this_graph)
+    labs <- colnames(this_graph)
+    this_graph <- as.vector(this_graph)
+    not_chosen <- 1 - (( 1 / (dimensions[1] - 1)) * p)
+    expected_random <-  1 - not_chosen^2
+    this_graph <- (this_graph - expected_random) / expected_random #relative to expected by random (i.e., 1 - chance of not being chosen^2)
+    this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
+    colnames(this_graph) <- labs
+    rownames(this_graph) <- labs
+    # Calculate thresh ratio
+    # ind <- replicates * i + j
+    thresh <- as.data.frame(thresh_data[[i]][j])
+    thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+    ratio <- order(thresh$ThreshRatio)
+  })
+})
+
+# Plot
+gg_act_net <- ggplot(data = task_activ, aes(x = Task1, y = degree, colour = n)) +
+  geom_point() +
+  theme_classic() +
+  facet_wrap(~n)
+gg_act_net
+
