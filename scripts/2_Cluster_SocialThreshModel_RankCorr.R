@@ -23,10 +23,11 @@ m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
+corrStep       <- 200 #number of time steps for calculation of correlation 
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -46,8 +47,7 @@ storage_path <- "/scratch/gpfs/ctokita/"
 dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta)
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
-sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
-              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
+sub_dirs <- c("TaskDist", "Entropy", "Thresh", "Graphs", "RankCorr")
 for (sub_dir in sub_dirs) {
   dir.create(paste0(full_path, "/", sub_dir), showWarnings = FALSE)
 }
@@ -86,6 +86,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   ens_entropy     <- list()
   ens_thresh      <- list()
   ens_graphs      <- list()
+  ens_taskCorr  <- list()
   # Run Simulations
   for (sim in 1:chunk_size) {
     ####################
@@ -143,6 +144,31 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_max = 2 * ThreshM[1])
       # Update total task performance profile
       X_tot <- X_tot + X_g
+      # Create time step for correlation
+      if (t %% corrStep == 0) {
+        # Get tasks performance in correlation step
+        X_step <- X_tot - X_prevTot
+        # Add to ensemble list of task steps
+        taskStep[[t / corrStep]] <- X_step
+        # Calculate rank correlation if it is not the first step
+        if(sum(X_prev) != 0) {
+          # Normalize
+          stepNorm <- X_step / rowSums(X_step)
+          prevNorm <- X_prev / rowSums(X_prev)
+          # Calculate ranks
+          step_ranks <- calculateTaskRank(TaskStepMat = X_step)
+          prev_ranks <- calculateTaskRank(TaskStepMat = X_prev)
+          # Calculate Correlation
+          rankCorr <- cor(prev_ranks, step_ranks, method = "spearman")
+          # Put in list
+          taskCorr[[(t / corrStep) - 1]] <- diag(rankCorr)
+          names(taskCorr)[(t / corrStep) - 1] <- paste0("Gen", t)
+        }
+        # Update previous step total matrix
+        X_prevTot <- X_tot
+        # Update previous step total matrix
+        X_prev <- X_step
+      }
     }
     
     ####################
@@ -156,11 +182,14 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
     # Create thresh table
     threshMat <- label_parallel_runs(matrix = threshMat, n = n, simulation = sim, chunk = chunk)
+    # Create tasktally table
+    taskCorr$replicate <- sim
     # Add total task distributions, entropy values, and graphs to lists
     ens_taskDist[[sim]]    <- totalTaskDist
     ens_entropy[[sim]]     <- entropy
     ens_thresh[[sim]]      <- threshMat 
     ens_graphs[[sim]]      <- g_tot / gens
+    ens_taskCorr[[sim]]  <- taskCorr
   }
   # Bind and write
   save_parallel_data(data = ens_taskDist, 
@@ -176,6 +205,11 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   save_parallel_data(data = ens_thresh, 
                      path = full_path, 
                      sub_directory = "Thresh",
+                     n = n, 
+                     chunk = chunk)
+  save_parallel_data(data = ens_taskCorr, 
+                     path = full_path, 
+                     sub_directory = "RankCorr",
                      n = n, 
                      chunk = chunk)
   save(ens_graphs, 

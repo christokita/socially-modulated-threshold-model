@@ -47,7 +47,7 @@ dir_name <- paste0("Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, "_P
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
-              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
+              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs", "RankCorr")
 for (sub_dir in sub_dirs) {
   dir.create(paste0(full_path, "/", sub_dir), showWarnings = FALSE)
 }
@@ -90,6 +90,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   ens_thresh1Time <- list()
   ens_thresh2Time <- list()
   ens_graphs      <- list()
+  ens_taskCorr  <- list()
   # Run Simulations
   for (sim in 1:chunk_size) {
     ####################
