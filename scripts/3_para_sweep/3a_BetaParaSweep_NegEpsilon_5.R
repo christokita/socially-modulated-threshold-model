@@ -47,7 +47,7 @@ run_in_parallel <- run_in_parallel %>%
 
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-file_name <- paste0("GroupSizeBetaSweep_NegEpsilon_Sigma", ThreshSD[1], "-Epsilon", epsilon)
+file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
 full_path <- paste0(storage_path, file_name, '/')
 dir.create(full_path, showWarnings = FALSE)
 
