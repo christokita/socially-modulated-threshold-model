@@ -13,6 +13,7 @@ library(scales)
 ####################
 # Load Data: epsilon
 ####################
+rm(list = ls())
 directory <- "output/Rdata/GroupSizeEpsilonSweep_Sigma0-Beta1.1/"
 
 # List files 
@@ -35,6 +36,7 @@ rm(entropy)
 ####################
 # Load Data: beta
 ####################
+rm(list = ls())
 directory <- "output/Rdata/GroupSizeBetaSweep_Sigma0-Epsilon-0.1/" 
 # List files 
 files <- list.files(directory, full.names = TRUE)
