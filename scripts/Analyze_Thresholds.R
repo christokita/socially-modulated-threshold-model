@@ -45,7 +45,9 @@ all_thresh <- do.call('rbind', group_thresh)
 
 # Format for plotting
 
-
+####################
+# Plot threshold distributions
+####################
 # Plot
 pal <- brewer_pal("seq", "RdPu")
 pal <- pal(9)
@@ -56,8 +58,9 @@ gg_threshvar <- ggplot(data = all_thresh,
   geom_density_ridges(size = 0.2, stat = "binline", bins = 100) +
   xlab("Threshold value") +
   scale_x_continuous(breaks = seq(0, 100, 25), 
+                     limits = c(-01, 101),
                      expand = c(0.03, 0)) +
-  scale_y_continuous(breaks = c(5, seq(25, 100, 25)), 
+  scale_y_continuous(breaks = c(5, seq(25, 100, 25)),
                      expand = c(0.03, 0)) +
   scale_fill_viridis() +
   scale_color_viridis() +
@@ -75,3 +78,16 @@ ggsave(gg_threshvar, file = "output/Thresholds/GroupSizeThreshold.svg", width = 
 
 ggsave(gg_threshvar, file = "output/Thresholds/GroupSizeThreshold_square.png", width = 70, height = 70, units = "mm", dpi = 600)
 
+
+####################
+# Plot thresholds by replicate
+####################
+look <- all_thresh %>% 
+  filter(n == 35) %>% 
+  mutate(replicate = paste(sim, chunk, sep = "-"))
+
+gg_thresh <- ggplot(look, aes(y = replicate, x = Thresh1,  color = replicate)) +
+  geom_point() +
+  theme_classic() +
+  theme(legend.position = "none")
+gg_thresh
