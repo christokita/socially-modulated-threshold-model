@@ -26,7 +26,7 @@ chunk_size     <- 5 #number of simulations sent to single core
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
