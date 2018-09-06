@@ -11,7 +11,7 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Load and bind data
 ####################
-files <- list.files("output/FixedThreshold-SigmaDeltaSweep/Rdata/", full.names = T)
+files <- list.files("output/FixedThreshold-SigmaDeltaSweep/Rdata/", pattern = ".Rdata", full.names = T)
 for (file in files) {
   load(file)
   if (!exists("entropy")) {
@@ -41,20 +41,21 @@ entropy_total$delta <- factor(entropy_total$delta,
 ###################
 # Plot
 ####################
+pal <- brewer.pal(9, "BuPu")[4:9]
+
 gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, group = sigma)) +
-  geom_line(position = position_dodge(width = 5)) +
-  geom_errorbar(aes(ymax = Mean + SE, ymin = Mean - SE),
-                position = position_dodge(width = 5)) +
-  geom_point(position = position_dodge(width = 5)) +
+  geom_line(size = 0.2) +
+  # geom_errorbar(aes(ymax = Mean + SE, ymin = Mean - SE)) +
+  geom_point(size = 0.6) +
   scale_y_continuous(limits = c(0, 1)) +
   # scale_color_gradient(low = "#9ebcda", high = "#4d004b", limit = c(0, 0.15), breaks = seq(0, 0.15, 0.05)) +
-  scale_color_brewer(name = expression(paste("Threshold\nvariation (", sigma, ")")),
-                     palette = "RdYlBu",
-                     direction = -1) +
+  scale_color_manual(name = expression(paste("Threshold\nvariation (", sigma, ")")),
+                     values = pal) +
   theme_classic() +
   xlab("Group size (n)") +
   ylab(expression(paste("Division of labor (", 'D'[indiv], ")"))) +
   facet_grid(~delta, labeller = label_parsed)
 
 gg_deltas
-ggsave(gg_deltas, filename = "output/FixedThreshold-SigmaDeltaSweep/plots")
+ggsave(gg_deltas, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma.png", 
+       width = 140, height = 60, units = "mm", dpi = 400)
