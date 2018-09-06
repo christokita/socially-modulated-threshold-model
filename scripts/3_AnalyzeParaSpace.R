@@ -162,7 +162,7 @@ for (influence in c("Positive", "Negative")) {
   
   gg_eps
   # Save
-  file_png <- paste0("output/ParameterSpace/Plots/EpsilonSweep_", influence,  "Homphily.png")
+  file_png <- paste0("output/ParameterSpace/Plots/EpsilonSweep_", influence,  "Homophily.png")
   file_svg <- paste0("output/ParameterSpace/Plots/svg/EpsilonSweep_", influence,  "Homophily.svg")
   ggsave(gg_eps, file = file_png, height = 45, width = 45, units = "mm", dpi = 400)
   ggsave(gg_eps, file = file_svg, height = 45, width = 45, units = "mm")
@@ -210,8 +210,8 @@ for (influence in c("Positive", "Negative")) {
   
   gg_eps
   # Save
-  file_png <- paste0("output/ParameterSpace/Plots/EpsilonSweep_", influence,  "Homphily.png")
-  file_svg <- paste0("output/ParameterSpace/Plots/svg/EpsilonSweep_", influence,  "Homophily.svg")
+  file_png <- paste0("output/ParameterSpace/Plots/EpsilonSweep_", influence,  "Heterophily.png")
+  file_svg <- paste0("output/ParameterSpace/Plots/svg/EpsilonSweep_", influence,  "Heterophily.svg")
   ggsave(gg_eps, file = file_png, height = 45, width = 45, units = "mm", dpi = 400)
   ggsave(gg_eps, file = file_svg, height = 45, width = 45, units = "mm")
 }
