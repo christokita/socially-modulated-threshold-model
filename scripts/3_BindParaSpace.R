@@ -4,17 +4,11 @@
 #
 ################################################################################
 
-rm(list = ls())
-source("scripts/util/__Util__MASTER.R")
-library(RColorBrewer)
-library(scales)
-
-
 ####################
 # Load Data: epsilon
 ####################
 rm(list = ls())
-directory <- "output/Rdata/GroupSizeEpsilonSweep_Sigma0-Beta1.1/"
+directory <- "output/Rdata/GroupSizeEpsilonSweep_Sigma0-Beta0.9/"
 
 # List files 
 files <- list.files(directory, full.names = TRUE)
@@ -29,7 +23,7 @@ for (file in files) {
   }
 }
 
-save(entropy, file = "output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta1.1.Rdata")
+save(entropy, file = "output/ParameterSpace/GroupSizeEpsilonSweep_Sigma0-Beta0.9.Rdata")
 
 rm(entropy)
 
