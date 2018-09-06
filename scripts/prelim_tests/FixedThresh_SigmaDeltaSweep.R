@@ -18,20 +18,16 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-# Ns             <- c(5, 10, seq(20, 100, 20)) #vector of number of individuals to simulate
-Ns             <- c(5, 10,20) #vector of number of individuals to simulate
+Ns             <- c(5, 10, seq(20, 100, 20)) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
-# reps           <- 100 #number of replications per simulation (for ensemble)
-reps           <- 2 #number of replications per simulation (for ensemble)
+reps           <- 100 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
 InitialStim    <- rep(0, m) #intital vector of stimuli
-# Sigmas         <- c(0.01, 0.025, 0.05, 0.075, 0.1, 0.15)
-Sigmas         <- c(0.01, 0.025)
-# delta_values   <- seq(0.5, 0.8, 0.1) #vector of stimuli increase rates
-delta_values   <- seq(0.5, 0.6, 0.1) #vector of stimuli increase rates
+Sigmas         <- c(0.01, 0.025, 0.05, 0.075, 0.1, 0.15)
+delta_values   <- seq(0.5, 0.8, 0.1) #vector of stimuli increase rates
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
@@ -44,14 +40,24 @@ quitP          <- 0.2 #probability of quitting task once active
 ####################
 # Prep for Parallelization
 ####################
-# Prepare table for values to be iterated over
-parameter_values <- expand.grid(D = delta_values, S = Sigmas)
-
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <-"FixedThreshold-VarDeltaSweep"
+dir_name <-"FixedThreshold-SigmaDeltaSweep"
 full_path <- paste0(storage_path, dir_name, "/")
 dir.create(full_path, showWarnings = FALSE)
+
+# Prepare table for values to be iterated over
+parameter_values <- expand.grid(n = Ns, D = delta_values, S = Sigmas)
+
+# Check if file already exists
+files <- list.files(full_path)
+completed_runs <- data.frame(n = as.numeric(gsub(x = files, "^.*-n([0-9]+)\\.Rdata$", "\\1", perl = T)))
+completed_runs$D <- as.numeric(gsub(x = files, "^Delta([\\.0-9]+)-.*$", "\\1", perl = T))
+completed_runs$S <- as.numeric(gsub(x = files, "^.*-Sigma([\\.0-9]+)-.*$", "\\1", perl = T))
+parameter_values <- anti_join(parameter_values, completed_runs, by = c("n", "D", "S"))
+parameter_values <- parameter_values %>% 
+  select(D, S) %>% 
+  unique()
 
 # Prepare for parallel
 no_cores <- detectCores()
