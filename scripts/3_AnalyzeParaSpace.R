@@ -207,6 +207,7 @@ for (influence in c("Positive", "Negative")) {
           axis.ticks = element_line(size = 0.3, color = "black"),
           panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
           aspect.ratio = 1)
+ 
   
   gg_eps
   # Save
