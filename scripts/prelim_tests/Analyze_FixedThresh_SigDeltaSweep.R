@@ -25,7 +25,7 @@ for (file in files) {
 # Summarise
 ####################
 entropy_total <- entropy %>% 
-  mutate(sigma = as.factor(sigma)) %>% 
+  mutate(sigma = as.factor(sigma)) %>%
   group_by(sigma, delta, n) %>% 
   summarise(Mean = mean(Dind),
             SE = sd(Dind) / sqrt(length(Dind)), 
@@ -44,6 +44,8 @@ entropy_total$delta <- factor(entropy_total$delta,
 library(RColorBrewer)
 pal <- brewer.pal(9, "BuPu")[4:9]
 
+
+# Line plots
 gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, group = sigma)) +
   geom_line(size = 0.2) +
   geom_errorbar(aes(ymax = Mean + SE, ymin = Mean - SE), size = 0.2, width = 0) +
@@ -59,4 +61,28 @@ gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, g
 
 gg_deltas
 ggsave(gg_deltas, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma.png", 
-       width = 140, height = 50, units = "mm", dpi = 400)
+       width = 140, height = 40, units = "mm", dpi = 400)
+
+
+# heat map
+entropy_total <- entropy_total %>% 
+  mutate(n = as.factor(n))
+
+pal <- brewer_pal("seq", "GnBu")
+pal <- pal(9)
+
+gg_deltamap <- ggplot(data = entropy_total, aes(x = n, y = sigma, fill = Mean, colour = Mean)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  xlab("Group size (n)") +
+  scale_x_discrete() +
+  ylab(expression(paste("Division of labor (", 'D'[indiv], ")"))) +
+  facet_grid(~delta, labeller = label_parsed) +
+  theme_ctokita()
+
+gg_deltamap
+ggsave(gg_deltamap, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma_HeatMap.png", 
+       width = 140, height = 40, units = "mm", dpi = 400)
