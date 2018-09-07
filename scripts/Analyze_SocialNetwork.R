@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.1-Beta1.1"
+run <- "Sigma0.1-Epsilon0-Beta1.1-Delta0.6"
 
 ####################
 # Load and process data
@@ -282,9 +282,10 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
           legend.key.height = unit(6, "mm"),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
-          # panel.background = element_rect(size = 0.3, fill = NA),
           panel.border = element_rect(size = 0.3, fill = NA, colour = "black"),
-          plot.title = element_blank()) +
+          plot.title = element_blank(),
+          aspect.ratio = 1,
+          panel.grid = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
   return(gg_avg_adj)
@@ -292,8 +293,19 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
 })
 
 
-# save with legend
-gg_simp <- simple_graphs[80/5]
+# Save single plot
+gg_simp <- simple_graphs[40/5]
 gg_simp
 ggsave("output/Networks/RawPlots/SimpleAdjPlot_80.svg", width = 38, height = 38, units = "mm")
 
+# Save all for gif
+new_dir <- paste0("output/Networks/RawPlots/", run, "/")
+dir.create(new_dir, showWarnings = FALSE)
+for (i in 1:length(simple_graphs)) {
+  gg_plot <- simple_graphs[[i]]
+  plot_name <- i*5
+  ggsave(gg_plot, filename = paste0(new_dir, plot_name, ".png"), width = 30, height = 30, units = "mm")
+}
+
+
+i = 1
