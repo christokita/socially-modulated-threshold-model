@@ -59,7 +59,7 @@ pal <- c("black", brewer.pal(5, "Greens")[2:5])
 gg_entropy <- ggplot(data = entropy_data, aes(x = n, colour = Model)) +
   geom_point(aes(y = Dind),
              size = 0.8,
-             alpha = 0.2,
+             alpha = 0.5,
              stroke = 0) +
   theme_classic() +
   ylab("Division of labor") +

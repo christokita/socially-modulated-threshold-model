@@ -38,35 +38,3 @@ update_stim <- function(stim_matrix, deltas, alpha, state_matrix, time_step) {
   stim_matrix[time_step + 1, ] <- new_values
   return(stim_matrix)
 }
-
-# Density dependent (per capita)
-globalStimUpdate_PerCap <- function(stimulus, delta, alpha, Ni, n, m, quitP) {
-  # Calculate
-  s <- stimulus + (alpha * (delta ) * (n / m)) - (Ni * alpha)
-  # s <- stimulus + (alpha * (delta ) * (1 / (1 + quitP)) * (n / m)) - (Ni * alpha)
-  # If negative, make zero
-  if(s < 0.0001) {
-    s <- 0
-  }
-  return(s)
-}
-
-####################
-# Update Exhuastion
-####################
-updateExhaustStim <- function(ExhaustStim, TaskExhaustVect, ExhaustRate, StateMat) {
-  # Zero out stim for those that are inactive
-  for (i in 1:nrow(StateMat)) {
-    if (sum(StateMat[i, ]) == 0) {
-      ExhaustStim[i] <- 0
-    }
-  }
-  # Get relative rate increase for task being performed
-  TaskRate <- StateMat %*% TaskExhaustVect
-  # Get rate increase for time step
-  StimIncrease <- TaskRate %*% ExhaustRate
-  # Update Stim
-  NewExhaust <- ExhaustStim + StimIncrease
-  # Return 
-  return(NewExhaust)
-}
