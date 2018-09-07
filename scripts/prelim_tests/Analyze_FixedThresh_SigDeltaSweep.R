@@ -41,6 +41,7 @@ entropy_total$delta <- factor(entropy_total$delta,
 ###################
 # Plot
 ####################
+library(RColorBrewer)
 pal <- brewer.pal(9, "BuPu")[4:9]
 
 gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, group = sigma)) +
@@ -54,8 +55,13 @@ gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, g
   theme_classic() +
   xlab("Group size (n)") +
   ylab(expression(paste("Division of labor (", 'D'[indiv], ")"))) +
-  facet_grid(~delta, labeller = label_parsed)
+  facet_grid(~delta, labeller = label_parsed) +
+  theme(axis.text = element_text(size = 6, color = "black"),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6), 
+        legend.key.height = unit(3, "mm"))
 
 gg_deltas
 ggsave(gg_deltas, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma.png", 
-       width = 140, height = 60, units = "mm", dpi = 400)
+       width = 140, height = 50, units = "mm", dpi = 400)

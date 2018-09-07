@@ -19,8 +19,9 @@ library(snowfall)
 # Initial paramters: Free to change
 # Base parameters
 Ns             <- c(5, 10, seq(20, 100, 20)) #vector of number of individuals to simulate
+Ns             <- c(100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+gens           <- 50000 #number of generations to run simulation
 reps           <- 100 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
@@ -173,8 +174,8 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values), function(k) {
     # Bind and save
     task_distributions <- do.call("rbind", ens_taskDist)
     entropies <- do.call("rbind", ens_entropy)
-    save(task_distributions, entropies, file = paste0(full_path, "Delta", deltas[1], 
-                                                      "-Sigma", ThreshSD[1]/ThreshM[1], 
+    save(task_distributions, entropies, file = paste0(full_path, "Delta", deltas[1],
+                                                      "-Sigma", ThreshSD[1]/ThreshM[1],
                                                       "-n", n, ".Rdata"))
     # Return all_clear
     rm(ens_taskDist, ens_entropy)
