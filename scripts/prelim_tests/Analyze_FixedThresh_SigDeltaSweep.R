@@ -46,21 +46,16 @@ pal <- brewer.pal(9, "BuPu")[4:9]
 
 gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, group = sigma)) +
   geom_line(size = 0.2) +
-  # geom_errorbar(aes(ymax = Mean + SE, ymin = Mean - SE)) +
+  geom_errorbar(aes(ymax = Mean + SE, ymin = Mean - SE), size = 0.2, width = 0) +
   geom_point(size = 0.6) +
   scale_y_continuous(limits = c(0, 1)) +
   # scale_color_gradient(low = "#9ebcda", high = "#4d004b", limit = c(0, 0.15), breaks = seq(0, 0.15, 0.05)) +
   scale_color_manual(name = expression(paste("Threshold\nvariation (", sigma, ")")),
                      values = pal) +
-  theme_classic() +
   xlab("Group size (n)") +
   ylab(expression(paste("Division of labor (", 'D'[indiv], ")"))) +
   facet_grid(~delta, labeller = label_parsed) +
-  theme(axis.text = element_text(size = 6, color = "black"),
-        axis.title = element_text(size = 7),
-        legend.title = element_text(size = 7),
-        legend.text = element_text(size = 6), 
-        legend.key.height = unit(3, "mm"))
+  theme_ctokita()
 
 gg_deltas
 ggsave(gg_deltas, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma.png", 

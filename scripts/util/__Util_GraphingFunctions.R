@@ -71,6 +71,20 @@ matrixToGraphObject <- function(AdjacencyMat, TaskStateMat) {
 }
 
 ####################
+# My preferred theme
+####################
+theme_ctokita <- function() {
+  theme_classic() +
+  theme(axis.text       = element_text(size = 6, color = "black"),
+        axis.title      = element_text(size = 7, color = "black"),
+        legend.title    = element_text(size = 7, face = "bold"),
+        legend.text     = element_text(size = 6, color = "black"),
+        strip.text      = element_text(size = 7, color = "black"),
+        legend.key.size = unit(3, "mm"))
+}
+
+
+####################
 # Empty theme for plotting graphs
 ####################
 theme_invisible <- function() {
