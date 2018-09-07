@@ -38,3 +38,14 @@ update_stim <- function(stim_matrix, deltas, alpha, state_matrix, time_step) {
   stim_matrix[time_step + 1, ] <- new_values
   return(stim_matrix)
 }
+
+# Old method
+globalStimUpdate <- function(stimulus, delta, alpha, Ni, n) {
+  # Calculate
+  s <- stimulus + delta - ( alpha * ( Ni / n ))
+  # If negative, make zero
+  if(s < 0.0001) {
+    s <- 0
+  }
+  return(s)
+}
