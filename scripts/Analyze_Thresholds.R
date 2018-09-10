@@ -12,7 +12,7 @@ library(viridis)
 library(ggridges)
 
 p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.1-Beta1.1"
+run <- "Sigma0.05-Epsilon0-Beta1.1"
 
 ####################
 # Load and process data
@@ -83,10 +83,10 @@ ggsave(gg_threshvar, file = "output/Thresholds/GroupSizeThreshold_square.png", w
 # Plot thresholds by replicate
 ####################
 look <- all_thresh %>% 
-  filter(n == 35) %>% 
+  filter(n == 20) %>% 
   mutate(replicate = paste(sim, chunk, sep = "-"))
 
-gg_thresh <- ggplot(look, aes(y = replicate, x = Thresh1,  color = replicate)) +
+gg_thresh <- ggplot(look, aes(y = replicate, x = Thresh2,  color = replicate)) +
   geom_point() +
   theme_classic() +
   theme(legend.position = "none")

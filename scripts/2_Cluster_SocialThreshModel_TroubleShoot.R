@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+gens           <- 10000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
@@ -46,8 +46,7 @@ storage_path <- "/scratch/gpfs/ctokita/"
 dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "-Delta", deltas[1], "-CHECK")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
-sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
-              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
+sub_dirs <- c("TaskDist", "Entropy", "Thresh", "Graphs")
 for (sub_dir in sub_dirs) {
   dir.create(paste0(full_path, "/", sub_dir), showWarnings = FALSE)
 }
@@ -117,14 +116,11 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     for (t in 1:gens) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
-      for (j in 1:ncol(stimMat)) {
-        # update stim
-        stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
-                                              delta = deltas[j], 
-                                              alpha = alpha, 
-                                              Ni = sum(X_g[ , j]), 
-                                              n = n)
-      }
+      stimMat <- update_stim(stim_matrix = stimMat, 
+                             deltas = deltas, 
+                             alpha = alpha, 
+                             state_matrix = X_g, 
+                             time_step = t)
       # Calculate task demand based on global stimuli
       P_g <- calc_determ_thresh(time_step        = t + 1, # first row is generation 0
                                 threshold_matrix = threshMat, 
