@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 p <- 1 #prob of interact
-run <- "Sigma0.1-Epsilon0-Beta1.1-Delta0.6"
+run <- "Sigma0-Epsilon0.1-Beta1.1"
 
 ####################
 # Load and process data
