@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.1-Beta1.1"
+run <- "Sigma0.05-Epsilon0-Beta1.1"
 
 ####################
 # Load and process data
@@ -152,7 +152,7 @@ for (plot in plots) {
 }
 
 # save specific plot
-gg_inter <- interaction_graphs[35/5]
+gg_inter <- interaction_graphs[100/5]
 gg_inter
 ggsave("output/Networks/RawPlots/GroupSize80.svg", width = 38, height = 38, units = "mm")
 
@@ -191,36 +191,31 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   expected_random <-  1 - not_chosen^2
   # Bind
   all_edgelist <- do.call("rbind", size_graph)
-  # Get pvalues of interaction rate relative to expected by random
-  nonNA_edgelist <- all_edgelist %>% 
-    group_by(Interaction) %>% 
-    filter(!is.na(Weight)) %>% 
-    mutate(pvalue = t.test(x = Weight, mu = expected_random)[3]) %>% 
-    mutate(Significant = pvalue < 0.05) %>% 
-    filter(Significant == TRUE)
-  # Get the CI for those that are significantly different and then determine if greater or less than expected
-  if (nrow(nonNA_edgelist) > 0) {
-    sigDiff_edgelist <- nonNA_edgelist %>% 
-    group_by(Interaction) %>% 
-    mutate(CImin = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random,
-           CImax = t.test(x = Weight, mu = expected_random)[[4]][1] - expected_random) %>% 
-    mutate(DiffDirection = ifelse(test = CImin > 0 & CImax > 0, yes = 1, no = -1)) %>% 
-    select(Interaction, DiffDirection) %>% 
-    unique(.) 
-    calc_edgelist <- merge(all_edgelist, sigDiff_edgelist, all = TRUE)
-  } else {
-    calc_edgelist <- all_edgelist
-    calc_edgelist$DiffDirection <- NA
-  }
-  # Merge back together and then form graph
-  calc_edgelist$DiffDirection[is.na(calc_edgelist$DiffDirection) & !is.na(calc_edgelist$Weight)] <- 0
-  calc_edgelist <- calc_edgelist %>% 
+  #  Calcualte 99% CI interval of interaction rate
+  edgelist_sig <- all_edgelist %>% 
+    group_by(From, To, Interaction) %>% 
+    # filter(!is.na(Weight)) %>% 
+    summarise(samp_mean = mean(Weight),
+              samp_sd = sd(Weight),
+              samples = length(Weight)) %>% 
+    mutate(error = qt(0.995,df = samples-1) * samp_sd/sqrt(samples),
+           CI_low = samp_mean - error,
+           CI_high = samp_mean + error) %>% 
+    mutate(Lower_check = CI_low > expected_random,
+           Higher_check = CI_high > expected_random) 
+  # Determine if it is different than random
+  edgelist_sig <- as.data.frame(edgelist_sig)
+  edgelist_sig$DiffDirection <- 0
+  edgelist_sig$DiffDirection[edgelist_sig$Lower_check & edgelist_sig$Higher_check] <- 1
+  edgelist_sig$DiffDirection[edgelist_sig$Lower_check==FALSE & edgelist_sig$Higher_check==FALSE] <- -1
+  # Make graph
+  edgelist_sig <- edgelist_sig %>% 
     select(From, To, Interaction, DiffDirection) %>% 
-    unique(.) %>% 
+    # unique(.) %>% 
     mutate(From = as.numeric(as.character(From)),
            To = as.numeric(as.character(To))) %>% 
     arrange(From, To)
-  avg_g <- matrix(data = calc_edgelist$DiffDirection, nrow = dimensions[1], byrow = T)
+  avg_g <- matrix(data = edgelist_sig$DiffDirection, nrow = dimensions[1], byrow = T)
   colnames(avg_g) <- paste0("i-", 1:dimensions[1])
   rownames(avg_g) <- paste0("i-", 1:dimensions[1])
   # Create graph object
@@ -235,11 +230,11 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
   # Get info for plot
   groupsize <- ncol(avg_g)
   if (groupsize < 30) {
-    breaks <- c(1, seq(5, length(unique(plot_data$to)), 5))
+    breaks <- c(1, seq(5, length(unique(node_list$name)), 5))
   } else if(groupsize < 55) {
-    breaks <- c(1, seq(10, length(unique(plot_data$to)), 10))
+    breaks <- c(1, seq(10, length(unique(node_list$name)), 10))
   } else {
-    breaks <- c(1, seq(20, length(unique(plot_data$to)), 20))
+    breaks <- c(1, seq(20, length(unique(node_list$name)), 20))
   }
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, colour = weight)) +
@@ -275,7 +270,6 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
           # axis.text = element_text(colour = "black", size = 6),
           # axis.title = element_text(size = 7),
           axis.ticks = element_line(size = 0.3, colour = "black"),
-          aspect.ratio = 1,
           # Hide the legend (optional)
           legend.position = "none",
           legend.key.width = unit(3, "mm"),
@@ -288,13 +282,12 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
           panel.grid = element_blank()) +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
+  print(groupsize)
   return(gg_avg_adj)
-  # return(avg_g)
 })
 
-
 # Save single plot
-gg_simp <- simple_graphs[40/5]
+gg_simp <- simple_graphs[25/5]
 gg_simp
 ggsave("output/Networks/RawPlots/SimpleAdjPlot_80.svg", width = 38, height = 38, units = "mm")
 
@@ -308,4 +301,3 @@ for (i in 1:length(simple_graphs)) {
 }
 
 
-i = 1

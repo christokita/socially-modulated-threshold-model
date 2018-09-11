@@ -25,8 +25,8 @@ reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
-ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
+ThreshM        <- rep(10, m) #population threshold means 
+ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.6, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance

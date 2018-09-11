@@ -41,15 +41,10 @@ for (bias in c("Homophily", "Heterophily")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    # scale_fill_viridis(option = "plasma", direction = -1,
-    #                    name = "Behavioral\nspecialization",
-    #                    limits = c(0,1)) +
-    # scale_colour_viridis(option = "plasma",  direction = -1,
-    #                      name = "Behavioral\nspecialization",
-    #                      limits = c(0,1)) +
-    ylab(expression(beta)) +
+    xlab(expression(paste("Group Size, ", n))) +
+    ylab(expression(paste( "Interaction bias, ", beta))) +
     theme(axis.text = element_text(colour = "black", size = 6),
-          axis.title = element_text(size = 7, face = "italic"),
+          axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
           legend.key.height = unit(5, "mm"),
@@ -94,15 +89,10 @@ for (bias in c("Homophily", "Heterophily")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    # scale_fill_viridis(option = "plasma", direction = -1,
-    #                    name = "Behavioral\nspecialization",
-    #                    limits = c(0,1)) +
-    # scale_colour_viridis(option = "plasma",  direction = -1,
-    #                      name = "Behavioral\nspecialization",
-    #                      limits = c(0,1)) +
-    ylab(expression(beta)) +
+    xlab(expression(paste("Group Size, ", n))) +
+    ylab(expression(paste( "Interaction bias, ", beta))) +
     theme(axis.text = element_text(colour = "black", size = 6),
-          axis.title = element_text(size = 7, face = "italic"),
+          axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
           legend.key.height = unit(5, "mm"),
@@ -148,9 +138,10 @@ for (influence in c("Positive", "Negative")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    ylab(expression(epsilon)) +
+    xlab(expression(paste("Group Size, ", n))) +
+    ylab(expression(paste( "Social influence, ", epsilon))) +
     theme(axis.text = element_text(colour = "black", size = 6),
-          axis.title = element_text(size = 7, face = "italic"),
+          axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
           legend.key.height = unit(5, "mm"),
@@ -196,9 +187,10 @@ for (influence in c("Positive", "Negative")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    ylab(expression(epsilon)) +
+    xlab(expression(paste("Group Size, ", n))) +
+    ylab(expression(paste( "Social influence, ", epsilon))) +
     theme(axis.text = element_text(colour = "black", size = 6),
-          axis.title = element_text(size = 7, face = "italic"),
+          axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
           legend.key.height = unit(5, "mm"),

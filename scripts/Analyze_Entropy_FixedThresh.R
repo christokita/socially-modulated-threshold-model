@@ -42,6 +42,12 @@ entropy_data <- rbind(entropy_data, compiled_data)
 rm(compiled_data)
 
 
+load("output/Rdata/_ProcessedData/Entropy/Sigma0.05-Epsilon0-Beta1.1-Delta0.6-CHECK.Rdata")
+compiled_data$Model <- "Fixed_Check"
+entropy_data <- rbind(entropy_data, compiled_data)
+rm(compiled_data)
+
+
 ####################
 # Summarise data
 ####################
@@ -113,10 +119,11 @@ gg_entropy
 # Only one data set
 ####################
 look <- entropy %>% 
-  filter(Model == "Fixed") %>% 
-  mutate(n_log = log10(n))
+  filter(Model == "Fixed_Check") %>% 
+  mutate(n_log = log10(n)) %>% 
+  filter(n %in% c(5, seq(10, 100, 10)))
 
-gg_entropy_check <- ggplot(data = look, aes(x = n_log)) +
+gg_entropy_check <- ggplot(data = look, aes(x = n)) +
   # geom_line(aes(y = Mean),
             # size = 0.4) +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
@@ -125,6 +132,7 @@ gg_entropy_check <- ggplot(data = look, aes(x = n_log)) +
              size = 0.8) +
   theme_classic() +
   ylab("Division of labor") +
+  scale_y_continuous(limits = c(0, 1)) +
   # scale_x_continuous(breaks = seq(0, 100, 20)) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, face = "italic"),
