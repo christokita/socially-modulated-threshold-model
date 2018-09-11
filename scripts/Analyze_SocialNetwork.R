@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 p <- 1 #prob of interact
-run <- "Sigma0.05-Epsilon0-Beta1.1"
+run <- "Sigma0.1-Epsilon0-Beta1.1"
 
 ####################
 # Load and process data
@@ -215,18 +215,12 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     mutate(From = as.numeric(as.character(From)),
            To = as.numeric(as.character(To))) %>% 
     arrange(From, To)
-  avg_g <- matrix(data = edgelist_sig$DiffDirection, nrow = dimensions[1], byrow = T)
-  colnames(avg_g) <- paste0("i-", 1:dimensions[1])
-  rownames(avg_g) <- paste0("i-", 1:dimensions[1])
-  # Create graph object
-  g <- graph_from_adjacency_matrix(avg_g, mode = c("directed"), weighted = TRUE, diag = TRUE)
-  # Get node and edge list
-  node_list <- get.data.frame(g, what = "vertices")
-  edge_list <- get.data.frame(g, what = "edges")
-  # Create dataframe for plotting
-  plot_data <- edge_list %>% mutate(
-    to = factor(to, levels = rev(node_list$name)),
-    from = factor(from, levels = node_list$name))
+  plot_data <- edgelist_sig %>% 
+    mutate(from = paste0("i-", From),
+           to = paste0("i-", To)) %>% 
+    mutate(to = factor(to, levels = rev(node_list$name)),
+           from = factor(from, levels = node_list$name),
+           weight = DiffDirection)
   # Get info for plot
   groupsize <- ncol(avg_g)
   if (groupsize < 30) {
@@ -249,19 +243,28 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     scale_y_discrete(drop = FALSE, expand = c(0, 0), 
                      limits = levels(plot_data$to),
                      breaks = levels(plot_data$from)[breaks]) +
-    # scale_fill_gradientn(colours = rev(brewer.pal(9,"RdYlBu")), na.value = "white", limit = c(-1.5, 1.5), oob = squish) +
     scale_fill_gradientn(name = "Relative Interaction\nFrequency",
                          colours = c("#9E9E9E", "#ffffff", "#79248C"),
-                         na.value = "white", 
+                         na.value = "white",
                          limit = c(-1, 1),
                          # limit = c(0.95, 1.05),
                          oob = squish) +
     scale_color_gradientn(name = "Relative Interaction\nFrequency",
                          colours = c("#9E9E9E", "#ffffff", "#79248C"),
-                         na.value = "white", 
+                         na.value = "white",
                          limit = c(-1, 1),
                          # limit = c(0.95, 1.05),
                          oob = squish) +
+    # scale_fill_gradient2(name = "Relative Interaction\nFrequency",
+    #                      low = "#305E99", mid = "#ffffff", high = "#A42C36",
+    #                      na.value = "#ffffff", 
+    #                      limit = c(-1, 1),
+    #                      oob = squish) +
+    # scale_colour_gradient2(name = "Relative Interaction\nFrequency",
+    #                      low = "#305E99", mid = "#ffffff", high = "#A42C36",
+    #                      na.value = "#ffffff", 
+    #                      limit = c(-1, 1),
+    #                      oob = squish) +
     xlab("Individual") +
     ylab("Individual") +
     theme(axis.text = element_blank(),
@@ -287,7 +290,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
 })
 
 # Save single plot
-gg_simp <- simple_graphs[25/5]
+gg_simp <- simple_graphs[100/5]
 gg_simp
 ggsave("output/Networks/RawPlots/SimpleAdjPlot_80.svg", width = 38, height = 38, units = "mm")
 
