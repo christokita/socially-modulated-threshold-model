@@ -34,7 +34,7 @@ for (i in 1:length(files)) {
 # Set threshold max/min
 thresh_limit <- 100
 # Set group size and replicate
-size <- 35
+size <- 80
 size <- size/5
 replicate <- 1
 # Get graph
@@ -47,14 +47,14 @@ example_thresh$ThreshBiasBounded[example_thresh$ThreshBiasBounded < -thresh_limi
 example_thresh$ThreshBiasBounded[example_thresh$ThreshBiasBounded > thresh_limit] <- thresh_limit
 # If no node reaches upper or lower limits, add for coloring purposes in gephi
 if (sum(example_thresh$ThreshBias == thresh_limit) == 0) {
-  max_row <- data.frame(Thresh1 = NA, Thresh2 = NA,
-                        n = NA, sim = NA, chunk = NA,
+  max_row <- data.frame(Thresh1 = 50, Thresh2 = 50,
+                        n = size * 5, sim = 0, chunk = 0,
                         Id = "Max", ThreshBias = thresh_limit, ThreshBiasBounded = thresh_limit)
   example_thresh <- rbind(example_thresh, max_row)
 }
 if (sum(example_thresh$ThreshBias == -thresh_limit) == 0) {
-  min_row <- data.frame(Thresh1 = NA, Thresh2 = NA,
-                        n = NA, sim = NA, chunk = NA,
+  min_row <- data.frame(Thresh1 = 50, Thresh2 = 50,
+                        n = size * 5, sim = 0, chunk = 0,
                         Id = "Min", ThreshBias = -thresh_limit, ThreshBiasBounded = -thresh_limit)
   example_thresh <- rbind(example_thresh, min_row)
 }
