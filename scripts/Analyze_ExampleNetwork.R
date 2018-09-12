@@ -32,33 +32,50 @@ for (i in 1:length(files)) {
 # Output example graph
 ####################
 # Set threshold max/min
-thresh_limit <- 5
+thresh_limit <- 100
 # Set group size and replicate
-size <- 80
+size <- 35
 size <- size/5
 replicate <- 1
 # Get graph
 example_graph <- soc_networks[[size]][[replicate]]
 example_thresh <- as.data.frame(thresh_data[[size]][[replicate]])
 example_thresh$Id <- row.names(example_thresh)
-example_thresh$ThreshRatio <- log(example_thresh$Thresh1 / example_thresh$Thresh2)
-example_thresh$ThreshRatioBounded <- example_thresh$ThreshRatio
-example_thresh$ThreshRatioBounded[example_thresh$ThreshRatioBounded < -thresh_limit] <- -thresh_limit
-example_thresh$ThreshRatioBounded[example_thresh$ThreshRatioBounded > thresh_limit] <- thresh_limit
+example_thresh$ThreshBias <- example_thresh$Thresh1 - example_thresh$Thresh2
+example_thresh$ThreshBiasBounded <- example_thresh$ThreshBias
+example_thresh$ThreshBiasBounded[example_thresh$ThreshBiasBounded < -thresh_limit] <- -thresh_limit
+example_thresh$ThreshBiasBounded[example_thresh$ThreshBiasBounded > thresh_limit] <- thresh_limit
 # If no node reaches upper or lower limits, add for coloring purposes in gephi
-if (sum(example_thresh$ThreshRatioBounded == thresh_limit) == 0) {
-  max_row <- data.frame(Thresh1 = NA, Thresh2 = NA, 
+if (sum(example_thresh$ThreshBias == thresh_limit) == 0) {
+  max_row <- data.frame(Thresh1 = NA, Thresh2 = NA,
                         n = NA, sim = NA, chunk = NA,
-                        Id = "Max", ThreshRatio = thresh_limit, ThreshRatioBounded = thresh_limit)
+                        Id = "Max", ThreshBias = thresh_limit, ThreshBiasBounded = thresh_limit)
   example_thresh <- rbind(example_thresh, max_row)
 }
-if (sum(example_thresh$ThreshRatioBounded == -thresh_limit) == 0) {
-  min_row <- data.frame(Thresh1 = NA, Thresh2 = NA, 
+if (sum(example_thresh$ThreshBias == -thresh_limit) == 0) {
+  min_row <- data.frame(Thresh1 = NA, Thresh2 = NA,
                         n = NA, sim = NA, chunk = NA,
-                        Id = "Min", ThreshRatio = -thresh_limit, ThreshRatioBounded = -thresh_limit)
+                        Id = "Min", ThreshBias = -thresh_limit, ThreshBiasBounded = -thresh_limit)
   example_thresh <- rbind(example_thresh, min_row)
 }
-# Calculate values expected
+# example_thresh$ThreshRatio <- log(example_thresh$Thresh1 / example_thresh$Thresh2)
+# example_thresh$ThreshRatioBounded <- example_thresh$ThreshRatio
+# example_thresh$ThreshRatioBounded[example_thresh$ThreshRatioBounded < -thresh_limit] <- -thresh_limit
+# example_thresh$ThreshRatioBounded[example_thresh$ThreshRatioBounded > thresh_limit] <- thresh_limit
+# # If no node reaches upper or lower limits, add for coloring purposes in gephi
+# if (sum(example_thresh$ThreshRatioBounded == thresh_limit) == 0) {
+#   max_row <- data.frame(Thresh1 = NA, Thresh2 = NA, 
+#                         n = NA, sim = NA, chunk = NA,
+#                         Id = "Max", ThreshRatio = thresh_limit, ThreshRatioBounded = thresh_limit)
+#   example_thresh <- rbind(example_thresh, max_row)
+# }
+# if (sum(example_thresh$ThreshRatioBounded == -thresh_limit) == 0) {
+#   min_row <- data.frame(Thresh1 = NA, Thresh2 = NA, 
+#                         n = NA, sim = NA, chunk = NA,
+#                         Id = "Min", ThreshRatio = -thresh_limit, ThreshRatioBounded = -thresh_limit)
+#   example_thresh <- rbind(example_thresh, min_row)
+# }
+# # Calculate values expected
 reweight_graph <- example_graph
 not_chosen <- 1 - (( 1 / (nrow(reweight_graph) - 1)) * p)
 expected_random <-  1 - not_chosen^2
@@ -69,7 +86,7 @@ reweight_graph <- (reweight_graph - expected_random) / reweight_graph
 percentiles <- quantile(example_graph, na.rm = TRUE)
 fiftypercent <- percentiles[3]
 seventyfivepercent <- percentiles[4]
-example_graph[example_graph < fiftypercent] <- 0
+example_graph[example_graph <= fiftypercent] <- 0
 diag(example_graph) <- 0
 # Turn into graph object to get edgelist
 g <- graph_from_adjacency_matrix(example_graph, mode = "undirected", weighted = TRUE)
