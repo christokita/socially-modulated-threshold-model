@@ -193,6 +193,10 @@ ggsave(gg_interactions, filename = "Output/Networks/NetworkMetrics/PercentNonRan
 ####################
 # Assortivity
 ####################
+runs <- c("Sigma0.05-Epsilon0-Beta1.1", 
+          "Sigma0-Epsilon0.1-Beta1.1")
+run_names <- c("Fixed", "Social")
+
 network_correlations <- lapply(1:length(runs), function(run) {
   # Load social networks
   files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
@@ -220,13 +224,13 @@ network_correlations <- lapply(1:length(runs), function(run) {
       this_graph <- graphs[[j]]
       diag(this_graph) <- NA
       thresh <- as.data.frame(thresh_data[[i]][j])
-      thresh$ThreshDiff <- thresh$Thresh2 - thresh$Thresh1
-      thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
+      # thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
       # Multiply
-      social_interaction <- thresh$ThreshDiff * this_graph
+      social_interaction <- thresh$ThreshBias * this_graph
       social_interaction <- t(social_interaction)
       effective_interactions <- rowSums(social_interaction, na.rm = T)
-      to_retun <- data.frame(n = nrow(this_graph), Correlation = cor(effective_interactions, thresh$ThreshDiff))
+      to_retun <- data.frame(n = nrow(this_graph), Correlation = cor(effective_interactions, thresh$ThreshBias))
       # return
       return(to_retun)
     })
@@ -253,17 +257,18 @@ gg_correlation <- ggplot(data = correlation_data, aes(x = n, y = Corr_mean,
   geom_errorbar(aes(ymin = Corr_mean - Corr_SE, ymax = Corr_mean + Corr_SE),
                 width = 0) +
   geom_point(size = 0.8, shape = 21) +
-  scale_color_manual(name = "Threshold type",
+  scale_color_manual(name = "Threshold",
                      values = c("#878787", "#4d4d4d")) +
-  scale_fill_manual(name = "Threshold type",
+  scale_fill_manual(name = "Threshold",
                     values = c("#ffffff", "#4d4d4d")) +
-  scale_linetype_manual(name = "Threshold type",
+  scale_linetype_manual(name = "Threshold",
                         values = c("dotted", "solid")) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab("Social netowrk correlation") +
   theme_ctokita() +
   theme(aspect.ratio = 1,
-        legend.position = c(0.8, 0.8))
+        legend.position = c(0.8, 0.7),
+        legend.key.height = unit(0.5, "line"))
 
 gg_correlation
 ggsave(gg_correlation, filename = "Output/Networks/NetworkMetrics/CorrelationInNetwork.png", 

@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 p <- 1 #prob of interact
-run <- "Sigma0.1-Epsilon0-Beta1.1"
+run <- "Sigma0-Epsilon0.1-Beta1.1"
 
 ####################
 # Load and process data
@@ -54,14 +54,11 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     this_graph <- matrix(data = this_graph, nrow = dimensions[1], ncol = dimensions[2])
     colnames(this_graph) <- labs
     rownames(this_graph) <- labs
-    # Calculate thresh ratio
-    # ind <- replicates * i + j
+    # Calculate thresh bias
     thresh <- as.data.frame(thresh_data[[i]][j])
-    thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-    ratio <- order(thresh$ThreshRatio)
-    # ratio <- order(thresh$Thresh1)
-    # Create order by threshold ratio
-    this_graph <- this_graph[ratio, ratio]
+    thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
+    bias <- order(thresh$ThreshBias)
+    this_graph <- this_graph[bias, bias]
     colnames(this_graph) <- paste0("i-", 1:dimensions[1])
     rownames(this_graph) <- paste0("i-", 1:dimensions[1])
     # return
@@ -87,6 +84,12 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
   } else {
     breaks <- c(1, seq(20, length(unique(plot_data$to)), 20))
   }
+  # Color palette
+  pal <- c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b',
+           '#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4',
+           '#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec',
+           '#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9',
+           '#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c')
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, color = weight)) +
     geom_tile() +
@@ -103,44 +106,39 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
                      breaks = levels(plot_data$to)[breaks],
                      labels = rep("", length(levels(plot_data$to)[breaks]))) +
     scale_fill_gradientn(name = "Relative\ninteraction\nfrequency",
-                         colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
-                         # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
+                         colours = pal,
                          na.value = "white", 
                          limit = c(-0.05, 0.05),
-                         # limit = c(0.95, 1.05),
                          oob = squish) +
     scale_color_gradientn(name = "Relative\ninteraction\nfrequency",
-                         colours = c('#525252','#5b5b5b','#646464','#6e6e6e','#787878','#818181','#8b8b8b','#959595','#a0a0a0','#a9a9a9','#b4b4b4','#bfbfbf','#c8c8c8','#d4d4d4','#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec','#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9','#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c'),
-                         # colours = rev(c("#F6BDAA", "#EC8591", "#E15287", "#AC3987", "#6B249C", "#4D1B7A", "#381B4A")),
+                         colours =  pal,
                          na.value = "white", 
                          limit = c(-0.05, 0.05),
-                         # limit = c(0.95, 1.05),
                          oob = squish) +
     xlab("Individual") +
     ylab("Individual") +
-    theme(axis.text = element_blank(),
-          axis.title = element_blank(),
-          # axis.ticks = element_blank(),
-          # axis.text = element_text(colour = "black", size = 6),
-          # axis.title = element_text(size = 7),
-          axis.ticks = element_line(size = 0.3, colour = "black"),
-          aspect.ratio = 1,
+    theme(aspect.ratio = 1,
           # Hide the legend (optional)
-          legend.position = "none",
           legend.key.width = unit(3, "mm"),
           legend.key.height = unit(6, "mm"),
           legend.title = element_text(size = 7),
           legend.text = element_text(size = 6),
-          # panel.background = element_rect(size = 0.3, fill = NA),
           panel.border = element_rect(size = 0.3, fill = NA, colour = "black"),
-          plot.title = element_blank()) +
+          plot.title = element_blank(),
+          axis.text = element_blank(),
+          axis.title = element_blank(),
+          # # Minimal settings
+          # axis.ticks = element_blank(),
+          # Detailed Settings
+          axis.ticks = element_line(size = 0.3, colour = "black"),
+          legend.position = "none") +
     ggtitle(paste0("Group Size = ", groupsize))
   # return graph
   return(gg_avg_adj)
   # return(avg_g)
 })
 
-# Save
+# Save (only for minimal plots)
 plots <- seq(4, 7, 1)
 for (plot in plots) {
   gg_inter <- interaction_graphs[[plot]]
@@ -151,8 +149,8 @@ for (plot in plots) {
          units = "mm")
 }
 
-# save specific plot
-gg_inter <- interaction_graphs[100/5]
+# save specific plot (only for fully detailed plot)
+gg_inter <- interaction_graphs[80/5]
 gg_inter
 ggsave("output/Networks/RawPlots/GroupSize80.svg", width = 38, height = 38, units = "mm")
 
@@ -171,10 +169,10 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     this_graph <- graphs[[j]]
     diag(this_graph) <- NA
     thresh <- as.data.frame(thresh_data[[i]][j])
-    thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-    ratio <- order(thresh$ThreshRatio)
-    # Create order by threshold ratio
-    this_graph <- this_graph[ratio, ratio]
+    thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
+    bias <- order(thresh$ThreshBias)
+    # Create order by threshold bias
+    this_graph <- this_graph[bias, bias]
     colnames(this_graph) <- 1:nrow(this_graph)
     rownames(this_graph) <- colnames(this_graph)
     g <- graph.adjacency(adjmatrix = this_graph, weighted = T)
@@ -215,20 +213,21 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     mutate(From = as.numeric(as.character(From)),
            To = as.numeric(as.character(To))) %>% 
     arrange(From, To)
+  node_list <- unique( paste0("i-", edgelist_sig$To))
   plot_data <- edgelist_sig %>% 
     mutate(from = paste0("i-", From),
            to = paste0("i-", To)) %>% 
-    mutate(to = factor(to, levels = rev(node_list$name)),
-           from = factor(from, levels = node_list$name),
+    mutate(to = factor(to, levels = rev(node_list)),
+           from = factor(from, levels = node_list),
            weight = DiffDirection)
   # Get info for plot
-  groupsize <- ncol(avg_g)
+  groupsize <- length(node_list)
   if (groupsize < 30) {
-    breaks <- c(1, seq(5, length(unique(node_list$name)), 5))
+    breaks <- c(1, seq(5, groupsize, 5))
   } else if(groupsize < 55) {
-    breaks <- c(1, seq(10, length(unique(node_list$name)), 10))
+    breaks <- c(1, seq(10, groupsize, 10))
   } else {
-    breaks <- c(1, seq(20, length(unique(node_list$name)), 20))
+    breaks <- c(1, seq(20, groupsize, 20))
   }
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, colour = weight)) +
@@ -247,31 +246,16 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
                          colours = c("#9E9E9E", "#ffffff", "#79248C"),
                          na.value = "white",
                          limit = c(-1, 1),
-                         # limit = c(0.95, 1.05),
                          oob = squish) +
     scale_color_gradientn(name = "Relative Interaction\nFrequency",
                          colours = c("#9E9E9E", "#ffffff", "#79248C"),
                          na.value = "white",
                          limit = c(-1, 1),
-                         # limit = c(0.95, 1.05),
                          oob = squish) +
-    # scale_fill_gradient2(name = "Relative Interaction\nFrequency",
-    #                      low = "#305E99", mid = "#ffffff", high = "#A42C36",
-    #                      na.value = "#ffffff", 
-    #                      limit = c(-1, 1),
-    #                      oob = squish) +
-    # scale_colour_gradient2(name = "Relative Interaction\nFrequency",
-    #                      low = "#305E99", mid = "#ffffff", high = "#A42C36",
-    #                      na.value = "#ffffff", 
-    #                      limit = c(-1, 1),
-    #                      oob = squish) +
     xlab("Individual") +
     ylab("Individual") +
     theme(axis.text = element_blank(),
           axis.title = element_blank(),
-          # axis.ticks = element_blank(),
-          # axis.text = element_text(colour = "black", size = 6),
-          # axis.title = element_text(size = 7),
           axis.ticks = element_line(size = 0.3, colour = "black"),
           # Hide the legend (optional)
           legend.position = "none",
@@ -290,7 +274,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
 })
 
 # Save single plot
-gg_simp <- simple_graphs[100/5]
+gg_simp <- simple_graphs[80/5]
 gg_simp
 ggsave("output/Networks/RawPlots/SimpleAdjPlot_80.svg", width = 38, height = 38, units = "mm")
 
