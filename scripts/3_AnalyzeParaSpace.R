@@ -41,8 +41,8 @@ for (bias in c("Homophily", "Heterophily")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size, ", n))) +
-    ylab(expression(paste( "Interaction bias, ", beta))) +
+    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
@@ -89,8 +89,8 @@ for (bias in c("Homophily", "Heterophily")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size, ", n))) +
-    ylab(expression(paste( "Interaction bias, ", beta))) +
+    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
@@ -138,8 +138,8 @@ for (influence in c("Positive", "Negative")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size, ", n))) +
-    ylab(expression(paste( "Social influence, ", epsilon))) +
+    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),
@@ -187,8 +187,8 @@ for (influence in c("Positive", "Negative")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size, ", n))) +
-    ylab(expression(paste( "Social influence, ", epsilon))) +
+    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
           legend.title = element_text(size = 7),

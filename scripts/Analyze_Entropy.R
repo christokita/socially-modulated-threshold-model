@@ -59,7 +59,8 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  ylab("Division of labor") +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = pal, 
                      labels = c("1.2", "1.1"),
@@ -80,7 +81,7 @@ gg_entropy
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.png", 
        height = 45, width = 45, units = "mm", dpi = 800)
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.svg", 
-       height = 47, width = 47, units = "mm")
+       height = 48.5, width = 48.5, units = "mm")
 
 ####################
 # Only beta = 1.1
@@ -96,7 +97,8 @@ gg_solo <- ggplot(data = select_entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 1) +
   theme_classic() +
-  ylab("Division of labor") +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = "#636363", 
                      name = expression("Interaction bias"(Beta))) +
@@ -113,7 +115,7 @@ gg_solo <- ggplot(data = select_entropy, aes(x = n, colour = Model)) +
         aspect.ratio = 1)
 gg_solo
 
-ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.svg", width = 45, height = 45, units = "mm")
+ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.svg", width = 60.5, height = 60.5, units = "mm")
 ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.png", width = 45, height = 45, units = "mm", dpi = 400)
 
 ############### Sweep across epsilon values ###############
@@ -162,7 +164,8 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  ylab("Division of labor") +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = pal, 
                      labels = c("1.2", "1.1"),
@@ -183,4 +186,4 @@ gg_entropy
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Beta1.1-EpsSweep.png", 
        height = 45, width = 45, units = "mm", dpi = 800)
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Beta1.1-EpsSweep.svg", 
-       height = 47, width = 47, units = "mm")
+       height = 48.5, width = 48.5, units = "mm")

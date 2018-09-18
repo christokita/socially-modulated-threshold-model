@@ -11,14 +11,14 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(40) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 30, 50, 70) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
-reps           <- 1 #number of replications per simulation (for ensemble)
+reps           <- 20 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -26,7 +26,7 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
