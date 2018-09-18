@@ -44,7 +44,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta)
+dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "_RankCorr")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "Thresh", "Graphs", "RankCorr")
@@ -106,6 +106,11 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     X_g <- matrix(data = rep(0, length(P_g)), ncol = ncol(P_g))
     # Create cumulative task performance matrix
     X_tot <- X_g
+    # Prep correlation step matrix
+    X_prev <- matrix(data = rep(0, n * m), ncol = m)
+    X_prevTot <- matrix(data = rep(0, n * m), ncol = m)
+    taskCorr <- list()
+    taskStep <- list()
     # Create cumulative adjacency matrix
     g_tot <-  matrix(data = rep(0, n * n), ncol = n)
     colnames(g_tot) <- paste0("v-", 1:n)
@@ -182,7 +187,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
     # Create thresh table
     threshMat <- label_parallel_runs(matrix = threshMat, n = n, simulation = sim, chunk = chunk)
-    # Create tasktally table
+    # Create rank correlation table
     taskCorr$replicate <- sim
     # Add total task distributions, entropy values, and graphs to lists
     ens_taskDist[[sim]]    <- totalTaskDist
@@ -191,6 +196,27 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     ens_graphs[[sim]]      <- g_tot / gens
     ens_taskCorr[[sim]]  <- taskCorr
   }
+  # Bind task correlation data
+  # Calculate mean correlation for each n
+  runCorrs <- lapply(ens_taskCorr, function(x) {
+    # Unlist
+    runs <- do.call("rbind", x)
+    replicate <- runs[nrow(runs), ]
+    replicate <- unique(replicate)
+    runs <- runs[-nrow(runs), ]
+    # Calculate mean
+    runMean <- matrix(data = rep(NA, m), ncol =  m)
+    for (column in 1:m) {
+      runMean[ , column] <- mean(runs[ , column], na.rm = TRUE)
+    }
+    runMean <- cbind(runMean, replicate)
+    colnames(runMean) <- c(paste0("Task", 1:m), "replicate")
+    return(runMean)
+  })
+  runCorrs <- as.data.frame(do.call("rbind", runCorrs))
+  runCorrs$n <- n
+  runCorrs$chunk <- chunk
+  
   # Bind and write
   save_parallel_data(data = ens_taskDist, 
                      path = full_path, 
