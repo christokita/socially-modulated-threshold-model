@@ -233,7 +233,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                      sub_directory = "Thresh",
                      n = n, 
                      chunk = chunk)
-  save_parallel_data(data = ens_taskCorr, 
+  save_parallel_data(data = runCorrs, 
                      path = full_path, 
                      sub_directory = "RankCorr",
                      n = n, 
