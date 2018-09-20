@@ -168,15 +168,13 @@ interaction_data <- do.call('rbind', interaction_rates)
 # Graph
 gg_interactions <- ggplot(interaction_data, aes(x = n, y = PercentNonRandom, 
                                                 colour = Model, group = Model, fill = Model)) +
-  geom_line(size = 0.4, aes(linetype = Model)) +
+  geom_line(size = 0.4) +
   geom_point(size = 0.8, shape = 21) +
   scale_y_continuous(limits = c(0, 1)) +
   scale_color_manual(name = "Threshold type",
                      values = c("#878787", "#4d4d4d")) +
   scale_fill_manual(name = "Threshold type",
                     values = c("#ffffff", "#4d4d4d")) +
-  scale_linetype_manual(name = "Threshold type",
-                        values = c("dotted", "solid")) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab("% Non-random interactions") +
   theme_ctokita() +
@@ -264,7 +262,7 @@ gg_correlation <- ggplot(data = correlation_data, aes(x = n, y = Corr_mean,
   scale_linetype_manual(name = "Threshold",
                         values = c("dotted", "solid")) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
-  ylab("Social netowrk correlation") +
+  ylab("Assortativity") +
   theme_ctokita() +
   theme(aspect.ratio = 1,
         legend.position = c(0.8, 0.7),
