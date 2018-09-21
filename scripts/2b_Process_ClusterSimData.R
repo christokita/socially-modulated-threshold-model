@@ -98,3 +98,22 @@ for (folder in list_folders) {
     }
   }
 }
+
+
+####################
+# Load rank corr data and bind, save
+####################
+files <- list.files(paste0(directory_path, "RankCorr"), full.names = TRUE)
+for (file in files) {
+  load(file)
+  if (!exists("compiled_data")) {
+    compiled_data <- data
+  } else {
+    compiled_data <- rbind(compiled_data, data)
+  }
+}
+compiled_data <- as.data.frame(compiled_data)
+save(compiled_data, file = paste0(output_path, "RankCorr/", run_info, ".Rdata"))
+rm(compiled_data)
+
+
