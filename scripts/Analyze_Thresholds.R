@@ -17,7 +17,7 @@ run <- "Sigma0.05-Epsilon0-Beta1.1"
 ####################
 # Load and process data
 ####################
-# Load social networks
+# Load Thresholds
 files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", run, "/"), full.names = TRUE)
 
 # Loop through group sizes

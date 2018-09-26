@@ -13,7 +13,7 @@ library(scales)
 ####################
 # Load data
 ####################
-load("output/Rdata/_ProcessedData/RankCorr/Sigma0-Epsilon0.1-Beta1.1_RankCorr.Rdata")
+load("output/Rdata/_ProcessedData/RankCorr/Sigma0-Epsilon0.1-Beta1.1.Rdata")
 
 ####################
 # Process data
@@ -52,3 +52,4 @@ gg_spec <- ggplot(data = rank_corr, aes(x = n)) +
         axis.line = element_line(size = 0.3, color = "black"),
         aspect.ratio = 1)
 gg_spec
+
