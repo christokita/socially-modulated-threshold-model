@@ -13,7 +13,8 @@ seed_thresholds <- function(n, m, threshold_means = NULL, threshold_sds = NULL) 
     threshList <- rtnorm(n = n, 
                          mean = threshold_means[i], 
                          sd = threshold_sds[i], 
-                         lower = 0)
+                         # lower = 0)
+                         lower = -0.00001)
     return(threshList)
   })
   thresh_mat <- do.call("cbind", thresh_mat)

@@ -13,7 +13,7 @@ library(scales)
 ####################
 # Load data
 ####################
-load("output/Rdata/_ProcessedData/RankCorr/Sigma0-Epsilon0-Beta1.1_RankCorr.Rdata")
+load("output/Rdata/_ProcessedData/RankCorr/Sigma0-Epsilon0.1-Beta1.1_RankCorr.Rdata")
 
 ####################
 # Process data

@@ -25,10 +25,10 @@ reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
-ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.1 #population threshold standard deviations
+ThreshM        <- rep(0, m) #population threshold means 
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-deltas         <- rep(0.6, m) #vector of stimuli increase rates  
+deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
@@ -43,7 +43,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "-Delta", deltas[1])
+dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "-0Mean")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
@@ -140,7 +140,8 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 2 * ThreshM[1])
+                                                   # threshold_max = 2 * ThreshM[1])
+                                                   threshold_max = 100)
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }

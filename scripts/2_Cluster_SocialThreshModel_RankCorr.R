@@ -157,9 +157,6 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
         taskStep[[t / corrStep]] <- X_step
         # Calculate rank correlation if it is not the first step
         if(sum(X_prev) != 0) {
-          # Normalize
-          stepNorm <- X_step / rowSums(X_step)
-          prevNorm <- X_prev / rowSums(X_prev)
           # Calculate ranks
           step_ranks <- calculateTaskRank(TaskStepMat = X_step)
           prev_ranks <- calculateTaskRank(TaskStepMat = X_prev)
