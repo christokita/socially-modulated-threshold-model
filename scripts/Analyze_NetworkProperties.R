@@ -38,9 +38,9 @@ task_dist$replicate <- task_dist$sim * task_dist$chunk
 rm(compiled_data)
 
 
-####################
+##########################################################
 # Total interactions vs. activity
-####################
+##########################################################
 # Create space for data collection
 task_activ <- task_dist
 task_activ$degree <- NA
@@ -67,9 +67,9 @@ gg_act_net <- ggplot(data = task_activ, aes(x = Task1, y = degree, colour = n)) 
 gg_act_net
 
 
-####################
+##########################################################
 # Percentage of non-random interactions
-####################
+##########################################################
 rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
@@ -188,13 +188,15 @@ ggsave(gg_interactions, filename = "Output/Networks/NetworkMetrics/PercentNonRan
        height = 45, width = 45, units = "mm")
 
 
-####################
+##########################################################
 # Assortivity
-####################
+##########################################################
 runs <- c("Sigma0.05-Epsilon0-Beta1.1", 
-          "Sigma0-Epsilon0.1-Beta1.1")
+          "Sigma0-Epsilon0.1-Beta1.2")
 run_names <- c("Fixed", "Social")
-
+###################
+# Correlation of Average interaction partner
+###################
 network_correlations <- lapply(1:length(runs), function(run) {
   # Load social networks
   files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
@@ -223,10 +225,12 @@ network_correlations <- lapply(1:length(runs), function(run) {
       diag(this_graph) <- NA
       thresh <- as.data.frame(thresh_data[[i]][j])
       thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
-      # thresh$ThreshRatio <- log(thresh$Thresh1 / thresh$Thresh2)
-      # Multiply
-      social_interaction <- thresh$ThreshBias * this_graph
-      social_interaction <- t(social_interaction)
+      # Multiply to get bias weighted by interaction frequenchy
+      social_interaction <- matrix(data = rep(NA, length(this_graph)), ncol = ncol(this_graph))
+      for (i in 1:nrow(this_graph)) {
+        # social_interaction[i, ] <- this_graph[i,] *  thresh$ThreshBias
+        social_interaction[i, ] <- (this_graph[i,] / sum(this_graph[i,], na.rm = T)) *  thresh$ThreshBias
+      }
       effective_interactions <- rowSums(social_interaction, na.rm = T)
       to_retun <- data.frame(n = nrow(this_graph), Correlation = cor(effective_interactions, thresh$ThreshBias))
       # return
@@ -273,3 +277,203 @@ ggsave(gg_correlation, filename = "Output/Networks/NetworkMetrics/CorrelationInN
        height = 45, width = 45, units = "mm", dpi = 400)
 ggsave(gg_correlation, filename = "Output/Networks/NetworkMetrics/CorrelationInNetwork.svg", 
        height = 45, width = 45, units = "mm")
+
+###################
+# Weighted correlation (analogous to assortivity?)
+###################
+weighted_correlation <- lapply(1:length(runs), function(run) {
+  print(runs[run])
+  # Load social networks
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
+  soc_networks <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    soc_networks[[file]] <- listed_data
+  }
+  # Load threshold matrices
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
+  thresh_data <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    thresh_data[[file]] <- listed_data
+  }
+  # Loop through individual graphs
+  interaction_info <- lapply(1:length(soc_networks), function(i) {
+    # Get graphs
+    graphs <- soc_networks[[i]]
+    replicates <- length(graphs)
+    # For each each compute interaction matrix
+    # Get graph and make adjacency matrix
+    size_graph <- lapply(1:length(graphs), function(j) {
+      # Get graph and calculate threshold differences
+      this_graph <- graphs[[j]]
+      number_individuals <- dim(this_graph)[1]
+      diag(this_graph) <- NA
+      thresh <- as.data.frame(thresh_data[[i]][j])
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
+      # Multiply to get bias weighted by interaction frequenchy
+      social_interaction <- data.frame(ThreshBias = NULL, InteractBias = NULL, InteractWeight = NULL)
+      for (ind in 1:nrow(this_graph)) {
+        # Calculate bias and weighted interaction
+        thresh_bias <- rep(thresh$ThreshBias[ind], number_individuals - 1)
+        interact_bias <- thresh$ThreshBias[-ind]
+        interact_weight <- this_graph[ind, ]
+        interact_weight <- interact_weight[!is.na(interact_weight)]
+        # Bind to dataframe
+        to_bind <- data.frame(ThreshBias = thresh_bias, InteractBias = interact_bias, InteractWeight = interact_weight)
+        social_interaction <- rbind(social_interaction, to_bind)
+      }
+      # Filter and return
+      weighted_corr <- weightedCorr(x = social_interaction$ThreshBias,
+                                    y = social_interaction$InteractBias, 
+                                    method = "pearson", 
+                                    weights = social_interaction$InteractWeight)
+      to_return <- data.frame(n = number_individuals, WeightedCorr = weighted_corr)
+      # return
+      return(to_return)
+    })
+    #Calculate baseline probability of interaction
+    size_graph <- do.call("rbind", size_graph)
+  })
+  # Bind and return
+  interaction_info <- do.call("rbind", interaction_info)
+  interaction_info$Model <- run_names[run]
+  return(interaction_info)
+})
+
+# Bind
+weightcorr_data <- do.call('rbind', weighted_correlation)
+weightcorr_data <- weightcorr_data %>% 
+  group_by(Model, n) %>% 
+  summarise(WeightedCorr = mean(WeightedCorr),
+            WeightedCorr_SE = sd(WeightedCorr)/length(WeightedCorr))
+
+# Plot
+gg_weightedcorr <- ggplot(data = weightcorr_data, aes(x = n, y = WeightedCorr_mean, 
+                                                      colour = Model, group = Model, fill = Model)) +
+  geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = WeightedCorr_mean - WeightedCorr_SE, ymax = WeightedCorr_mean + WeightedCorr_SE),
+                width = 0) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  scale_linetype_manual(name = "Threshold",
+                        values = c("dotted", "solid")) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab("Weighted Correlation") +
+  theme_ctokita() +
+  theme(aspect.ratio = 1,
+        legend.position = c(0.8, 0.7),
+        legend.key.height = unit(0.5, "line"))
+gg_weightedcorr
+
+###################
+# Assortment coefficient from Newman 2003
+###################
+network_assort <- lapply(1:length(runs), function(run) {
+  print(runs[run])
+  # Load social networks
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
+  soc_networks <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    soc_networks[[file]] <- listed_data
+  }
+  # Load threshold matrices
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
+  thresh_data <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    thresh_data[[file]] <- listed_data
+  }
+  # Loop through individual graphs
+  interaction_info <- lapply(1:length(soc_networks), function(i) {
+    # Get graphs
+    graphs <- soc_networks[[i]]
+    replicates <- length(graphs)
+    # For each each compute interaction matrix
+    # Get graph and make adjacency matrix
+    size_graph <- lapply(1:length(graphs), function(j) {
+      # Get graph and calculate threshold differences
+      this_graph <- graphs[[j]]
+      diag(this_graph) <- NA
+      thresh <- as.data.frame(thresh_data[[i]][j])
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
+      # # Calculate assortment
+      # reweight_graph <- this_graph / sum(this_graph, na.rm = TRUE)
+      # a_i <- rowSums(reweight_graph, na.rm = TRUE)
+      # sigma_i <- sd(a_i)
+      # xi_xj <- thresh$ThreshBias %*% t(thresh$ThreshBias)
+      # eij_minus_aibj <- reweight_graph - a_i^2
+      # top_sum <- xi_xj * eij_minus_aibj
+      # assort <- sum(top_sum, na.rm = TRUE) / sigma_i^2
+      
+      # Calculate using iGraph
+      g <- graph_from_adjacency_matrix(this_graph, mode = "undirected", weighted = T, diag = F)
+      V(g)$Bias <- thresh$ThreshBias
+      assort <- assortativity(graph = g, types1 = V(g)$Bias, directed = F)
+      to_retun <- data.frame(n = nrow(this_graph), Assortativity = assort)
+      # return
+      return(to_retun)
+    })
+    #Calculate baseline probability of interaction
+    size_graph <- do.call("rbind", size_graph)
+  })
+  # Bind and return
+  interaction_info <- do.call("rbind", interaction_info)
+  interaction_info$Model <- run_names[run]
+  return(interaction_info)
+})
+
+# Bind
+assort_data <- do.call('rbind', network_assort)
+assort_data <- assort_data %>% 
+  group_by(Model, n) %>% 
+  summarise(Assort_mean = mean(Assortativity),
+            Assort_SE = sd(Assortativity)/length(Assortativity))
+
+# Plot
+gg_assort <- ggplot(data = assort_data, aes(x = n, y = Assort_mean, 
+                                                      colour = Model, group = Model, fill = Model)) +
+  geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = Assort_mean - Assort_SE, ymax = Assort_mean + Assort_SE),
+                width = 0) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  scale_linetype_manual(name = "Threshold",
+                        values = c("dotted", "solid")) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab("Assortativity") +
+  theme_ctokita() +
+  theme(aspect.ratio = 1,
+        legend.position = c(0.8, 0.7),
+        legend.key.height = unit(0.5, "line")) +
+  facet_grid(~Model)
+
+gg_assort
+
+
+gg_assort <- ggplot(data = assort_data, aes(x = n, y = Assortativity, 
+                                            colour = Model, group = Model, fill = Model)) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  scale_linetype_manual(name = "Threshold",
+                        values = c("dotted", "solid")) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab("Assortativity") +
+  theme_ctokita() +
+  theme(aspect.ratio = 1,
+        legend.position = c(0.8, 0.7),
+        legend.key.height = unit(0.5, "line")) +
+  facet_grid(~Model)
+gg_assort
+
+

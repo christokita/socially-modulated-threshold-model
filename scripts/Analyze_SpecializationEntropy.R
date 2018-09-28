@@ -39,7 +39,8 @@ gg_spec <- ggplot(data = rank_corr, aes(x = n)) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab(expression(paste("Specialization (rank corr.)"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_y_continuous(limits = c(-0.2, 1),
+                     breaks = seq(-0.2, 1, 0.2)) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, face = "italic"),
         legend.position = "none",
