@@ -86,22 +86,47 @@ ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSwee
 ####################
 # Only beta = 1.1
 ####################
-select_entropy <- entropy %>%
-  filter(Model == "Social_Beta1.1")
+rm(list = ls())
+source("scripts/util/__Util__MASTER.R")
+library(RColorBrewer)
+library(scales)
 
-gg_solo <- ggplot(data = select_entropy, aes(x = n, colour = Model)) +
+# Load data
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
+compiled_data$Model <- "Social"
+entropy_data <- compiled_data
+rm(compiled_data)
+
+load("output/Rdata/_ProcessedData/Entropy/Sigma0.05-Epsilon0-Beta1.1.Rdata")
+compiled_data$Model <- "Fixed"
+entropy_data <- rbind(entropy_data, compiled_data)
+rm(compiled_data)
+
+# Calculate mean and SE
+entropy <- entropy_data %>% 
+  group_by(Model, n) %>% 
+  summarise(Mean = mean(Dind),
+            SE = sd(Dind) / sqrt(length(Dind)))
+
+# Plot
+
+gg_solo <- ggplot(data = entropy, aes(x = n, colour = Model, fill = Model)) +
   geom_line(aes(y = Mean),
             size = 0.4) +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
                 width = 0) +
   geom_point(aes(y = Mean),
-             size = 1) +
+             size = 1, shape = 21) +
   theme_classic() +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_color_manual(values = "#636363", 
-                     name = expression("Interaction bias"(Beta))) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  scale_linetype_manual(name = "Threshold",
+                        values = c("dotted", "solid")) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, face = "italic"),
         legend.position = "none",
@@ -115,8 +140,8 @@ gg_solo <- ggplot(data = select_entropy, aes(x = n, colour = Model)) +
         aspect.ratio = 1)
 gg_solo
 
-ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.svg", width = 60.5, height = 60.5, units = "mm")
-ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1.png", width = 45, height = 45, units = "mm", dpi = 400)
+ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1_withfixed.svg", width = 60.5, height = 60.5, units = "mm")
+ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1withfixed.png", width = 45, height = 45, units = "mm", dpi = 400)
 
 ############### Sweep across epsilon values ###############
 rm(list = ls())
