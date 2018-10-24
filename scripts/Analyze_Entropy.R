@@ -141,7 +141,7 @@ gg_solo <- ggplot(data = entropy, aes(x = n, colour = Model, fill = Model)) +
 gg_solo
 
 ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1_withfixed.svg", width = 60.5, height = 60.5, units = "mm")
-ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1withfixed.png", width = 45, height = 45, units = "mm", dpi = 400)
+ggsave(gg_solo, filename = "output/SpecializationPlots/Beta1.1withfixed.png", width = 60.5, height = 60.5, units = "mm", dpi = 400)
 
 ############### Sweep across epsilon values ###############
 rm(list = ls())
