@@ -8,6 +8,7 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
+library(viridis)
 
 p <- 1 #prob of interact
 run <- "Sigma0-Epsilon0.1-Beta1.1"
@@ -90,9 +91,9 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
   #          '#dedede','#e9e9e9','#f4f4f4','#ffffff','#edf5f9','#dee9f2','#d3ddec',
   #          '#c7d1e5','#bfc4de','#b7b7d7','#b0aad0','#a99ec8','#a391c1','#9e83b9',
   #          '#9a76b1','#9569a9','#915aa1','#8c4c98','#893c8f','#852986','#810f7c')
-  pal <- c('#525252', '#737373', '#969696', '#bdbdbd', '#d9d9d9', 
+  pal <- c('#525252','#6c6c6c','#878787','#a4a4a4','#c2c2c2','#e0e0e0', 
            '#ffffff',
-           '#dadaeb', '#bcbddc', '#9e9ac8', '#807dba', '#6a51a3')
+           '#e2d7eb','#c7b1d7','#ad8ac1','#9763aa','#823b8f','#6e016b')
   # Plot
   gg_avg_adj <- ggplot(plot_data, aes(x = from, y = to, fill = weight, color = weight)) +
     geom_tile() +
@@ -110,13 +111,13 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
                      labels = rep("", length(levels(plot_data$to)[breaks]))) +
     scale_fill_gradientn(name = "Relative\ninteraction\nfrequency",
                          colours = pal,
-                         na.value = "white", 
-                         limit = c(-0.05, 0.05),
+                         na.value = "white",
+                         limit = c(-0.04, 0.04),
                          oob = squish) +
     scale_color_gradientn(name = "Relative\ninteraction\nfrequency",
                          colours =  pal,
-                         na.value = "white", 
-                         limit = c(-0.05, 0.05),
+                         na.value = "white",
+                         limit = c(-0.04, 0.04),
                          oob = squish) +
     xlab("Individual") +
     ylab("Individual") +
