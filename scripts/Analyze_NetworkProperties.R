@@ -226,12 +226,11 @@ network_correlations <- lapply(1:length(runs), function(run) {
       thresh <- as.data.frame(thresh_data[[i]][j])
       thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
       # Multiply to get bias weighted by interaction frequenchy
-      social_interaction <- matrix(data = rep(NA, length(this_graph)), ncol = ncol(this_graph))
+      effective_interactions <- matrix(data = rep(NA, nrow(this_graph)))
       for (i in 1:nrow(this_graph)) {
-        # social_interaction[i, ] <- this_graph[i,] *  thresh$ThreshBias
-        social_interaction[i, ] <- (this_graph[i,] / sum(this_graph[i,], na.rm = T)) *  thresh$ThreshBias
+        effective_interactions[i] <- sum(this_graph[i,] *  thresh$ThreshBias, na.rm = TRUE) / sum(this_graph[i, ], na.rm = TRUE)
+        # social_interaction[i, ] <- (this_graph[i,] / sum(this_graph[i,], na.rm = T)) *  thresh$ThreshBias
       }
-      effective_interactions <- rowSums(social_interaction, na.rm = T)
       to_retun <- data.frame(n = nrow(this_graph), Correlation = cor(effective_interactions, thresh$ThreshBias))
       # return
       return(to_retun)

@@ -10,6 +10,47 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Average change in stim levels: beginning to end
 ####################
+# Social thresholds
+files <- list.files("output/Rdata/_ProcessedData/Stim/Sigma0-Epsilon0.1-Beta1.1/", full.names = TRUE)
+stim_data <- lapply(files, function(file) {
+  # Load group size data
+  load(file)
+  n <- as.numeric(gsub(".*/([0-9]+)\\.Rdata", "\\1", file, perl = T))
+  print(paste("Loaded: Group Size", n))
+  # Summarise within each replicate
+  rep_data <- lapply(listed_data, function(replicate) {
+    replicate <- as.data.frame(replicate)
+    replicate <- replicate[-1, ] #remove time step 0
+    replicate$sTotal <- replicate$s1 + replicate$s2
+    # Grab first and last 1000 time steps
+    begin <- head(replicate, 1000)
+    end <- tail(replicate, 1000)
+    # Summarise
+    begin <- begin %>% 
+      summarise(s1 = mean(s1),
+                s2 = mean(s2),
+                sTotal = mean(sTotal))
+    end <- end %>% 
+      summarise(s1 = mean(s1),
+                s2 = mean(s2),
+                sTotal = mean(sTotal))
+    diff <- end - begin
+    return(diff)
+  })
+  rep_data <- do.call('rbind', rep_data)
+  # Combine all stim data
+  all_stim <- c(rep_data$s1, rep_data$s2)
+  # Calculate statistics and return
+  to_return <- data.frame(n = n, 
+                          sMean = mean(rep_data$sTotal), 
+                          sSD = sd(rep_data$sTotal), 
+                          sSE = sd(rep_data$sTotal)/sqrt(nrow(rep_data)))
+  return(to_return)
+})
+# Bind
+stim_data <- do.call("rbind", stim_data)
+
+# Fixed thresholds
 files <- list.files("output/Rdata/_ProcessedData/Stim/Sigma0-Epsilon0.1-Beta1.1/", full.names = TRUE)
 stim_data <- lapply(files, function(file) {
   # Load group size data
