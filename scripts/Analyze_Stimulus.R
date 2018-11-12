@@ -90,10 +90,7 @@ stim_data <- lapply(files, function(file) {
 # Bind
 stim_data <- do.call("rbind", stim_data)
 
-
-####################
 # Plot
-####################
 gg_stimdiff <- ggplot(stim_data, aes(x = n, y = sMean)) +
   geom_errorbar(aes(ymin = sMean - sSD, ymax = sMean + sSD), 
                 size = 0.3,
@@ -112,6 +109,13 @@ gg_stimdiff
 
 ggsave("output/StimLevels/ChangeInStimLevels.png", width = 45, height = 45, units = 'mm', dpi = 800)
 
+####################
+# Average change in stim levels: beginning to end
+####################
+# Runs of intertest
+runs <- c("Sigma0.05-Epsilon0-Beta1.1", 
+          "Sigma0-Epsilon0.1-Beta1.1")
+run_names <- c("Fixed", "Social")
 
 
 ####################
