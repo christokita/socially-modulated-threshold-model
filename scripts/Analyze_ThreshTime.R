@@ -12,13 +12,16 @@ library(viridis)
 library(rje)
 
 p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.1-Beta1.1"
+run <- "Sigma0.05-Epsilon0-Beta1.1"
 
 ####################
 # Load and process data
 ####################
 # Load social networks
 files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh1Time/", run, "/"), full.names = TRUE)
+
+# Create file
+dir.create(paste0("output/ThresholdTime/", run))
 
 # Get group sizes
 group_sizes <- unique(gsub(".*/([0-9]+)-[0-9]+\\.Rdata", "\\1", files, perl = TRUE))
@@ -107,8 +110,8 @@ group_plots <- lapply(select_sizes, function(size) {
           panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
           panel.grid = element_blank(),
           plot.margin = unit(c(0.2, 0.35, 0.1, 0.1), "cm"))
-  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".png"), width = 90, height = 25, units = "mm", dpi = 600)
-  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/ThreshTime_", size, ".pdf"), width = 90, height = 25, units = "mm", dpi = 600)
+  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/", run, "/ThreshTime_", size, ".png"), width = 90, height = 25, units = "mm", dpi = 600)
+  ggsave(gg_threshtime, file = paste0("output/ThresholdTime/", run, "/ThreshTime_", size, ".pdf"), width = 90, height = 25, units = "mm", dpi = 600)
   # smoothScatter(x = group_data$t, y = group_data$Threshold,
   #               ylim = c(0, 100))
   # plot(hexbin(x = group_data$t, y = group_data$Threshold, xbins = 30))

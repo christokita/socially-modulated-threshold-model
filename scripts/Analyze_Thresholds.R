@@ -72,11 +72,11 @@ gg_threshvar <- ggplot(data = all_thresh,
 
 gg_threshvar
 
-ggsave(gg_threshvar, file = "output/Thresholds/GroupSizeThreshold.png", width = 90, height = 60, units = "mm", dpi = 600)
-ggsave(gg_threshvar, file = "output/Thresholds/GroupSizeThreshold.svg", width = 90, height = 60, units = "mm", dpi = 600)
+ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, ".png"), width = 90, height = 60, units = "mm", dpi = 600)
+ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, ".svg"), width = 90, height = 60, units = "mm", dpi = 600)
 
 
-ggsave(gg_threshvar, file = "output/Thresholds/GroupSizeThreshold_square.png", width = 70, height = 70, units = "mm", dpi = 600)
+ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, "_square.png"), width = 70, height = 70, units = "mm", dpi = 600)
 
 
 ####################
