@@ -16,7 +16,7 @@ library(ggridges)
 # Load and process data
 ####################
 # Load entropy
-load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1_P0.5.Rdata")
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1-P0.5.Rdata")
 entropy_data <- compiled_data 
 entropy_data$Model <- "Ep0.1-P0.5"
 

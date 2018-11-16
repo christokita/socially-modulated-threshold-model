@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-directory_path <- "output/Rdata/Sigma0-Epsilon0.1-Beta1.1_P0.5/"
+directory_path <- "output/Rdata/Sigma0-Epsilon0.1-Beta1.1-P0.5/"
 output_path <- "output/Rdata/_ProcessedData/"
 run_info <- gsub("^.*(Sigma.*)/$", "\\1", directory_path, perl = TRUE)
 

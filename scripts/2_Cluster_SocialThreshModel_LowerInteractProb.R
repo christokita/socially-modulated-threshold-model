@@ -33,7 +33,7 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-p              <- 1 #baseline probablity of initiating an interaction per time step
+p              <- 0.5 #baseline probablity of initiating an interaction per time step
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
@@ -43,7 +43,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta)
+dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "-P0.5")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
