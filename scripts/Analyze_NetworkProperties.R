@@ -189,6 +189,67 @@ ggsave(gg_interactions, filename = "Output/Networks/NetworkMetrics/PercentNonRan
 
 
 ##########################################################
+# Clustering coefficient
+##########################################################
+# rm(list = ls())
+# source("scripts/util/__Util__MASTER.R")
+# 
+# p <- 1 #prob of interact
+# runs <- c("Sigma0.05-Epsilon0-Beta1.1", 
+#           "Sigma0-Epsilon0.1-Beta1.1")
+# run_names <- c("Fixed", "Social")
+# 
+# clustering <- lapply(1:length(runs), function(run) {
+#   # Load social networks
+#   files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
+#   soc_networks <- list()
+#   for (file in 1:length(files)) {
+#     load(files[file])
+#     soc_networks[[file]] <- listed_data
+#   }
+#   # Load threshold matrices
+#   files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
+#   thresh_data <- list()
+#   for (file in 1:length(files)) {
+#     load(files[file])
+#     thresh_data[[file]] <- listed_data
+#   }
+#   # Loop through individual graphs
+#   interaction_info <- lapply(1:length(soc_networks), function(i) {
+#     # Get graphs
+#     graphs <- soc_networks[[i]]
+#     replicates <- length(graphs)
+#     # For each each compute interaction matrix
+#     # Get graph and make adjacency matrix
+#     size_graph <- lapply(1:length(graphs), function(j) {
+#       # Format: set diagonal, rescale, and make adj matrix
+#       this_graph <- graphs[[j]]
+#       diag(this_graph) <- NA
+#       g <- graph_from_adjacency_matrix(this_graph, mode = "undirected", weighted = T)
+#       g_clust <- cluster_walktrap(g, weights = E(g)$Weight)
+#       # return
+#       replicate_row <- data.frame(Model = run_names[run], 
+#                                   n = nrow(this_graph),
+#                                   Modularity = modularity(g_clust),
+#                                   ClustCoeff =  transitivity(g))
+#       return(replicate_row)
+#     })
+#     size_data <- do.call("rbind", size_graph)
+#   })
+#   # Bind and return
+#   interaction_info <- do.call("rbind", interaction_info)
+#   return(interaction_info)
+# })
+# # Bind
+# cluster_data <- do.call("rbind", clustering)
+# 
+# # Plot
+# gg_clust <- ggplot(cluster_data, aes(x = n, y = Modularity, colour = Model)) +
+#   geom_point() +
+#   theme_ctokita()
+# gg_clust
+
+##########################################################
 # Assortivity
 ##########################################################
 runs <- c("Sigma0.05-Epsilon0-Beta1.1", 
