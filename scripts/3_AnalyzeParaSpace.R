@@ -20,8 +20,8 @@ load("output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon0.1.Rdata")
 pal <- brewer_pal("seq", "GnBu")
 pal <- pal(9)
 
-library(viridis)
-pal <- viridis(9, option = "plasma")
+# library(viridis)
+# pal <- viridis(9, option = "plasma")
 
 for (bias in c("Homophily", "Heterophily")) {
   # Filter
@@ -58,7 +58,7 @@ for (bias in c("Homophily", "Heterophily")) {
           aspect.ratio = 1)
   gg_beta
   # Save
-  file_png <- paste0("output/ParameterSpace/Plots/BetaSweep_Positive", bias,  "_viridis.png")
+  file_png <- paste0("output/ParameterSpace/Plots/BetaSweep_Positive", bias,  ".png")
   file_svg <- paste0("output/ParameterSpace/Plots/svg/BetaSweep_Positive", bias,  ".svg")
   ggsave(gg_beta, file = file_png, height = 45, width = 45, units = "mm", dpi = 400)
   ggsave(gg_beta, file = file_svg, height = 45, width = 45, units = "mm")
