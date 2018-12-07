@@ -22,6 +22,7 @@ rank_corr <- compiled_data %>%
   mutate(Spec = (Task1 + Task2) / 2) %>% 
   group_by(n) %>% 
   summarise(MeanSpec = mean(Spec),
+            SDSpec = sd(Spec),
             SESpec = sd(Spec)/sqrt(length(Spec)))
 
 

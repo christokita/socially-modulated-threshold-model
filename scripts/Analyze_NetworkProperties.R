@@ -39,35 +39,6 @@ rm(compiled_data)
 
 
 ##########################################################
-# Total interactions vs. activity
-##########################################################
-# Create space for data collection
-task_activ <- task_dist
-task_activ$degree <- NA
-
-# Get data from social networks
-for(i in 1:length(soc_networks)) {
-  # Get group size graphs
-  graphs <- soc_networks[[i]]
-  # Get individual graphs
-  for(j in 1:length(graphs)) {
-    this_graph <- graphs[[j]]
-    degrees <- rowSums(this_graph)
-    # add to dataframe
-    n <- 5 * i
-    task_activ$degree[task_activ$n == n & task_activ$replicate == j] <- degrees
-  }
-}
-
-# Plot
-gg_act_net <- ggplot(data = task_activ, aes(x = Task1, y = degree, colour = n)) +
-  geom_point() +
-  theme_classic() +
-  facet_wrap(~n)
-gg_act_net
-
-
-##########################################################
 # Percentage of non-random interactions
 ##########################################################
 rm(list = ls())
@@ -310,6 +281,7 @@ correlation_data <- do.call('rbind', network_correlations)
 correlation_data <- correlation_data %>% 
   group_by(Model, n) %>% 
   summarise(Corr_mean = mean(Correlation),
+            Corr_SD = sd(Correlation),
             Corr_SE = sd(Correlation)/length(Correlation))
 
 # Plot
@@ -318,7 +290,8 @@ gg_correlation <- ggplot(data = correlation_data, aes(x = n, y = Corr_mean,
   geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
   geom_line(size = 0.4) +
   geom_errorbar(aes(ymin = Corr_mean - Corr_SE, ymax = Corr_mean + Corr_SE),
-                width = 0) +
+                width = 0,
+                size = 0.4) +
   geom_point(size = 0.8, shape = 21) +
   scale_color_manual(name = "Threshold",
                      values = c("#878787", "#4d4d4d")) +
@@ -341,6 +314,7 @@ ggsave(gg_correlation, filename = "Output/Networks/NetworkMetrics/CorrelationInN
 ###################
 # Weighted correlation (analogous to assortivity?)
 ###################
+library(wCorr)
 weighted_correlation <- lapply(1:length(runs), function(run) {
   print(runs[run])
   # Load social networks
@@ -407,6 +381,7 @@ weightcorr_data <- do.call('rbind', weighted_correlation)
 weightcorr_data <- weightcorr_data %>% 
   group_by(Model, n) %>% 
   summarise(WeightedCorr_mean = mean(WeightedCorr),
+            WeightedCorr_SD = sd(WeightedCorr),
             WeightedCorr_SE = sd(WeightedCorr)/length(WeightedCorr))
 
 # Plot
@@ -415,7 +390,8 @@ gg_weightedcorr <- ggplot(data = weightcorr_data, aes(x = n, y = WeightedCorr_me
   geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
   geom_line(size = 0.4) +
   geom_errorbar(aes(ymin = WeightedCorr_mean - WeightedCorr_SE, ymax = WeightedCorr_mean + WeightedCorr_SE),
-                width = 0) +
+                width = 0,
+                size = 0.4) +
   geom_point(size = 0.8, shape = 21) +
   scale_color_manual(name = "Threshold",
                      values = c("#878787", "#4d4d4d")) +

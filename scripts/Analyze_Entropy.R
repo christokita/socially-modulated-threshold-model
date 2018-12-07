@@ -43,6 +43,7 @@ rm(compiled_data)
 entropy <- entropy_data %>% 
   group_by(Model, n) %>% 
   summarise(Mean = mean(Dind),
+            SD = sd(Dind),
             SE = sd(Dind) / sqrt(length(Dind)))
 
 
@@ -55,7 +56,8 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_line(aes(y = Mean),
             size = 0.4) +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
-                width = 0) +
+                width = 0,
+                size = 0.4) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +

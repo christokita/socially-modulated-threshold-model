@@ -55,6 +55,7 @@ rm(compiled_data)
 entropy <- entropy_data %>% 
   group_by(Model, n) %>% 
   summarise(Mean = mean(Dind),
+            SD = sd(Dind),
             SE = sd(Dind) / sqrt(length(Dind)))
 
 
