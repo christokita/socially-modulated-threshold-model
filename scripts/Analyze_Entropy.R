@@ -53,11 +53,11 @@ entropy <- entropy_data %>%
 pal <- brewer.pal(5, "Greens")[2:5]
 
 gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
+  geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD),
+                width = 0,
+                size = 0.3) +
   geom_line(aes(y = Mean),
             size = 0.4) +
-  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
-                width = 0,
-                size = 0.4) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
@@ -108,16 +108,21 @@ rm(compiled_data)
 entropy <- entropy_data %>% 
   group_by(Model, n) %>% 
   summarise(Mean = mean(Dind),
+            SD = sd(Dind),
             SE = sd(Dind) / sqrt(length(Dind)))
 
 # Plot
 
 gg_solo <- ggplot(data = entropy, aes(x = n, colour = Model, fill = Model)) +
+  geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD),
+                width = 0,
+                position = position_dodge(width = 1.5),
+                size = 0.3) +
   geom_line(aes(y = Mean),
+            position = position_dodge(width = 1.5),
             size = 0.4) +
-  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
-                width = 0) +
   geom_point(aes(y = Mean),
+             position = position_dodge(width = 1.5),
              size = 1, shape = 21) +
   theme_classic() +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
@@ -176,6 +181,7 @@ rm(compiled_data)
 entropy <- entropy_data %>% 
   group_by(Model, n) %>% 
   summarise(Mean = mean(Dind),
+            SD = sd(Dind),
             SE = sd(Dind) / sqrt(length(Dind)))
 
 ####################
@@ -184,10 +190,11 @@ entropy <- entropy_data %>%
 pal <- brewer.pal(5, "Greens")[c(2, 4, 5)]
 
 gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
+  geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD),
+                width = 0,
+                size = 0.3) +
   geom_line(aes(y = Mean),
             size = 0.4) +
-  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE),
-                width = 0) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
