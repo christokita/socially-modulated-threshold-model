@@ -76,7 +76,7 @@ interaction_rates <- lapply(1:length(runs), function(run) {
       this_graph <- graphs[[j]]
       diag(this_graph) <- NA
       thresh <- as.data.frame(thresh_data[[i]][j])
-      thresh$ThreshBias <- thresh$Thresh2 - thresh$Thresh1
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2 
       ratio <- order(thresh$ThreshBias)
       # Create order by threshold ratio
       this_graph <- this_graph[ratio, ratio]
@@ -256,7 +256,7 @@ network_correlations <- lapply(1:length(runs), function(run) {
       this_graph <- graphs[[j]]
       diag(this_graph) <- NA
       thresh <- as.data.frame(thresh_data[[i]][j])
-      thresh$ThreshBias <- thresh$Thresh2 - thresh$Thresh1
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2 
       # Multiply to get bias weighted by interaction frequenchy
       effective_interactions <- matrix(data = rep(NA, nrow(this_graph)))
       for (i in 1:nrow(this_graph)) {
@@ -345,7 +345,7 @@ weighted_correlation <- lapply(1:length(runs), function(run) {
       number_individuals <- dim(this_graph)[1]
       diag(this_graph) <- 0
       thresh <- as.data.frame(thresh_data[[i]][j])
-      thresh$ThreshBias <- thresh$Thresh2 - thresh$Thresh1
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2 
       # Multiply to get bias weighted by interaction frequenchy
       social_interaction <- data.frame(ThreshBias = NULL, InteractBias = NULL, InteractWeight = NULL)
       for (ind in 1:nrow(this_graph)) {
