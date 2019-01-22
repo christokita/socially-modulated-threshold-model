@@ -418,115 +418,88 @@ ggsave(gg_weightedcorr, filename = "Output/Networks/NetworkMetrics/WeightedCorre
 ###################
 # Assortment coefficient from Newman 2003
 ###################
-# network_assort <- lapply(1:length(runs), function(run) {
-#   print(runs[run])
-#   # Load social networks
-#   files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
-#   soc_networks <- list()
-#   for (file in 1:length(files)) {
-#     load(files[file])
-#     soc_networks[[file]] <- listed_data
-#   }
-#   # Load threshold matrices
-#   files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
-#   thresh_data <- list()
-#   for (file in 1:length(files)) {
-#     load(files[file])
-#     thresh_data[[file]] <- listed_data
-#   }
-#   # Loop through individual graphs
-#   interaction_info <- lapply(1:length(soc_networks), function(i) {
-#     print(i * 5)
-#     # Get graphs
-#     graphs <- soc_networks[[i]]
-#     replicates <- length(graphs)
-#     # For each each compute interaction matrix
-#     # Get graph and make adjacency matrix
-#     size_graph <- lapply(1:length(graphs), function(j) {
-#       # Get graph and calculate threshold differences
-#       this_graph <- graphs[[j]]
-#       diag(this_graph) <- NA
-#       thresh <- as.data.frame(thresh_data[[i]][j])
-#       thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
-#       # Bin data 
-#       thresh$ThreshBias_bin <- ceiling(thresh$ThreshBias)
-#       colnames(this_graph) <- thresh$ThreshBias_bin
-#       rownames(this_graph) <- thresh$ThreshBias_bin
-#       # Create mixing matrix
-#       g <- graph_from_adjacency_matrix(this_graph, mode = "directed", weighted = T, diag = F)
-#       edge_list <- as.data.frame(get.edgelist(g))
-#       names(edge_list) <- c("From", "To")
-#       edge_list$weight <- E(g)$weight
-#       edge_list <- aggregate(weight ~ From + To, data = edge_list, sum)
-#       if (nrow(edge_list) != 1) {
-#         mixing_matrix <- edge_list %>% 
-#           spread(key = To, value = weight) %>% 
-#           select(-From)
-#         rownames(mixing_matrix) <- colnames(mixing_matrix)
-#         mixing_matrix[is.na(mixing_matrix)] <- 0
-#         thresh_bias <- as.numeric(colnames(mixing_matrix))
-#         mixing_matrix <- mixing_matrix[order(thresh_bias), order(thresh_bias)]
-#         # Calculate assortment
-#         thresh_bias <- thresh_bias[order(thresh_bias)]
-#         reweight_graph <- mixing_matrix / sum(mixing_matrix, na.rm = TRUE)
-#         a_i <- rowSums(reweight_graph, na.rm = TRUE) 
-#         b_j <- colSums(reweight_graph, na.rm = TRUE)
-#         sigma_i <- sd(a_i)
-#         top_sum <- 0
-#         for (x in 1:nrow(reweight_graph)) {
-#           for (y in 1:ncol(reweight_graph)) {
-#             e_xy <- reweight_graph[x, y]
-#             ax_by <- a_i[x] * b_j[y]
-#             x_y <- thresh_bias[x] * thresh_bias[y]
-#             top_sum <- top_sum + (x_y * (e_xy - ax_by))
-#           }
-#         }
-#         assort <- top_sum / sigma_i^2
-#         # Calculate using iGraph
-#         #       V(g)$Bias <- thresh$ThreshBias
-#         #       assort <- assortativity(graph = g, types1 = V(g)$Bias, directed = F)
-#         to_retun <- data.frame(n = nrow(this_graph), Assortativity = assort)
-#         # return
-#         return(to_retun)
-#       }
-#     })
-#     #Calculate baseline probability of interaction
-#     size_graph <- do.call("rbind", size_graph)
-#   })
-#   # Bind and return
-#   interaction_info <- do.call("rbind", interaction_info)
-#   interaction_info$Model <- run_names[run]
-#   return(interaction_info)
-# })
-# 
-# # Bind
-# assort_data <- do.call('rbind', network_assort)
-# assort_data <- assort_data %>% 
-#   group_by(Model, n) %>% 
-#   summarise(Assort_mean = mean(Assortativity),
-#             Assort_SE = sd(Assortativity)/length(Assortativity))
-# 
-# # Plot
-# gg_assort <- ggplot(data = assort_data, aes(x = n, y = Assort_mean, 
-#                                                       colour = Model, group = Model, fill = Model)) +
-#   geom_line(size = 0.4) +
-#   geom_errorbar(aes(ymin = Assort_mean - Assort_SE, ymax = Assort_mean + Assort_SE),
-#                 width = 0) +
-#   geom_point(size = 0.8, shape = 21) +
-#   scale_color_manual(name = "Threshold",
-#                      values = c("#878787", "#4d4d4d")) +
-#   scale_fill_manual(name = "Threshold",
-#                     values = c("#ffffff", "#4d4d4d")) +
-#   scale_linetype_manual(name = "Threshold",
-#                         values = c("dotted", "solid")) +
-#   xlab(expression(paste("Group Size (", italic(n), ")"))) +
-#   ylab("Assortativity") +
-#   theme_ctokita() +
-#   theme(aspect.ratio = 1,
-#         legend.position = "none",
-#         legend.key.height = unit(0.5, "line"))
-# 
-# gg_assort
-# 
-# 
-# 
+library(assortnet)
+
+network_assort <- lapply(1:length(runs), function(run) {
+  print(runs[run])
+  # Load social networks
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
+  soc_networks <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    soc_networks[[file]] <- listed_data
+  }
+  # Load threshold matrices
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
+  thresh_data <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    thresh_data[[file]] <- listed_data
+  }
+  # Loop through individual graphs
+  interaction_info <- lapply(1:length(soc_networks), function(i) {
+    print(i * 5)
+    # Get graphs
+    graphs <- soc_networks[[i]]
+    replicates <- length(graphs)
+    # For each each compute interaction matrix
+    # Get graph and make adjacency matrix
+    size_graph <- lapply(1:length(graphs), function(j) {
+      # Get graph and calculate threshold differences
+      this_graph <- graphs[[j]]
+      diag(this_graph) <- 0
+      thresh <- as.data.frame(thresh_data[[i]][j])
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
+      # Calculate assortmnet
+      assort <- assortment.continuous(graph = this_graph, vertex_values = thresh$ThreshBias, weighted = T)
+      assort <- assort$r
+      to_retun <- data.frame(n = nrow(this_graph), Assortativity = assort)
+      # return
+      return(to_retun)
+    })
+    #Calculate baseline probability of interaction
+    size_graph <- do.call("rbind", size_graph)
+  })
+  # Bind and return
+  interaction_info <- do.call("rbind", interaction_info)
+  interaction_info$Model <- run_names[run]
+  return(interaction_info)
+})
+
+# Bind
+assort_data <- do.call('rbind', network_assort)
+assort_data <- assort_data %>%
+  group_by(Model, n) %>%
+  summarise(Assort_mean = mean(Assortativity),
+            Assort_SE = sd(Assortativity)/length(Assortativity))
+
+# Plot
+gg_assort <- ggplot(data = assort_data, aes(x = n, y = Assort_mean,
+                                                      colour = Model, group = Model, fill = Model)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
+  geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = Assort_mean - Assort_SE, ymax = Assort_mean + Assort_SE),
+                width = 0) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  scale_linetype_manual(name = "Threshold",
+                        values = c("dotted", "solid")) +
+  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_y_continuous(breaks = seq(-0.25, 0.05, 0.05), limits = c(-0.26, 0.05)) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab("Assortativity") +
+  theme_ctokita() +
+  theme(aspect.ratio = 1,
+        legend.position = "none",
+        legend.key.height = unit(0.5, "line"))
+
+gg_assort
+
+ggsave(gg_assort, filename = "Output/Networks/NetworkMetrics/AssortmentCoeff.png", 
+       height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_assort, filename = "Output/Networks/NetworkMetrics/AssortmentCoeff.svg", 
+       height = 46, width = 46, units = "mm")
+
