@@ -197,7 +197,7 @@ modularity <- lapply(1:length(runs), function(run) {
       this_graph <- graphs[[j]]
       diag(this_graph) <- 0
       g <- graph_from_adjacency_matrix(this_graph, mode = "undirected", weighted = TRUE)
-      g_clust <- fastgreedy.community(g, weights = E(g)$weight)
+      g_clust <- cluster_fast_greedy(g, weights = E(g)$weight)
       # g_membership <- membership(g_clust)
       # mod <- modularity(g, membership = g_membership, weights = E(g)$weight)
       mod <- modularity(g_clust)
