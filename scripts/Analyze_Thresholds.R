@@ -12,7 +12,7 @@ library(viridis)
 library(ggridges)
 
 p <- 1 #prob of interact
-run <- "Sigma0.05-Epsilon0-Beta1.1"
+run <- "Sigma0-Epsilon0.1-Beta1.1"
 
 ####################
 # Load and process data
@@ -56,7 +56,8 @@ gg_threshvar <- ggplot(data = all_thresh,
                        aes(x = Thresh1, y = n, fill = n, group = n)) +
   theme_invisible() +
   geom_density_ridges(size = 0.2, stat = "binline", bins = 100) +
-  xlab("Threshold value") +
+  xlab(expression(paste("Threshold Value (", theta[i1], ")"))) +
+  ylab(expression(paste("Group Size (", italic(n), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 25), 
                      limits = c(-01, 101),
                      expand = c(0.03, 0)) +

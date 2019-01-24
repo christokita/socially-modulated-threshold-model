@@ -58,7 +58,7 @@ interaction_graphs <- lapply(1:length(soc_networks), function(i) {
     # Calculate thresh bias
     thresh <- as.data.frame(thresh_data[[i]][j])
     thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2
-    bias <- order(thresh$ThreshBias)
+    bias <- order(thresh$ThreshBias) # sort from most negative (bias task 1) to most positive (bias task 2)
     this_graph <- this_graph[bias, bias]
     colnames(this_graph) <- paste0("i-", 1:dimensions[1])
     rownames(this_graph) <- paste0("i-", 1:dimensions[1])
