@@ -76,25 +76,26 @@ if (sum(example_thresh$ThreshBias == -thresh_limit) == 0) {
 #   example_thresh <- rbind(example_thresh, min_row)
 # }
 # # Calculate values expected
-reweight_graph <- example_graph
-not_chosen <- 1 - (( 1 / (nrow(reweight_graph) - 1)) * p)
-expected_random <-  1 - not_chosen^2
-reweight_graph <- (reweight_graph - expected_random) / reweight_graph 
 # Zero out interactions equal to or less than random
-# example_graph[reweight_graph <= 0] <- 0
+not_chosen <- 1 - (( 1 / (nrow(example_graph) - 1)) * p)
+expected_random <-  1 - not_chosen^2
+example_graph[example_graph <= expected_random] <- 0
+
 # Or take in those in top X percentile
 percentiles <- quantile(example_graph, na.rm = TRUE)
 fiftypercent <- percentiles[3]
 seventyfivepercent <- percentiles[4]
 example_graph[example_graph <= fiftypercent] <- 0
 diag(example_graph) <- 0
+
 # Turn into graph object to get edgelist
 g <- graph_from_adjacency_matrix(example_graph, mode = "undirected", weighted = TRUE)
 edgelist <- get.edgelist(g)
 edgelist <- as.data.frame(edgelist)
 names(edgelist) <- c("Source", "Target")
 edgelist$Weight <- E(g)$weight 
+
 # Write
-write.csv(edgelist, file = paste0("output/Networks/ExampleNetworks/GroupSize", 5*size, "_50th_edgelist.csv"), row.names = FALSE)
+write.csv(edgelist, file = paste0("output/Networks/ExampleNetworks/GroupSize", 5*size, "_AboveRandom_edgelist.csv"), row.names = FALSE)
 write.csv(example_thresh, file = paste0("output/Networks/ExampleNetworks/GroupSize", 5*size, "nodelist.csv"), row.names = FALSE)
 
