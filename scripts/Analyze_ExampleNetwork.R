@@ -34,7 +34,7 @@ for (i in 1:length(files)) {
 # Set threshold max/min
 thresh_limit <- 100
 # Set group size and replicate
-size <- 80
+size <- 35
 size <- size/5
 replicate <- 1
 # Get graph
@@ -82,11 +82,11 @@ expected_random <-  1 - not_chosen^2
 example_graph[example_graph <= expected_random] <- 0
 
 # Or take in those in top X percentile
-percentiles <- quantile(example_graph, na.rm = TRUE)
-fiftypercent <- percentiles[3]
-seventyfivepercent <- percentiles[4]
-example_graph[example_graph <= fiftypercent] <- 0
-diag(example_graph) <- 0
+# percentiles <- quantile(example_graph, na.rm = TRUE)
+# fiftypercent <- percentiles[3]
+# seventyfivepercent <- percentiles[4]
+# example_graph[example_graph <= fiftypercent] <- 0
+# diag(example_graph) <- 0
 
 # Turn into graph object to get edgelist
 g <- graph_from_adjacency_matrix(example_graph, mode = "undirected", weighted = TRUE)
