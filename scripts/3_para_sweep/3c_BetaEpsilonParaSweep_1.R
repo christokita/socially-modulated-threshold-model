@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Social interaction model: set for running on Della cluster
+# Social interaction model: Sweep beta and group size parameter space
 #
 ################################################################################
 
@@ -18,11 +18,10 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
+n              <- 60 #number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
-chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
@@ -33,30 +32,31 @@ alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
+# SWEEPING across betas, sweeping across epsilon within each beta value
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-beta           <- 0 #probability of interacting with individual in same state relative to others
+epsilons       <- seq(0, 0.6, 0.025) #relative weighting of social interactions for adjusting thresholds
+betas          <- seq(1.00, 1.04, 0.01) #probability of interacting with individual in same state relative to others
 
 
 ####################
 # Prep for Parallelization
 ####################
+# Create parameter combinations for parallelization
+run_in_parallel <- expand.grid(epsilon = epsilons, beta = betas)
+run_in_parallel <- run_in_parallel %>% 
+  arrange(epsilon)
+
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta)
-full_path <- paste0(storage_path, dir_name)
-dir.create(full_path)
-sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
-              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
-for (sub_dir in sub_dirs) {
-  dir.create(paste0(full_path, "/", sub_dir), showWarnings = FALSE)
-}
+file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
+full_path <- paste0(storage_path, file_name, '/')
+dir.create(full_path, showWarnings = FALSE)
 
-# Break up parameter replications into smaller batches\
-chunk_run  <- 1:(reps / chunk_size)
-run_in_parallel <- expand.grid(n = Ns, run = chunk_run)
-run_in_parallel <- run_in_parallel %>% 
-  arrange(n)
+# Check if there is already some runs done
+files <- list.files(full_path)
+completed_runs <- data.frame(n = as.numeric(gsub(x = files, "n([0-9]+)-.*", "\\1", perl = T)))
+completed_runs$beta <- as.numeric(gsub(x = files, ".*-beta([\\.0-9]+).Rdata$", "\\1", perl = T))
+run_in_parallel <- anti_join(run_in_parallel, completed_runs, by = c("n", "beta"))
 
 # Prepare for parallel
 no_cores <- detectCores()
@@ -71,7 +71,7 @@ sfLibrary(gtools)
 sfLibrary(snowfall)
 sfLibrary(tidyr)
 sfLibrary(stringr)
-sfClusterSetupRNGstream(seed = 323)
+# sfClusterSetupRNGstream(seed = 100)
 
 ####################
 # Run ensemble simulation
@@ -79,15 +79,12 @@ sfClusterSetupRNGstream(seed = 323)
 # Loop through group size (and chucnks)
 parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   # Set group size 
-  n <- run_in_parallel[k, 1]
-  chunk <- run_in_parallel[k, 2]
+  epsilon <- run_in_parallel[k, 1]
+  beta    <- run_in_parallel[k, 2]
   # Prep lists for collection of simulation outputs from this group size
-  ens_taskDist    <- list()
   ens_entropy     <- list()
-  ens_thresh      <- list()
-  ens_graphs      <- list()
   # Run Simulations
-  for (sim in 1:chunk_size) {
+  for (sim in 1:reps) {
     ####################
     # Seed structures and intial matrices
     ####################
@@ -109,7 +106,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     g_tot <-  matrix(data = rep(0, n * n), ncol = n)
     colnames(g_tot) <- paste0("v-", 1:n)
     rownames(g_tot) <- paste0("v-", 1:n)
-
+    
     ####################
     # Simulate individual run
     ####################
@@ -140,58 +137,49 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   # threshold_max = 2 * ThreshM[1])
-                                                   threshold_max = 100)
+                                                   threshold_max = 2 * ThreshM[1])
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }
-    
     ####################
     # Post run calculations
     ####################
     # Calculate Entropy
-    entropy <- mutualEntropy(TotalStateMat = X_tot)
-    entropy <- label_parallel_runs(matrix = entropy, n = n, simulation = sim, chunk = chunk)
-    # Calculate total task distribution
-    totalTaskDist <- X_tot / gens
-    totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
-    # Create thresh table
-    threshMat <- label_parallel_runs(matrix = threshMat, n = n, simulation = sim, chunk = chunk)
-    # Add total task distributions, entropy values, and graphs to lists
-    ens_taskDist[[sim]]    <- totalTaskDist
-    ens_entropy[[sim]]     <- entropy
-    ens_thresh[[sim]]      <- threshMat 
-    ens_graphs[[sim]]      <- g_tot / gens
+    entropy <- as.data.frame(mutualEntropy(TotalStateMat = X_tot))
+    entropy$epsilon <- epsilon
+    entropy$beta <- beta
+    # Add entropy values to list
+    ens_entropy[[sim]] <- entropy
+    # Clean
+    rm(X_tot, stimMat, threshMat, g_tot, g_adj, P_g, X_g)
   }
-  # Bind and write
-  save_parallel_data(data = ens_taskDist, 
-                     path = full_path, 
-                     sub_directory = "TaskDist",
-                     n = n, 
-                     chunk = chunk)
-  save_parallel_data(data = ens_entropy, 
-                     path = full_path, 
-                     sub_directory = "Entropy",
-                     n = n, 
-                     chunk = chunk)
-  save_parallel_data(data = ens_thresh, 
-                     path = full_path, 
-                     sub_directory = "Thresh",
-                     n = n, 
-                     chunk = chunk)
-  save(ens_graphs, 
-       file = paste0(full_path,
-                     "/Graphs/", 
-                     str_pad(string = n, width = 3, pad = "0"), 
-                     "-", 
-                     str_pad(string = chunk, width = 2, pad = "0"), 
-                     ".Rdata"))
-  # Return all_clear
-  rm(ens_taskDist, ens_entropy, ens_thresh, ens_graphs)
-  return(paste0("DONE: n = ", n, 
-                ", Sims ", ((chunk-1) * chunk_size)+1, "-", chunk * chunk_size))
-  sys.sleep(1)
+  # Bind together and summarise
+  entropy_sum <- do.call("rbind", ens_entropy)
+  entropy_sum <- entropy_sum %>% 
+    group_by(epsilon, beta) %>% 
+    summarise(Dsym_mean = mean(Dsym),
+              Dysm_SD = sd(Dsym),
+              Dtask_mean = mean(Dtask),
+              Dtask_SD = sd(Dtask),
+              Dind_mean = mean(Dind),
+              Dind_SD = sd(Dind))
+  entropy_sum <- as.data.frame(entropy_sum)
+  save(entropy_sum, file = paste0(full_path, 
+                                  "eps", 
+                                  str_pad(string = epsilon, width =  3, pad =  "0"),
+                                  "-beta",
+                                  beta, 
+                                  ".Rdata"))
+  Sys.sleep(1)
 })
 
 sfStop()
 
+# Bind and save
+# parallel_data <- do.call('rbind', parallel_simulations)
+
+# Create directory for depositing data
+# storage_path <- "/scratch/gpfs/ctokita/"
+# file_name <- paste0("GroupSizeBetaSweep_Sigma", ThreshSD[1], "-Epsilon", epsilon)
+# full_path <- paste0(storage_path, file_name, '.Rdata')
+# save(parallel_data, file = full_path)

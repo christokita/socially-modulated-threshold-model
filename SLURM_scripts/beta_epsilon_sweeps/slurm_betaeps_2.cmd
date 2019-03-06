@@ -2,12 +2,11 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -c 20
-#SBATCH -t 12:00:00
+#SBATCH -t 47:59:00
 #SBATCH --mem-per-cpu=6G
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ctokita@princeton.edu
 
-cd cd SocialInteractionModel/
-Rscript scripts/2_Cluster_SocialThreshModel.R
-
+cd
+Rscript scripts/3_para_sweep/3c_BetaEpsilonParaSweep_2.R
