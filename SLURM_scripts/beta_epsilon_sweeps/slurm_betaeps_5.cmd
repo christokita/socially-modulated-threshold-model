@@ -8,5 +8,5 @@
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ctokita@princeton.edu
 
-cd
+cd SocialInteractionModel/
 Rscript scripts/3_para_sweep/3c_BetaEpsilonParaSweep_5.R

@@ -8,6 +8,6 @@
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ctokita@princeton.edu
 
-cd cd SocialInteractionModel/
+cd SocialInteractionModel/
 Rscript scripts/2_Cluster_SocialThreshModel.R
 
