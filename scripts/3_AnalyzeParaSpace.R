@@ -212,5 +212,40 @@ for (influence in c("Positive", "Negative")) {
   ggsave(gg_eps, file = file_svg, height = 45, width = 45, units = "mm")
 }
 
+# Beta- Epsilon sweeps -----------------------------------------------------------------
+ 
+####################
+# Plot: Beta-
+####################
+load("output/ParameterSpace/EpsilonBetaSweep-n60.Rdata")
+pal <- brewer_pal("seq", "GnBu")
+pal <- pal(9)
 
+# Graph
+gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
+  geom_tile() +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(1, 1.25, 0.05), 
+                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(0, 0.6, 0.1), 
+                     expand = c(0,0)) +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
+  ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(2, "mm"),
+        legend.position = "none",
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
+        aspect.ratio = 1)
+
+
+gg_betaeps
 

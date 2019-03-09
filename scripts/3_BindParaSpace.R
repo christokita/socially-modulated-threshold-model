@@ -45,3 +45,24 @@ for (file in files) {
 
 save(entropy, file = "output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon-0.1.Rdata")
 
+
+####################
+# Load Data: Beta-Epsilon
+####################
+rm(list = ls())
+directory <- "output/Rdata/EpsilonBetaSweep_Sigma0-n60/"
+# List files 
+files <- list.files(directory, full.names = TRUE)
+for (file in files) {
+  load(file)
+  if (!exists("entropy")) {
+    entropy <- entropy_sum
+  } else {
+    entropy <- rbind(entropy, entropy_sum)
+  }
+}
+
+entropy$epsilon <- round(entropy$epsilon, digits = 5) #the seq() funciton makes weird non-precise values (e.g., 0.3 isn't really 0.3)
+
+save(entropy, file = "output/ParameterSpace/EpsilonBetaSweep-n60.Rdata")
+
