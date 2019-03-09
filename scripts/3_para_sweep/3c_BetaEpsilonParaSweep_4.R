@@ -54,7 +54,7 @@ dir.create(full_path, showWarnings = FALSE)
 
 # Check if there is already some runs done
 files <- list.files(full_path)
-completed_runs <- data.frame(epsilon = as.numeric(gsub(x = files, ".*eps([0-9]+)-.*", "\\1", perl = T)))
+completed_runs <- data.frame(epsilon = as.numeric(gsub(x = files, ".*eps([\\.0-9]+)-.*", "\\1", perl = T)))
 completed_runs$beta <- as.numeric(gsub(x = files, ".*-beta([\\.0-9]+).Rdata$", "\\1", perl = T))
 run_in_parallel <- anti_join(run_in_parallel, completed_runs, by = c("epsilon", "beta"))
 
