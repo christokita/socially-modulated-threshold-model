@@ -248,4 +248,4 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
 
 
 gg_betaeps
-
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_n60.png", height = 45, width = 45, units = "mm", dpi = 400)
