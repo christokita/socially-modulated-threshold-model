@@ -13,6 +13,9 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
+
+# Beta sweeps -----------------------------------------------------------------
+
 ####################
 # Plot: Beta sweep - positive social influence
 ####################
@@ -23,6 +26,7 @@ pal <- pal(9)
 # library(viridis)
 # pal <- viridis(9, option = "plasma")
 
+# As separate plots
 for (bias in c("Homophily", "Heterophily")) {
   # Filter
   if (bias == "Homophily") {
@@ -63,6 +67,36 @@ for (bias in c("Homophily", "Heterophily")) {
   ggsave(gg_beta, file = file_png, height = 45, width = 45, units = "mm", dpi = 400)
   ggsave(gg_beta, file = file_svg, height = 45, width = 45, units = "mm")
 }
+
+# As one plot
+gg_beta_all <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
+  geom_tile() +
+  theme_bw() +
+  geom_hline(yintercept = 1, size = 0.3, linetype = "dashed") +
+  scale_x_continuous(breaks = seq(0, 100, 20), 
+                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
+                     expand = c(0,0)) +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(2, "mm"),
+        legend.position = "none",
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
+        aspect.ratio = 2)
+gg_beta_all
+
+ggsave(gg_beta_all, file = "output/ParameterSpace/Plots/BetaSweep_PositiveAll.png", height = 90, width = 45, units = "mm", dpi = 400)
+ggsave(gg_beta_all, file = "output/ParameterSpace/Plots/svg/BetaSweep_PositiveAll.svg", height = 90, width = 45, units = "mm")
 
 ####################
 # Plot: Beta sweep - negative social influence
@@ -112,6 +146,38 @@ for (bias in c("Homophily", "Heterophily")) {
   ggsave(gg_beta, file = file_svg, height = 45, width = 45, units = "mm")
 }
 
+# As one plot
+gg_beta_all <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
+  geom_tile() +
+  theme_bw() +
+  geom_hline(yintercept = 1, size = 0.3, linetype = "dashed") +
+  scale_x_continuous(breaks = seq(0, 100, 20), 
+                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
+                     expand = c(0,0)) +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(2, "mm"),
+        legend.position = "none",
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
+        aspect.ratio = 2)
+gg_beta_all
+
+ggsave(gg_beta_all, file = "output/ParameterSpace/Plots/BetaSweep_NegativeAll.png", height = 90, width = 45, units = "mm", dpi = 400)
+ggsave(gg_beta_all, file = "output/ParameterSpace/Plots/svg/BetaSweep_NegativeAll.svg", height = 90, width = 45, units = "mm")
+
+
+# Epsilon sweeps -----------------------------------------------------------------
 
 ####################
 # Plot: Epsilon sweep - homophily
@@ -162,6 +228,37 @@ for (influence in c("Positive", "Negative")) {
   ggsave(gg_eps, file = file_svg, height = 45, width = 45, units = "mm")
 }
 
+# As one plot
+gg_eps_all <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
+  geom_tile() +
+  geom_hline(yintercept = 0, size = 0.3, linetype = "dashed") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(0, 100, 20), 
+                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(-1, 1, 0.1), 
+                     expand = c(0,0)) +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(2, "mm"),
+        legend.position = "none",
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
+        aspect.ratio = 2)
+
+gg_eps_all
+ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/EpsilonSweep_HomophilyAll.png", height = 90, width = 45, units = "mm", dpi = 400)
+ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/svg/EpsilonSweep_HomophilyAll.svg", height = 90, width = 45, units = "mm")
+
+
 ####################
 # Plot: Epsilon sweep - heterophily
 ####################
@@ -211,6 +308,39 @@ for (influence in c("Positive", "Negative")) {
   ggsave(gg_eps, file = file_png, height = 45, width = 45, units = "mm", dpi = 400)
   ggsave(gg_eps, file = file_svg, height = 45, width = 45, units = "mm")
 }
+
+# As one plot
+gg_eps_all <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
+  geom_tile() +
+  geom_hline(yintercept = 0, size = 0.3, linetype = "dashed") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(0, 100, 20), 
+                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(-1, 1, 0.1), 
+                     expand = c(0,0)) +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(2, "mm"),
+        legend.position = "none",
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
+        aspect.ratio = 2)
+
+gg_eps_all
+
+ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/EpsilonSweep_HeterophilyAll.png", height = 90, width = 45, units = "mm", dpi = 400)
+ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/svg/EpsilonSweep_HeterphilyAll.svg", height = 90, width = 45, units = "mm")
+
+
 
 # Beta- Epsilon sweeps -----------------------------------------------------------------
  

@@ -18,8 +18,7 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, seq(20, 100, 20)) #vector of number of individuals to simulate
-Ns             <- c(100) #vector of number of individuals to simulate
+Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation
 reps           <- 100 #number of replications per simulation (for ensemble)
@@ -27,15 +26,15 @@ reps           <- 100 #number of replications per simulation (for ensemble)
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
 InitialStim    <- rep(0, m) #intital vector of stimuli
-Sigmas         <- c(0.01, 0.025, 0.05, 0.075, 0.1, 0.15)
+Sigmas         <- c(0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5)
 delta_values   <- seq(0.5, 0.8, 0.1) #vector of stimuli increase rates
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
-# p              <- 1 #baseline probablity of initiating an interaction per time step
-# epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
-# beta           <- 1.1 #probability of interacting with individual in same state relative to others
+p              <- 1 #baseline probablity of initiating an interaction per time step
+epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
+beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -113,14 +112,14 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values), function(k) {
       # Create cumulative task performance matrix
       X_tot <- X_g
       # Create cumulative adjacency matrix
-      # g_tot <-  matrix(data = rep(0, n * n), ncol = n)
-      # colnames(g_tot) <- paste0("v-", 1:n)
-      # rownames(g_tot) <- paste0("v-", 1:n)
+      g_tot <-  matrix(data = rep(0, n * n), ncol = n)
+      colnames(g_tot) <- paste0("v-", 1:n)
+      rownames(g_tot) <- paste0("v-", 1:n)
       
       ####################
       # Simulate individual run
       ####################
-      # LOOP 4: Run simulation
+      # Run simulation
       for (t in 1:gens) { 
         # Current timestep is actually t+1 in this formulation, because first row is timestep 0
         # Update stimuli
@@ -138,16 +137,16 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values), function(k) {
                                        state_matrix = X_g,
                                        quit_prob    = quitP)
         # Update social network (previously this was before probability/task update)
-        # g_adj <- temporalNetwork(X_sub_g = X_g,
-        #                          prob_interact = p,
-        #                          bias = beta)
-        # g_tot <- g_tot + g_adj
-        # # Adjust thresholds
-        # threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
-        #                                              threshold_matrix = threshMat,
-        #                                              state_matrix = X_g,
-        #                                              epsilon = epsilon,
-        #                                              threshold_max = 2 * ThreshM[1])
+        g_adj <- temporalNetwork(X_sub_g = X_g,
+                                 prob_interact = p,
+                                 bias = beta)
+        g_tot <- g_tot + g_adj
+        # Adjust thresholds
+        threshMat <- adjust_thresholds_social_capped(social_network = g_adj,
+                                                     threshold_matrix = threshMat,
+                                                     state_matrix = X_g,
+                                                     epsilon = epsilon,
+                                                     threshold_max = 100)
         # Update total task performance profile
         X_tot <- X_tot + X_g
       }
