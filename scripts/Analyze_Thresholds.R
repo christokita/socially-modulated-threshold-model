@@ -12,7 +12,7 @@ library(viridis)
 library(ggridges)
 
 p <- 1 #prob of interact
-run <- "Sigma0.05-Epsilon0-Beta1.1"
+run <- "Sigma0-Epsilon0.1-Beta1.1"
 
 ####################
 # Load and process data
@@ -82,6 +82,18 @@ ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, 
 ####################
 # Plot frequency of threshold values within 1, 2 SD of mean
 ####################
+# Calcualte values signifying mean, 1 SD, 2SD
+thresh_dist_value <- all_thresh %>% 
+  group_by(n) %>% 
+  mutate(within_1SD = ( mean(Thresh1) - sd(Thresh1) < Thresh1 )  & Thresh1 < (mean(Thresh1) + sd(Thresh1))) %>% 
+  mutate(within_2SD = ( mean(Thresh1) - 2*sd(Thresh1) < Thresh1 )  & Thresh1 < (mean(Thresh1) + 2*sd(Thresh1)) & within_1SD == FALSE) %>% 
+  mutate(outside_2SD = within_1SD == FALSE & within_2SD == FALSE) %>% 
+  summarise(within_1SD = sum(within_1SD),
+            within_2SD = sum(within_2SD),
+            outside_2SD = sum(outside_2SD)) %>% 
+  mutate(within_1SD = within_1SD / (n*100),
+         within_2SD = within_2SD / (n*100),
+         outside_2SD = outside_2SD / (n*100))
 
 
 
@@ -89,11 +101,12 @@ ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, 
 # Plot thresholds by replicate
 ####################
 look <- all_thresh %>% 
-  filter(n == 100) %>% 
+  filter(n == 10) %>% 
   mutate(replicate = paste(sim, chunk, sep = "-"))
 
 gg_thresh <- ggplot(look, aes(y = replicate, x = Thresh2,  color = replicate)) +
   geom_point() +
+  scale_x_continuous(limits = c(39, 61)) +
   theme_classic() +
   theme(legend.position = "none")
 gg_thresh
