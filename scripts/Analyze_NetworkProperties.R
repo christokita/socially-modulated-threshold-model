@@ -103,7 +103,7 @@ interaction_rates <- lapply(1:length(runs), function(run) {
       summarise(samp_mean = mean(Weight),
                 samp_sd = sd(Weight),
                 samples = length(Weight)) %>% 
-      mutate(error = qt(0.995,df = samples-1) * samp_sd/sqrt(samples),
+      mutate(error = qt(0.975, df = samples-1) * samp_sd/sqrt(samples),
              CI_low = samp_mean - error,
              CI_high = samp_mean + error) %>% 
       mutate(Lower_check = CI_low > expected_random,
@@ -148,7 +148,7 @@ gg_interactions <- ggplot(interaction_data, aes(x = n, y = PercentNonRandom,
                     values = c("#ffffff", "#4d4d4d")) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab("% Non-random interactions") +
-  # facet_grid(Model~.) +
+  # facet_grid(~Model) +
   theme_ctokita() +
   theme(aspect.ratio = 1,
         # strip.background = element_blank(),
@@ -162,7 +162,7 @@ ggsave(gg_interactions, filename = "Output/Networks/NetworkMetrics/PercentNonRan
        height = 45, width = 45, units = "mm")
 #Facet plot
 # ggsave(gg_interactions, filename = "Output/Networks/NetworkMetrics/PercentNonRandomInteractions_Facet.svg",
-#       width = 45, units = "mm")
+# width = 90, units = "mm")
 
 ##########################################################
 # Modularity

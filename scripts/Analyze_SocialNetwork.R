@@ -200,7 +200,7 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     summarise(samp_mean = mean(Weight),
               samp_sd = sd(Weight),
               samples = length(Weight)) %>% 
-    mutate(error = qt(0.995,df = samples-1) * samp_sd/sqrt(samples),
+    mutate(error = qt(0.975,df = samples-1) * samp_sd/sqrt(samples),
            CI_low = samp_mean - error,
            CI_high = samp_mean + error) %>% 
     mutate(Lower_check = CI_low > expected_random,
@@ -260,7 +260,8 @@ simple_graphs <- lapply(1:length(soc_networks), function(i) {
     ylab("Individual") +
     theme(axis.text = element_blank(),
           axis.title = element_blank(),
-          axis.ticks = element_line(size = 0.3, colour = "black"),
+          # axis.ticks = element_line(size = 0.3, colour = "black"),
+          axis.ticks = element_blank(),
           # Hide the legend (optional)
           legend.position = "none",
           legend.key.width = unit(3, "mm"),
@@ -288,7 +289,7 @@ dir.create(new_dir, showWarnings = FALSE)
 for (i in 1:length(simple_graphs)) {
   gg_plot <- simple_graphs[[i]]
   plot_name <- i*5
-  ggsave(gg_plot, filename = paste0(new_dir, plot_name, ".png"), width = 30, height = 30, units = "mm")
+  ggsave(gg_plot, filename = paste0(new_dir, plot_name, ".svg"), width = 15, height = 15, units = "mm")
 }
 
 

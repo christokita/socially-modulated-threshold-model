@@ -12,7 +12,7 @@ library(viridis)
 library(ggridges)
 
 p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.1-Beta1.1"
+run <- "Sigma0.05-Epsilon0-Beta1.1"
 
 ####################
 # Load and process data
@@ -79,12 +79,17 @@ ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, 
 
 ggsave(gg_threshvar, file = paste0("output/Thresholds/GroupSizeThreshold", run, "_square.png"), width = 70, height = 70, units = "mm", dpi = 600)
 
+####################
+# Plot frequency of threshold values within 1, 2 SD of mean
+####################
+
+
 
 ####################
 # Plot thresholds by replicate
 ####################
 look <- all_thresh %>% 
-  filter(n == 20) %>% 
+  filter(n == 100) %>% 
   mutate(replicate = paste(sim, chunk, sep = "-"))
 
 gg_thresh <- ggplot(look, aes(y = replicate, x = Thresh2,  color = replicate)) +
