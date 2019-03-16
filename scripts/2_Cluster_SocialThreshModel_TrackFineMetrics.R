@@ -18,15 +18,15 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
+Ns             <- seq(60) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
-reps           <- 100 #number of replications per simulation (for ensemble)
+reps           <- 10 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
-ThreshSD       <- ThreshM * 0.05 #population threshold standard deviations
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
@@ -34,7 +34,7 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.4 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 

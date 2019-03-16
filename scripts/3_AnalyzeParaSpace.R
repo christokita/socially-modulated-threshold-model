@@ -379,4 +379,5 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
 
 gg_betaeps
 ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_n60.png", height = 45, width = 45, units = "mm", dpi = 400)
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n60.svg", height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n60.svg", height = 45, width = 45, units = "mm")
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n60_large.svg", height = 75, width = 75, units = "mm")

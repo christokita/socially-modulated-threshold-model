@@ -16,7 +16,7 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(75) #vector of number of individuals to simulate
+Ns             <- c(60) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 1 #number of replications per simulation (for ensemble)
@@ -31,7 +31,7 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.4 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -170,10 +170,12 @@ for (i in 1:length(Ns)) {
   groups_graphs[[i]]      <- ens_graphs
 }
 
-thresh1time <- do.call("rbind", thresh1time)
-thresh1time <- as.data.frame(thresh1time)
-thresh1time <- thresh1time %>% 
-  mutate(t = 0:(nrow(.)-1)) %>% 
-  gather("Id", "Threshold", 1:75) %>% 
-  select(t, Id, Threshold)
-thresh2time <- do.call('rbind', thresh2time)
+thresh_time <- do.call('rbind', thresh1time)
+thresh_time <- as.data.frame(thresh_time)
+thresh_time <- thresh_time %>% 
+  mutate(t = 1:nrow(.)) %>% 
+  gather(., Id, Threshold, -t)
+
+ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
+  geom_line(size = 0.1, alpha = 0.3) +
+  theme_ctokita()
