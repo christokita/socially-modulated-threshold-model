@@ -9,9 +9,6 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
-p <- 1 #prob of interact
-run <- "Sigma0-Epsilon0.1-Beta1.1"
-
 ####################
 # Load and process data
 ####################
