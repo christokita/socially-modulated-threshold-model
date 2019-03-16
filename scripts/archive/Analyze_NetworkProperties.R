@@ -263,6 +263,91 @@ ggsave(gg_mod, filename = "Output/Networks/NetworkMetrics/Modularity.svg",
 runs <- c("Sigma0.05-Epsilon0-Beta1.1", 
           "Sigma0-Epsilon0.1-Beta1.1")
 run_names <- c("Fixed", "Social")
+###################
+# Correlation of Average interaction partner
+###################
+network_correlations <- lapply(1:length(runs), function(run) {
+  # Load social networks
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
+  soc_networks <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    soc_networks[[file]] <- listed_data
+  }
+  # Load threshold matrices
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
+  thresh_data <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    thresh_data[[file]] <- listed_data
+  }
+  # Loop through individual graphs
+  interaction_info <- lapply(1:length(soc_networks), function(i) {
+    # Get graphs
+    graphs <- soc_networks[[i]]
+    replicates <- length(graphs)
+    # For each each compute interaction matrix
+    # Get graph and make adjacency matrix
+    size_graph <- lapply(1:length(graphs), function(j) {
+      # Get graph and calculate threshold differences
+      this_graph <- graphs[[j]]
+      diag(this_graph) <- NA
+      thresh <- as.data.frame(thresh_data[[i]][j])
+      thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2 
+      # Multiply to get bias weighted by interaction frequenchy
+      effective_interactions <- matrix(data = rep(NA, nrow(this_graph)))
+      for (i in 1:nrow(this_graph)) {
+        effective_interactions[i] <- sum(this_graph[i,] *  thresh$ThreshBias, na.rm = TRUE) / sum(this_graph[i, ], na.rm = TRUE)
+        # social_interaction[i, ] <- (this_graph[i,] / sum(this_graph[i,], na.rm = T)) *  thresh$ThreshBias
+      }
+      to_retun <- data.frame(n = nrow(this_graph), Correlation = cor(effective_interactions, thresh$ThreshBias))
+      # return
+      return(to_retun)
+    })
+    #Calculate baseline probability of interaction
+    size_graph <- do.call("rbind", size_graph)
+  })
+  # Bind and return
+  interaction_info <- do.call("rbind", interaction_info)
+  interaction_info$Model <- run_names[run]
+  return(interaction_info)
+})
+
+# Bind
+correlation_data <- do.call('rbind', network_correlations)
+correlation_data <- correlation_data %>% 
+  group_by(Model, n) %>% 
+  summarise(Corr_mean = mean(Correlation),
+            Corr_SD = sd(Correlation),
+            Corr_SE = sd(Correlation)/length(Correlation))
+
+# Plot
+gg_correlation <- ggplot(data = correlation_data, aes(x = n, y = Corr_mean, 
+                                                      colour = Model, group = Model, fill = Model)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
+  geom_errorbar(aes(ymin = Corr_mean - Corr_SD, ymax = Corr_mean + Corr_SD),
+                width = 0,
+                size = 0.3) +
+  geom_line(size = 0.4) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab("Interaction partner correlation") +
+  theme_ctokita() +
+  theme(aspect.ratio = 1,
+        legend.position = "none",
+        legend.key.height = unit(0.5, "line"),
+        legend.background = element_blank())
+
+gg_correlation
+ggsave(gg_correlation, filename = "Output/Networks/NetworkMetrics/CorrelationInNetwork.png", 
+       height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_correlation, filename = "Output/Networks/NetworkMetrics/CorrelationInNetwork.svg", 
+       height = 45.5, width = 45.5, units = "mm")
+
 
 ###################
 # Assortment coefficient from Newman 2003
