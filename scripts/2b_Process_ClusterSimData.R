@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-directory_path <- "output/Rdata/Sigma0-Epsilon0.1-Beta1.1-P0.5/"
+directory_path <- "output/Rdata/n60-Sigma0-Epsilon0.1_BetaSweep/"
 output_path <- "output/Rdata/_ProcessedData/"
 run_info <- gsub("^.*(Sigma.*)/$", "\\1", directory_path, perl = TRUE)
 
@@ -61,8 +61,8 @@ for (folder in list_folders) {
   dir.create(full_output_path, showWarnings = FALSE)
   # Get files
   files <- list.files(paste0(directory_path, folder), full.names = TRUE)
-  # Get group sizes
-  group_sizes <- gsub(".*/([0-9]+)-[0-9]+.Rdata", "\\1", files, perl = TRUE)
+  # Get group sizes or identifying value
+  group_sizes <- gsub(".+/([\\.0-9]+)-[0-9]+.Rdata", "\\1", files, perl = TRUE)
   group_sizes <- unique(group_sizes)
   # Loop through group sizes
   # Graphs are stored with different name
