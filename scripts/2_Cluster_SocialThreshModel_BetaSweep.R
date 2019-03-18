@@ -163,7 +163,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     ens_graphs[[sim]]      <- g_tot / gens
   }
   # Bind and write
-  save_parallel_data_beta(data = ens_entropy, 
+  save_parallel_data_beta(data = ens_taskDist, 
                           path = full_path, 
                           sub_directory = "TaskDist",
                           beta = beta, 
@@ -173,7 +173,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                           sub_directory = "Entropy",
                           beta = beta, 
                           chunk = chunk)
-  save_parallel_data_beta(data = ens_entropy, 
+  save_parallel_data_beta(data = ens_thresh, 
                           path = full_path, 
                           sub_directory = "Thresh",
                           beta = beta, 
