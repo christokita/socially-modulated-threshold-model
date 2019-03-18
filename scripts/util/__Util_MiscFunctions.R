@@ -27,13 +27,14 @@ label_parallel_runs <- function(matrix, n, simulation, chunk) {
   return(matrix)
 }
 
-label_parallel_runs_beta <- function(matrix, beta, simulation, chunk) {
+label_parallel_runs_parmeters <- function(matrix, beta, epsilon, simulation, chunk) {
   rows <- nrow(matrix)
   col_names <- colnames(matrix)
   matrix <- cbind(matrix, rep(beta, rows))
+  matrix <- cbind(matrix, rep(epsilon, rows))
   matrix <- cbind(matrix, rep(simulation, rows))
   matrix <- cbind(matrix, rep(chunk, rows))
-  colnames(matrix) <- c(col_names, 'beta', 'sim', 'chunk')
+  colnames(matrix) <- c(col_names, 'beta', 'epsilon', 'sim', 'chunk')
   return(matrix)
 }
 
@@ -47,8 +48,8 @@ save_parallel_data <- function(data, path, sub_directory, n, chunk) {
   save(data, file = write_path)
 }
 
-save_parallel_data_beta <- function(data, path, sub_directory, beta, chunk) {
+save_parallel_data_parameter <- function(data, path, sub_directory, parameter_value, chunk) {
   chunk <- str_pad(string = chunk, width = 2, pad = "0")
-  write_path <- paste0(path, "/", sub_directory, "/", beta, "-", chunk, ".Rdata")
+  write_path <- paste0(path, "/", sub_directory, "/", parameter_value, "-", chunk, ".Rdata")
   save(data, file = write_path)
 }

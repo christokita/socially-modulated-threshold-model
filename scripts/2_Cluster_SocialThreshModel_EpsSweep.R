@@ -34,8 +34,8 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-betas          <- seq(1, 1.25, 0.025) #probability of interacting with individual in same state relative to others
+epsilons       <- seq(0, 0.6, 0.05) #relative weighting of social interactions for adjusting thresholds
+beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -43,7 +43,7 @@ betas          <- seq(1, 1.25, 0.025) #probability of interacting with individua
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep")
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Beta", beta, "_EpsSweep")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
@@ -54,9 +54,9 @@ for (sub_dir in sub_dirs) {
 
 # Break up parameter replications into smaller batches\
 chunk_run  <- 1:(reps / chunk_size)
-run_in_parallel <- expand.grid(beta = betas, run = chunk_run)
+run_in_parallel <- expand.grid(epsilon = epsilons, run = chunk_run)
 run_in_parallel <- run_in_parallel %>% 
-  arrange(beta)
+  arrange(epsilon)
 
 # Prepare for parallel
 no_cores <- detectCores()
@@ -79,8 +79,8 @@ sfClusterSetupRNGstream(seed = 323)
 # Loop through group size (and chucnks)
 parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   # Set group size 
-  beta <- run_in_parallel[k, 1]
-  chunk <- run_in_parallel[k, 2]
+  epsilon <- run_in_parallel[k, 1]
+  chunk   <- run_in_parallel[k, 2]
   # Prep lists for collection of simulation outputs from this group size
   ens_taskDist    <- list()
   ens_entropy     <- list()
@@ -166,28 +166,28 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   save_parallel_data_parameter(data = ens_taskDist, 
                                path = full_path, 
                                sub_directory = "TaskDist",
-                               parameter_value = beta, 
+                               parameter_value= beta, 
                                chunk = chunk)
   save_parallel_data_parameter(data = ens_entropy, 
                                path = full_path, 
                                sub_directory = "Entropy",
-                               parameter_value = beta, 
+                               parameter_value= beta, 
                                chunk = chunk)
   save_parallel_data_parameter(data = ens_thresh, 
                                path = full_path, 
                                sub_directory = "Thresh",
-                               parameter_value = beta, 
+                               parameter_value= beta, 
                                chunk = chunk)
   save(ens_graphs, 
        file = paste0(full_path,
                      "/Graphs/", 
-                     beta, 
+                     epsilon, 
                      "-", 
                      str_pad(string = chunk, width = 2, pad = "0"), 
                      ".Rdata"))
   # Return all_clear
   rm(ens_taskDist, ens_entropy, ens_thresh, ens_graphs)
-  return(paste0("DONE: beta = ", beta, 
+  return(paste0("DONE: epsilon = ", epsilon, 
                 ", Sims ", ((chunk-1) * chunk_size)+1, "-", chunk * chunk_size))
   sys.sleep(1)
 })
