@@ -166,17 +166,17 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
   save_parallel_data_parameter(data = ens_taskDist, 
                                path = full_path, 
                                sub_directory = "TaskDist",
-                               parameter_value= beta, 
+                               parameter_value = epsilon, 
                                chunk = chunk)
   save_parallel_data_parameter(data = ens_entropy, 
                                path = full_path, 
                                sub_directory = "Entropy",
-                               parameter_value= beta, 
+                               parameter_value = epsilon, 
                                chunk = chunk)
   save_parallel_data_parameter(data = ens_thresh, 
                                path = full_path, 
                                sub_directory = "Thresh",
-                               parameter_value= beta, 
+                               parameter_value = epsilon, 
                                chunk = chunk)
   save(ens_graphs, 
        file = paste0(full_path,

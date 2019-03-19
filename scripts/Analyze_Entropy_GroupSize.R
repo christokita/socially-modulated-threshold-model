@@ -43,6 +43,7 @@ rm(compiled_data)
 entropy <- entropy_data %>% 
   group_by(Model, n) %>% 
   summarise(Mean = mean(Dind),
+            CI_95 = qnorm(0.975) * sd(Dind) / sqrt(length(n)),
             SD = sd(Dind),
             SE = sd(Dind) / sqrt(length(Dind)))
 

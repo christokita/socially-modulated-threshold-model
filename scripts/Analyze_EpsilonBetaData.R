@@ -127,6 +127,8 @@ ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n60-DiffBetaV
        width = 45, height = 25, units = "mm")
 
 
+
+
 ##############################  Network property plots  ############################## 
 
 ##########################################################
@@ -136,13 +138,14 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
 p <- 1 #prob of interact
-runs <- c("Sigma0-Epsilon0.1_BetaSweep")
-run_names <- c("Social")
+runs <- c("Sigma0-Epsilon0.1_BetaSweep",
+          "Sigma0-Beta1.1_EpsSweep")
+run_names <- c("Beta", "Epsilon")
 
 modularity <- lapply(1:length(runs), function(run) {
   # Load social networks
   files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
-  betas <- gsub(".*/([\\.0-9]+).Rdata", "\\1", x = files, perl = T)
+  parameter_value <- gsub(".*/([\\.0-9]+).Rdata", "\\1", x = files, perl = T)
   soc_networks <- list()
   for (file in 1:length(files)) {
     load(files[file])
@@ -173,7 +176,7 @@ modularity <- lapply(1:length(runs), function(run) {
       mod <- modularity(g_clust)
       clust_coeff <- transitivity(graph = g, type = "weighted", weights = E(g)$weight)
       # return
-      replicate_row <- data.frame(beta = as.numeric(betas[i]),
+      replicate_row <- data.frame(parameter_value = as.numeric(parameter_value[i]),
                                   Modularity = mod,
                                   ClustCoeff =  mean(clust_coeff, na.rm = TRUE))
       return(replicate_row)
@@ -182,21 +185,23 @@ modularity <- lapply(1:length(runs), function(run) {
   })
   # Bind and return
   interaction_info <- do.call("rbind", interaction_info)
-  interaction_info$Model <- run_names[run]
+  interaction_info$parameter <- run_names[run]
   return(interaction_info)
 })
 # Bind
 mod_data <- do.call("rbind", modularity)
 mod_data <- mod_data %>% 
-  group_by(Model, beta) %>% 
+  group_by(parameter, parameter_value) %>% 
   summarise(Modul_mean = mean(Modularity),
             Modul_SD = sd(Modularity),
             Modul_SE = sd(Modularity)/length(Modularity))
 
 # Plot
-gg_mod <- ggplot(mod_data, aes(x = beta, y = Modul_mean, colour = Model, fill = Model)) +
+mod_data_beta <- mod_data %>% 
+  filter(parameter == "Beta")
+gg_mod_beta <- ggplot(mod_data_beta, aes(x = parameter_value, y = Modul_mean, colour = parameter, fill = parameter)) +
   # geom_line(size = 0.4) +
-  geom_errorbar(aes(ymin = Modul_mean - Modul_SD, ymax = Modul_mean + Modul_SD),
+  geom_errorbar(aes(ymin = ifelse(Modul_mean - Modul_SD < 0, 0, Modul_mean - Modul_SD), ymax = Modul_mean + Modul_SD),
                 width = 0,
                 size = 0.3) +
   geom_point(size = 0.8, shape = 21) +
@@ -213,8 +218,30 @@ gg_mod <- ggplot(mod_data, aes(x = beta, y = Modul_mean, colour = Model, fill = 
   theme_ctokita() +
   theme(legend.position = "none",
         legend.key.height = unit(0.5, "line"))
+gg_mod_beta
 
-gg_mod
+mod_data_eps <- mod_data %>% 
+  filter(parameter == "Epsilon")
+gg_mod_eps <- ggplot(mod_data_eps, aes(x = parameter_value, y = Modul_mean, colour = parameter, fill = parameter)) +
+  # geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = ifelse(Modul_mean - Modul_SD < 0, 0, Modul_mean - Modul_SD), ymax = Modul_mean + Modul_SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     # values = c("#878787", "#4d4d4d")) +
+                     values = c("#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    # values = c("#ffffff", "#4d4d4d")) +
+                    values = c("#4d4d4d")) +
+  scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
+  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.03)) +
+  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
+  ylab("Modularity") +
+  theme_ctokita() +
+  theme(legend.position = "none",
+        legend.key.height = unit(0.5, "line"))
+gg_mod_eps
 
 # ggsave(gg_mod, filename = "Output/Networks/NetworkMetrics/Modularity_betasweep.svg", 
 #        height = 23, width = 46, units = "mm")
@@ -222,12 +249,12 @@ gg_mod
 #########################################################
 # Assortivity
 ##########################################################
-rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
 p <- 1 #prob of interact
-runs <- c("Sigma0-Epsilon0.1_BetaSweep")
-run_names <- c("Social")
+runs <- c("Sigma0-Epsilon0.1_BetaSweep",
+          "Sigma0-Beta1.1_EpsSweep")
+run_names <- c("Beta", "Epsilon")
 
 ###################
 # Assortment coefficient from Newman 2003
@@ -239,7 +266,7 @@ network_assort <- lapply(1:length(runs), function(run) {
   print(runs[run])
   # Load social networks
   files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
-  betas <- gsub(".*/([\\.0-9]+).Rdata", "\\1", x = files, perl = T)
+  parameter_value <- gsub(".*/([\\.0-9]+).Rdata", "\\1", x = files, perl = T)
   soc_networks <- list()
   for (file in 1:length(files)) {
     load(files[file])
@@ -268,7 +295,7 @@ network_assort <- lapply(1:length(runs), function(run) {
       # Calculate assortmnet
       assort <- assortment.continuous(graph = this_graph, vertex_values = thresh$ThreshBias, weighted = T)
       assort <- assort$r
-      to_retun <- data.frame(beta = as.numeric(betas[i]), Assortativity = assort)
+      to_retun <- data.frame(parameter_value = as.numeric(parameter_value[i]), Assortativity = assort)
       # return
       return(to_retun)
     })
@@ -277,21 +304,23 @@ network_assort <- lapply(1:length(runs), function(run) {
   })
   # Bind and return
   interaction_info <- do.call("rbind", interaction_info)
-  interaction_info$Model <- run_names[run]
+  interaction_info$parameter <- run_names[run]
   return(interaction_info)
 })
 
 # Bind
 assort_data <- do.call('rbind', network_assort)
 assort_data <- assort_data %>%
-  group_by(Model, beta) %>%
+  group_by(parameter, parameter_value) %>%
   summarise(Assort_mean = mean(Assortativity),
             Assort_SD = sd(Assortativity), 
             Assort_SE = sd(Assortativity)/length(Assortativity))
 
 # Plot
-gg_assort <- ggplot(data = assort_data, aes(x = beta, y = Assort_mean,
-                                            colour = Model, group = Model, fill = Model)) +
+assort_data_beta <- assort_data %>% 
+  filter(parameter == "Beta")
+gg_assort_beta <- ggplot(data = assort_data_beta, aes(x = parameter_value, y = Assort_mean,
+                                            colour = parameter, group = parameter, fill = parameter)) +
   geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
   geom_errorbar(aes(ymin = Assort_mean - Assort_SD, ymax = Assort_mean + Assort_SD),
                 width = 0,
@@ -308,14 +337,39 @@ gg_assort <- ggplot(data = assort_data, aes(x = beta, y = Assort_mean,
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
   ylab("Assortativity") +
   theme_ctokita() +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title.y = element_text(vjust = -1.5))
+gg_assort_beta
 
-gg_assort
-
-# ggsave(gg_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_betasweep.svg", 
-#        height = 23, width = 49, units = "mm")
+assort_data_eps <- assort_data %>% 
+  filter(parameter == "Epsilon")
+gg_assort_eps <- ggplot(data = assort_data_eps, aes(x = parameter_value, y = Assort_mean,
+                                                      colour = parameter, group = parameter, fill = parameter)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
+  geom_errorbar(aes(ymin = Assort_mean - Assort_SD, ymax = Assort_mean + Assort_SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     # values = c("#878787", "#4d4d4d")) +
+                     values = c("#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    # values = c("#ffffff", "#4d4d4d")) +
+                    values = c("#4d4d4d")) +
+  scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
+  scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.06)) +
+  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
+  ylab("Assortativity") +
+  theme_ctokita() +
+  theme(legend.position = "none",
+        axis.title.y = element_text(vjust = -1.5))
+gg_assort_eps
 
 # Together
-gg_net_metrics <- grid.arrange(gg_mod, gg_assort, nrow = 2)
-ggsave(gg_net_metrics, filename = "Output/Networks/NetworkMetrics/NetworkMetrics_betasweep.svg", 
-       height = 45, width = 49, units = "mm")
+gg_net_mod <- grid.arrange(gg_mod_beta, gg_mod_eps, nrow = 1)
+ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_parametersweep.svg", 
+       height = 23, width = 95, units = "mm")
+
+gg_net_assort <- grid.arrange(gg_assort_beta, gg_assort_eps, nrow = 1)
+ggsave(gg_net_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_parametersweep.svg", 
+       height = 23, width = 96, units = "mm")
