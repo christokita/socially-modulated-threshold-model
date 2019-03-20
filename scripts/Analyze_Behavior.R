@@ -26,6 +26,7 @@ fixed_data$Model <- "Fixed threhsolds"
 behav_data <- rbind(social_data, fixed_data) %>% 
   mutate(Set = paste(sim, chunk, sep = "-")) %>% 
   mutate(Task_bias = Task1 - Task2,
+         Task_ratio = Task1 - Task2 / (Task1 + Task2),
          Activity = Task1 + Task2)
 rm(compiled_data, social_data, fixed_data)
 
@@ -81,5 +82,61 @@ gg_behavvar<- ggplot(data = filter_data,
 
 gg_behavvar
 
-ggsave(gg_behavvar, file = paste0("output/Behavior/GroupSize_Behavior.png"), width = 90, height = 60, units = "mm", dpi = 600)
-ggsave(gg_behavvar, file = paste0("output/Behavior/GroupSize_Behavior.svg"), width = 90, height = 60, units = "mm", dpi = 600)
+ggsave(gg_behavvar, file = "output/Behavior/GroupSize_Behavior.png", width = 90, height = 60, units = "mm", dpi = 600)
+ggsave(gg_behavvar, file = "output/Behavior/GroupSize_Behavior.svg", width = 90, height = 60, units = "mm", dpi = 600)
+
+
+####################
+#  Look at frequency of specialists and generalists
+####################
+# Categorize each individual as specialists or generalist
+# 
+# Def: 
+# Generalist: >80% of activity on one task
+#
+behav_data <- behav_data %>% 
+  mutate(Type = ifelse(abs(Task_ratio) > 0.8 & (Activity > 0), "Specialist", "Generalist"),
+         Activity_type = ifelse(Activity > 0.5, "HighActivity", "LowActivity")) %>% 
+  mutate(Type_refined = paste0(Type, "-", Activity_type))
+
+behav_summary <- behav_data %>% 
+  group_by(n, Model, Set, Type) %>% 
+  summarise(Count = n()) %>% 
+  mutate(Freq = Count / n) %>% 
+  group_by(n, Model, Type) %>% 
+  summarise(Mean_Count = mean(Count),
+            SD_Count = sd(Count),
+            Mean_Freq = mean(Freq),
+            SD_Freq = sd(Freq))
+
+# Plot
+gg_type_freq <- ggplot(behav_summary, aes(x = n, y = Mean_Count, colour = Type)) +
+  geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = Mean_Count - SD_Count, ymax = Mean_Count + SD_Count), 
+                width = 0,
+                size = 0.3) +
+  geom_point(size = 0.8) +
+  scale_colour_manual(name = "Individual type", 
+                      values = c("#a6cee3", "#1f78b4")) +
+  ylab("Number of individuals") +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  scale_x_continuous(breaks = seq(20, 100, 20)) +
+  scale_y_continuous(breaks = seq(0, 100, 20), limits = c(0, 100)) +
+  theme_ctokita() +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7, color = "black"),
+        axis.title.y = element_text(size = 7, color = "black"),
+        legend.position = c(0.2, 0.75),
+        legend.title = element_text(size = 6, 
+                                    face = "bold"),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(3, "mm"),
+        strip.text = element_text(size = 6, face = "bold"),
+        axis.ticks = element_line(size = 0.2, color = "black"),
+        strip.background = element_rect(colour = NA, fill = "#DCDCDC")) +
+  facet_grid(~Model) 
+
+gg_type_freq
+ggsave(gg_type_freq, file = "output/Behavior/GroupSize_BehaviorType.svg", width = 90, height = 45, units = "mm")
+

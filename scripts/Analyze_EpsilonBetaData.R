@@ -13,7 +13,7 @@ library(scales)
 ####################
 # Load data
 ####################
-load("output/ParameterSpace/EpsilonBetaSweep-n60.Rdata")
+load("output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
 
 # Filter to parameter combos of interest
 epsilons_of_interest <- c(0, 0.1, 0.3, 0.5)
@@ -64,9 +64,9 @@ gg_entropy_betas <- ggplot(data = betas, aes(x = beta, colour = epsilon)) +
         aspect.ratio = 1)
 gg_entropy_betas
 
-ggsave(gg_entropy_betas, file = "output/SpecializationPlots/Beta-Eps-n60-DiffEpsValues.png", 
+ggsave(gg_entropy_betas, file = "output/SpecializationPlots/Beta-Eps-n80-DiffEpsValues.png", 
        height = 45, width = 45, units = "mm", dpi = 400)
-ggsave(gg_entropy_betas, file = "output/SpecializationPlots/Beta-Eps-n60-DiffEpsValues.svg", 
+ggsave(gg_entropy_betas, file = "output/SpecializationPlots/Beta-Eps-n80-DiffEpsValues.svg", 
        heigh = 45, width = 45, units = "mm")
 
 # resize
@@ -75,7 +75,7 @@ gg_entropy_betas <- gg_entropy_betas +
   theme(aspect.ratio = NULL,
         axis.title.y = element_blank())
 
-ggsave(gg_entropy_betas, file = "output/SpecializationPlots/Beta-Eps-n60-DiffEpsValues.svg", 
+ggsave(gg_entropy_betas, file = "output/SpecializationPlots/Beta-Eps-n80-DiffEpsValues.svg", 
        width = 45, height = 25, units = "mm")
 
 ####################
@@ -101,7 +101,7 @@ gg_entropy_eps <- ggplot(data = epsilons, aes(x = epsilon, colour = beta)) +
   theme_ctokita() +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, face = "italic"),
-        legend.position = "right",
+        legend.position = "none",
         legend.title = element_text(size = 6, 
                                     face = "bold"),
         legend.text = element_text(size = 6),
@@ -112,9 +112,9 @@ gg_entropy_eps <- ggplot(data = epsilons, aes(x = epsilon, colour = beta)) +
         aspect.ratio = 1)
 gg_entropy_eps
 
-ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n60-DiffBetaValues.png", 
+ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n80-DiffBetaValues.png", 
        height = 45, width = 45, units = "mm", dpi = 400)
-ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n60-DiffBetaValues.svg", 
+ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n80-DiffBetaValues.svg", 
        width = 45, height = 45, units = "mm")
 
 # resize
@@ -123,7 +123,7 @@ gg_entropy_eps <- gg_entropy_eps +
   theme(aspect.ratio = NULL,
         axis.title.y = element_blank())
 
-ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n60-DiffBetaValues.svg", 
+ggsave(gg_entropy_eps, file = "output/SpecializationPlots/Beta-Eps-n80-DiffBetaValues.svg", 
        width = 45, height = 25, units = "mm")
 
 
@@ -212,7 +212,7 @@ gg_mod_beta <- ggplot(mod_data_beta, aes(x = parameter_value, y = Modul_mean, co
                     # values = c("#ffffff", "#4d4d4d")) +
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(1, 1.5, 0.05)) +
-  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.03)) +
+  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
   ylab("Modularity") +
   theme_ctokita() +
@@ -235,7 +235,7 @@ gg_mod_eps <- ggplot(mod_data_eps, aes(x = parameter_value, y = Modul_mean, colo
                     # values = c("#ffffff", "#4d4d4d")) +
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
-  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.03)) +
+  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
   xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
   ylab("Modularity") +
   theme_ctokita() +
@@ -311,10 +311,11 @@ network_assort <- lapply(1:length(runs), function(run) {
 # Bind
 assort_data <- do.call('rbind', network_assort)
 assort_data <- assort_data %>%
+  mutate(Assortativity = ifelse(Assortativity == -1, NA, Assortativity)) %>% #remove huge outlier
   group_by(parameter, parameter_value) %>%
-  summarise(Assort_mean = mean(Assortativity),
-            Assort_SD = sd(Assortativity), 
-            Assort_SE = sd(Assortativity)/length(Assortativity))
+  summarise(Assort_mean = mean(Assortativity, na.rm = T),
+            Assort_SD = sd(Assortativity, na.rm = T), 
+            Assort_SE = sd(Assortativity, na.rm = T)/length(Assortativity))
 
 # Plot
 assort_data_beta <- assort_data %>% 
@@ -333,7 +334,7 @@ gg_assort_beta <- ggplot(data = assort_data_beta, aes(x = parameter_value, y = A
                     # values = c("#ffffff", "#4d4d4d")) +
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
-  scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.06)) +
+  scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
   ylab("Assortativity") +
   theme_ctokita() +
@@ -357,7 +358,7 @@ gg_assort_eps <- ggplot(data = assort_data_eps, aes(x = parameter_value, y = Ass
                     # values = c("#ffffff", "#4d4d4d")) +
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
-  scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.06)) +
+  scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
   xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
   ylab("Assortativity") +
   theme_ctokita() +

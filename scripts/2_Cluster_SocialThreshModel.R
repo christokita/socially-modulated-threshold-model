@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+gens           <- 200000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
@@ -34,8 +34,8 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-beta           <- 0 #probability of interacting with individual in same state relative to others
+epsilon        <- 0.4 #relative weighting of social interactions for adjusting thresholds
+beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -43,7 +43,7 @@ beta           <- 0 #probability of interacting with individual in same state re
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta)
+dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "-LongRun")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 

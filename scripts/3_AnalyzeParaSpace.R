@@ -68,13 +68,23 @@ for (bias in c("Homophily", "Heterophily")) {
   ggsave(gg_beta, file = file_svg, height = 45, width = 45, units = "mm")
 }
 
+# Analytical results for group size above which full DOL should emerge (n*)
+analytical_data <- data.frame(beta = seq(1.001, 1.255, 0.0001), n = rep(NA, length(seq(1.001, 1.255, 0.0001))))
+for (i in 1:nrow(analytical_data)) {
+  analytical_data[i, 2] <- (2 * analytical_data[i, 1]) / (0.8 * (analytical_data[i, 1] - 1))
+}
+analytical_data <- analytical_data %>% 
+  filter(n < 102.5)
+
 # As one plot
-gg_beta_all <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
-  geom_tile() +
+gg_beta_all <- ggplot() +
+  geom_tile(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
   theme_bw() +
   geom_hline(yintercept = 1, size = 0.3, linetype = "dashed") +
+  geom_line(data = analytical_data, aes(x = n, y = beta), size = 0.6) +
   scale_x_continuous(breaks = seq(0, 100, 20), 
-                     expand = c(0,0)) +
+                     expand = c(0,0),
+                     limits = c(2.5, 102.5)) +
   scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
                      expand = c(0,0)) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
@@ -146,11 +156,20 @@ for (bias in c("Homophily", "Heterophily")) {
   ggsave(gg_beta, file = file_svg, height = 45, width = 45, units = "mm")
 }
 
+# Analytical results for group size above which full DOL should emerge (n*)
+analytical_data <- data.frame(beta = seq(1.001, 1.255, 0.0001), n = rep(NA, length(seq(1.001, 1.255, 0.0001))))
+for (i in 1:nrow(analytical_data)) {
+  analytical_data[i, 2] <- (2 * analytical_data[i, 1]) / (0.8 * (analytical_data[i, 1] - 1))
+}
+analytical_data <- analytical_data %>% 
+  filter(n < 102.5)
+
 # As one plot
-gg_beta_all <- ggplot(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
-  geom_tile() +
+gg_beta_all <- ggplot() +
+  geom_tile(data = entropy, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
   theme_bw() +
   geom_hline(yintercept = 1, size = 0.3, linetype = "dashed") +
+  geom_line(data = analytical_data, aes(x = n, y = beta), size = 0.6) +
   scale_x_continuous(breaks = seq(0, 100, 20), 
                      expand = c(0,0)) +
   scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
@@ -347,7 +366,7 @@ ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/svg/EpsilonSweep_Heterphi
 ####################
 # Plot: Beta-
 ####################
-load("output/ParameterSpace/EpsilonBetaSweep-n60.Rdata")
+load("output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
 pal <- brewer_pal("seq", "GnBu")
 pal <- pal(9)
 
@@ -378,9 +397,9 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
 
 
 gg_betaeps
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_n60.png", height = 45, width = 45, units = "mm", dpi = 400)
-<<<<<<< HEAD
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n60.svg", height = 45, width = 45, units = "mm")
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n60_large.svg", height = 75, width = 75, units = "mm")
-=======
->>>>>>> parent of 529252b... Updating plots
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_n80.png", height = 45, width = 45, units = "mm", dpi = 400)
+
+
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n80.svg", height = 45, width = 45, units = "mm")
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n80_large.svg", height = 75, width = 75, units = "mm")
+

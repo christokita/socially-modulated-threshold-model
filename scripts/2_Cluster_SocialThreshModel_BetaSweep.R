@@ -18,7 +18,7 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-n              <- 60 #group size
+n              <- 80 #group size
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)

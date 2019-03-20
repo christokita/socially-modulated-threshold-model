@@ -18,9 +18,9 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20, 30, 40, 50, 100) #vector of number of individuals to simulate
+Ns             <- c(5, 10, seq(20, 30, 1), 40, 50, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 70000 #number of generations to run simulation 
+gens           <- 200000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 10 #number of simulations sent to single core 
 
@@ -34,14 +34,14 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.07 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 
 # Where to check time values
 avg_window <- 100
-times <- c(1000, seq(5000, 70000, 5000))
+times <- c(1000, seq(5000, gens, 5000))
 
 ####################
 # Prep for Parallelization
