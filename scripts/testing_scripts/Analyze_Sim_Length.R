@@ -15,7 +15,7 @@ library(scales)
 ####################
 # Load data
 ####################
-path <- "output/SimLength/CheckSimLength_Thresh50_Sigma0-Epsilon0.07-Beta1.1.Rdata"
+path <- "output/SimLength/CheckSimLength_Thresh50_Sigma0-Epsilon0.1-Beta1.1.Rdata"
 load(path)
 
 file_name <- gsub("^.*(Thresh[\\. 0-9]*.*)\\.Rdata$", "\\1", path, perl = T)
@@ -30,7 +30,7 @@ sim_data <- sim_data %>%
   select(-sim, -chunk) %>% 
   group_by(n, t) %>% 
   summarise_all(funs(mean))
-sim_data$n <- factor(sim_data$n, levels = c(5, 10, 20, 30, 40, 50, 100))
+sim_data$n <- factor(sim_data$n, levels = unique(sim_data$n))
 sim_data <- sim_data %>% 
   mutate(TotalStimAvg = Stim1Avg + Stim2Avg,
          Thresh1Gap = Thresh1Max - Thresh1Min,
@@ -40,18 +40,20 @@ sim_data <- sim_data %>%
          ThreshMin = (Thresh1Min + Thresh2Min) / 2,
          ThreshSD = (Thresh1SD + Thresh2SD) / 2)
 
+sim_data <- sim_data %>% 
+  filter(n %in% c(5, 10, 20, 26, 27, 29, 30, 40, 50, 100))
 
 ####################
 # Plot - DOL
 ####################
-pal <- brewer_pal(11, palette = "YlGnBu")
-cols <- pal(n = length(unique(sim_data$n)) + 1)[2:(length(unique(sim_data$n))+1)]
+pal <- brewer_pal(10, palette = "RdYlBu")
+cols <- pal(10)
 
 ggplot(data = sim_data, aes(x = t, y = Dind, group = n, col = n)) +
-  geom_vline(xintercept = 20000, linetype = "dotted", alpha = 0.3) +
-  geom_vline(xintercept = 40000, linetype = "dotted", alpha = 0.3) +
+  # geom_vline(xintercept = 20000, linetype = "dotted", alpha = 0.3) +
+  # geom_vline(xintercept = 40000, linetype = "dotted", alpha = 0.3) +
   geom_vline(xintercept = 50000, linetype = "dashed", alpha = 0.3) +
-  geom_vline(xintercept = 60000, linetype = "dotted", alpha = 0.3) +
+  # geom_vline(xintercept = 60000, linetype = "dotted", alpha = 0.3) +
   geom_line() +
   theme_classic() +
   scale_color_manual(values = cols) +
@@ -63,8 +65,8 @@ ggsave(file = paste0("output/SimLength/DOL/", file_name, ".png"), scale = 0.6, d
 ####################
 # Plot - Stimulus Levels
 ####################
-pal <- brewer_pal(11, palette = "YlGnBu")
-cols <- pal(n = length(unique(sim_data$n)) + 1)[2:(length(unique(sim_data$n))+1)]
+pal <- brewer_pal(10, palette = "RdYlBu")
+cols <- pal(10)
 
 ggplot(data = sim_data, aes(x = t, y = TotalStimAvg, group = n, col = n)) +
   geom_vline(xintercept = 20000, linetype = "dotted", alpha = 0.3) +
@@ -83,8 +85,8 @@ ggsave(file = paste0("output/SimLength/StimulusLevel/", file_name, ".png"), scal
 ####################
 # Plot - Thresh SD
 ####################
-pal <- brewer_pal(11, palette = "YlGnBu")
-cols <- pal(n = length(unique(sim_data$n)) + 1)[2:(length(unique(sim_data$n))+1)]
+pal <- brewer_pal(10, palette = "RdYlBu")
+cols <- pal(10)
 
 ggplot(data = sim_data, aes(x = t, y = ThreshSD, group = n, col = n)) +
   geom_vline(xintercept = 20000, linetype = "dotted", alpha = 0.3) +
@@ -102,8 +104,8 @@ ggsave(file = paste0("output/SimLength/ThresholdVariation/", file_name, ".png"),
 ####################
 # Plot - Thresh Gap
 ####################
-pal <- brewer_pal(11, palette = "YlGnBu")
-cols <- pal(n = length(unique(sim_data$n)) + 1)[2:(length(unique(sim_data$n))+1)]
+pal <- brewer_pal(10, palette = "RdYlBu")
+cols <- pal(10)
 
 ggplot(data = sim_data, aes(x = t, y = ThreshGap, group = n, col = n)) +
   geom_vline(xintercept = 20000, linetype = "dotted") +

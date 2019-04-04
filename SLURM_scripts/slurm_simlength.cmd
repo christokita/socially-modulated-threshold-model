@@ -8,5 +8,5 @@
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ctokita@princeton.edu
 
-cd
+cd SocialInteractionModel/
 Rscript scripts/testing_scripts/Check_Simulation_Length.R
