@@ -28,6 +28,7 @@ InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
+thresh_max     <- 1000
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
@@ -121,7 +122,7 @@ for (i in 1:length(Ns)) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 2 * ThreshM[1])
+                                                   threshold_max = thresh_max)
       # Capture threshold values
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]
@@ -176,7 +177,5 @@ thresh_time <- thresh_time %>%
   mutate(t = 1:nrow(.)) %>% 
   gather(., Id, Threshold, -t)
 
-ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
-  geom_line(size = 0.1, alpha = 0.1) +
-  scale_x_continuous(label = comma) +
-  theme_ctokita()
+save(thresh_time, file = paste0("output/ThresholdTime/ThresholdLimits/ThreshMax-", thresh_max, ".Rdata"))
+

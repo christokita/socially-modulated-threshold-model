@@ -23,6 +23,12 @@ compiled_data$Model <- "Social_Beta1.1-LongRun"
 entropy_data <- compiled_data
 rm(compiled_data)
 
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
+compiled_data$Model <- "Social_Beta1.1"
+entropy_data <- rbind(entropy_data, compiled_data)
+rm(compiled_data)
+
+
 load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.2.Rdata")
 compiled_data$Model <- "Social_Beta1.2"
 entropy_data <- rbind(entropy_data, compiled_data)
@@ -44,8 +50,6 @@ entropy <- entropy_data %>%
 ####################
 # Plot
 ####################
-pal <- brewer.pal(5, "Greens")[2:5]
-
 gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD),
                 width = 0,
@@ -58,26 +62,26 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_color_manual(values = pal, 
-                     labels = c("1.2", "1.1"),
-                     name = expression("Interaction bias"(Beta))) +
+  scale_color_manual(values = c("#fb9a99", "#e31a1c", "#969696"), 
+                     labels = c(expression(paste(italic(beta), " = 1.1")), 
+                                expression(paste(italic(beta), " = 1.1, long run")), 
+                                expression(paste(italic(beta), " = 1.2"))),
+                     name = "Model") +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, face = "italic"),
-        legend.position = "none",
-        legend.title = element_text(size = 7, 
+        legend.position = c(0.75, 0.2),
+        legend.title = element_text(size = 6, 
                                     face = "bold"),
         legend.text = element_text(size = 6),
-        legend.key.height = unit(4, "mm"),
-        legend.key.width = unit(5, "mm"),
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(3, "mm"),
         axis.ticks = element_line(size = 0.3, color = "black"),
         axis.line = element_line(size = 0.3, color = "black"),
         aspect.ratio = 1)
 gg_entropy
 
-ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.png", 
-       height = 45, width = 45, units = "mm", dpi = 800)
 ggsave(gg_entropy, file = "output/SpecializationPlots/Sigma0-Epsilon0.1-BetaSweep.svg", 
-       height = 48.5, width = 48.5, units = "mm")
+       height = 45, width = 45, units = "mm")
 
 ####################
 # Only beta = 1.1

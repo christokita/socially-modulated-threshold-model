@@ -55,12 +55,13 @@ ggplot(data = sim_data, aes(x = t, y = Dind, group = n, col = n)) +
   geom_vline(xintercept = 50000, linetype = "dashed", alpha = 0.3) +
   # geom_vline(xintercept = 60000, linetype = "dotted", alpha = 0.3) +
   geom_line() +
-  theme_classic() +
-  scale_color_manual(values = cols) +
-  ylab("Division of Labor") +
-  theme(aspect.ratio = 1)
+  theme_ctokita() +
+  scale_color_manual(values = cols, guide = guide_legend(reverse = TRUE)) +
+  scale_x_continuous(breaks = seq(0, 200000, 50000), label = comma) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Time step (", italic(t), ")")))
 
-ggsave(file = paste0("output/SimLength/DOL/", file_name, ".png"), scale = 0.6, dpi = 300)
+ggsave(file = paste0("output/SimLength/DOL/", file_name, ".svg"), width = 90, height = 45, units = "mm")
 
 ####################
 # Plot - Stimulus Levels

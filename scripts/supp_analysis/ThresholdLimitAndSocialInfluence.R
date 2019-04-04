@@ -43,22 +43,28 @@ gg_comp <- ggplot(entropy_data, aes(x = n, y = Mean, group = Model, color = Mode
   theme_classic() +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
-  ggtitle(expression(paste(italic(epsilon), "= 0.4, ", italic(beta), "= 1.1"))) +
+  scale_color_manual(name = "Thresh. limits",
+                     values = c("#a6cee3", "#1f78b4"),
+                     labels = c("[0, 1,000]", "[0, 100]")) +
+  # ggtitle(expression(paste(italic(epsilon), "= 0.4, ", italic(beta), "= 1.1"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   theme(title = element_text(size = 6),
         axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7, face = "italic"),
         legend.position = c(0.8, 0.2),
         legend.title = element_text(size = 6, 
-                                    face = "bold"),
+                                    face = "bold", 
+                                    hjust = 5),
         legend.text = element_text(size = 6),
         legend.key.height = unit(2, "mm"),
         legend.key.width = unit(3, "mm"),
+        legend.background = element_blank(),
         axis.ticks = element_line(size = 0.3, color = "black"),
         axis.line = element_line(size = 0.3, color = "black"),
         aspect.ratio = 1)
 gg_comp
-ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.png", height = 50, width = 50, units = "mm")
+ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.png", height = 45, width = 45, units = "mm")
+ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.svg", height = 45, width = 45, units = "mm")
   
 
 # ------------------------------ Thresholds ------------------------------
@@ -115,3 +121,25 @@ gg_threshvar <- ggplot(data = all_thresh,
         axis.ticks = element_line(size = 0.2, color = "black"))
 
 gg_threshvar
+
+
+# ------------------------------ Thresholds over time  ------------------------------
+####################
+# Load and process data
+####################
+load("output/ThresholdTime/ThresholdLimits/ThreshMax-100.Rdata")
+thresh_time$Limit <- 100
+thresh_time_data <- thresh_time
+
+load("output/ThresholdTime/ThresholdLimits/ThreshMax-1000.Rdata")
+thresh_time$Limit <- 1000
+thresh_time_data <- rbind(thresh_time_data, thresh_time)
+
+thresh_time <- thresh_time %>% 
+  mutate(t = 1:nrow(.)) %>% 
+  gather(., Id, Threshold, -t)
+
+ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
+  geom_line(size = 0.1, alpha = 0.1) +
+  scale_x_continuous(label = comma) +
+  theme_ctokita()
