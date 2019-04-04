@@ -131,7 +131,7 @@ gg_threshvar
 load("output/ThresholdTime/ThresholdLimits/ThreshMax-100.Rdata")
 
 gg_threshtime_100 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
-  geom_line(size = 0.1, alpha = 0.1, colour = "#165783") +
+  geom_line(size = 0.1, alpha = 0.1, colour = "#1f78b4") +
   scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
                      breaks = seq(0, 50000, 10000),
                      labels = c("", "10,000", "", "30,000", "", "50,000"),
@@ -151,7 +151,7 @@ ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Max-100.p
 load("output/ThresholdTime/ThresholdLimits/ThreshMax-1000.Rdata")
 
 gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
-  geom_line(size = 0.1, alpha = 0.1) +
+  geom_line(size = 0.1, alpha = 0.1, colour = "#8bbeda") +
   scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
                      breaks = seq(0, 50000, 10000),
                      labels = c("", "10,000", "", "30,000", "", "50,000"),
