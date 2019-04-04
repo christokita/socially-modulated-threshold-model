@@ -125,21 +125,44 @@ gg_threshvar
 
 # ------------------------------ Thresholds over time  ------------------------------
 ####################
-# Load and process data
+# Load normal threshold limit (epsilon = 0.4, beta = 1.1)
 ####################
+# Normal threshold limit
 load("output/ThresholdTime/ThresholdLimits/ThreshMax-100.Rdata")
-thresh_time$Limit <- 100
-thresh_time_data <- thresh_time
 
+gg_threshtime_100 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
+  geom_line(size = 0.1, alpha = 0.1, colour = "#165783") +
+  scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
+                     breaks = seq(0, 50000, 10000),
+                     labels = c("", "10,000", "", "30,000", "", "50,000"),
+                     expand = c(0, 0)) +
+  scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
+                     limits = c(0, 100),
+                     breaks = seq(0, 100, 50)) +
+  theme_ctokita() +
+  theme(axis.title.y = element_blank(),
+        axis.text.x = element_text(hjust = 0.8))
+
+gg_threshtime_100
+ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Max-100.png", height = 26, width = 40, units = "mm", dpi = 400)
+
+
+# High threshold limit
 load("output/ThresholdTime/ThresholdLimits/ThreshMax-1000.Rdata")
-thresh_time$Limit <- 1000
-thresh_time_data <- rbind(thresh_time_data, thresh_time)
 
-thresh_time <- thresh_time %>% 
-  mutate(t = 1:nrow(.)) %>% 
-  gather(., Id, Threshold, -t)
-
-ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
+gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
   geom_line(size = 0.1, alpha = 0.1) +
-  scale_x_continuous(label = comma) +
-  theme_ctokita()
+  scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
+                     breaks = seq(0, 50000, 10000),
+                     labels = c("", "10,000", "", "30,000", "", "50,000"),
+                     expand = c(0, 0)) +
+  scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
+                     limits = c(0, 1000),
+                     breaks = seq(0, 1000, 500),
+                     label = comma) +
+  theme_ctokita() +
+  theme(axis.title.y = element_blank(),
+        axis.text.x = element_text(hjust = 0.8))
+
+gg_threshtime_1000
+ggsave(gg_threshtime_1000, file = "output/ThresholdTime/ThresholdLimits/Max-1000.png", height = 26, width = 42, units = "mm")
