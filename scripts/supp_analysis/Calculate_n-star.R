@@ -1,8 +1,10 @@
 ################################################################################
 #
-# Social interaction model: set for running on Della cluster
+# Social interaction model: calculate n* via simulation (to compare to analytical results)
 #
 ################################################################################
+# We will compare DOL at 1,000 time steps to DOL at 6,000 time steps. Where the change in DOL is 0, we can assume that is n*
+# as this is where we expect probability of interacting with each behavioral type to be equal
 
 rm(list = ls())
 
@@ -18,49 +20,30 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation
+gens           <- 6000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
+chunk_size     <- 10 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
+ThreshSD       <- ThreshM * 0 #population threshold standard deviations
 InitialStim    <- rep(0, m) #intital vector of stimuli
-Sigmas         <- c(0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5)
-delta_values   <- seq(0.5, 0.8, 0.1) #vector of stimuli increase rates
+deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0 #relative weighting of social interactions for adjusting thresholds
-beta           <- 1.1 #probability of interacting with individual in same state relative to others
+epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
+betas          <- seq(1.025, 1.25, 0.025) #probability of interacting with individual in same state relative to others
 
+# Where to check time values
+times <- c(1000, 6000)
 
 ####################
 # Prep for Parallelization
 ####################
-# Create directory for depositing data
-storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <-"FixedThreshold-SigmaDeltaSweep"
-full_path <- paste0(storage_path, dir_name, "/")
-dir.create(full_path, showWarnings = FALSE)
-
-# Prepare table for values to be iterated over
-parameter_values <- expand.grid(n = Ns, D = delta_values, S = Sigmas)
-
-# Check if file already exists
-files <- list.files(full_path)
-completed_runs <- data.frame(n = as.numeric(gsub(x = files, "^.*-n([0-9]+)\\.Rdata$", "\\1", perl = T)))
-completed_runs$D <- as.numeric(gsub(x = files, "^Delta([\\.0-9]+)-.*$", "\\1", perl = T))
-completed_runs$S <- as.numeric(gsub(x = files, "^.*-Sigma([\\.0-9]+)-.*$", "\\1", perl = T))
-parameter_values <- anti_join(parameter_values, completed_runs, by = c("n", "D", "S"))
-
-Ns <- unique(parameter_values$n) #finish off only those group sizes and parameter combos missing
-
-parameter_values <- parameter_values %>% 
-  select(D, S) %>% 
-  unique()
 
 # Prepare for parallel
 no_cores <- detectCores()
@@ -74,28 +57,25 @@ sfLibrary(msm)
 sfLibrary(gtools)
 sfLibrary(snowfall)
 sfLibrary(tidyr)
-sfLibrary(stringr)
 sfClusterSetupRNGstream(seed = 323)
 
 ####################
 # Run ensemble simulation
 ####################
-# LOOP 1: loop through threshold variation and deltas
-parallel_simulations <- sfLapply(1:nrow(parameter_values), function(k) {
-  # Set threshold variation
-  ThreshSD <- ThreshM * parameter_values[k, "S"]
-  # Set deltas
-  deltas <- rep(parameter_values[k, "D"], m)
-  # LOOP 2: loop through group sizes
-  for (i in 1:length(Ns)) {
-    # Set group size
-    n <- Ns[i]
-    # Prep lists for collection of simulation outputs from this group size
-    ens_taskDist    <- list()
-    ens_entropy     <- list()
-    ens_thresh      <- list()
-    ens_graphs      <- list()
-    # LOOP 3: Loop through replicates
+# Loop through group size (and chucnks)
+parallel_simulations <- sfLapply(1:length(betas), function(k) {
+  # Set beta
+  beta <- betas[k]
+  # Set group sizes 
+  n_star_calculated <- round((m * beta) / (deltas[1] * (beta - m + 1)))
+  Ns <- seq(n_star_calculated - 5, n_star_calculated + 5, 1)
+  # Prep lists for collection of simulation outputs from this group size
+  group_size_data <- lapply(1:length(Ns), function(x) {
+    # set group size 
+    n <- Ns[x]
+    # set list for collection of sim_data 
+    group_size_list <- list()
+    # Run Simulations
     for (sim in 1:reps) {
       ####################
       # Seed structures and intial matrices
@@ -149,41 +129,41 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values), function(k) {
                                                      threshold_matrix = threshMat,
                                                      state_matrix = X_g,
                                                      epsilon = epsilon,
-                                                     threshold_max = 100)
+                                                     threshold_max = 2 * ThreshM[1])
         # Update total task performance profile
         X_tot <- X_tot + X_g
+        # Capture stats if it is appropriate window
+        if (t %in% times) {
+          # Get DOL
+          window_entropy <- mutualEntropy(X_tot)
+          # Bind
+          all_info <- matrix(data = c(n, beta, sim, t),
+                             nrow = 1,
+                             dimnames = list(NULL,
+                                             c("n", "beta", "sim", "t")))
+          all_info <- cbind(all_info, window_entropy)
+          if (!exists("sim_info")) {
+            sim_info <- all_info
+          } else {
+            sim_info <- rbind(sim_info, all_info)
+          }
+          rm(all_info, window_entropy)
+        }
       }
-      
-      ####################
-      # Post run calculations
-      ####################
-      # Calculate Entropy
-      entropy <- as.data.frame(mutualEntropy(TotalStateMat = X_tot))
-      entropy$n <- n
-      entropy$replicate <- sim
-      entropy$sigma <- ThreshSD[1] / ThreshM[1]
-      entropy$delta <- deltas[1]
-      # Calculate total task distribution
-      total_task_dist <- as.data.frame(X_tot / gens)
-      total_task_dist$n <- n
-      total_task_dist$replicate <- sim
-      total_task_dist$sigma <- ThreshSD[1] / ThreshM[1]
-      total_task_dist$delta <- deltas[1]
-      # Add total task distributions, entropy values, and graphs to lists
-      ens_taskDist[[sim]]    <- total_task_dist
-      ens_entropy[[sim]]     <- entropy
-    }
-    # Bind and save
-    task_distributions <- do.call("rbind", ens_taskDist)
-    entropies <- do.call("rbind", ens_entropy)
-    save(task_distributions, entropies, file = paste0(full_path, "Delta", deltas[1],
-                                                      "-Sigma", ThreshSD[1]/ThreshM[1],
-                                                      "-n", n, ".Rdata"))
-    # Return all_clear
-    rm(ens_taskDist, ens_entropy)
-    Sys.sleep(1)
-  }
+      group_size_list[[sim]] <- sim_info
+      print(paste0("Done ", sim))
+      rm(sim_info)
+    } #end of replicate simulations loop
+    to_return <- do.call("rbind", group_size_list)
+    return(to_return)
+  }) # end of group size loop
+  sys.sleep(1)
 })
 
 sfStop()
+
+parallel_simulations <- do.call("rbind", parallel_simulations)
+# Create directory for depositing data
+storage_path <- "/scratch/gpfs/ctokita/"
+save(parallel_simulations, file =  paste0(storage_path, "CalculateNstar-", ThreshM[1], "_Sigma", ThreshSD[1], "-Epsilon", epsilon, ".Rdata"))
 
