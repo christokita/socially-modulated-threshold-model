@@ -158,17 +158,12 @@ library(scales)
 ####################
 # Load data
 ####################
-load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0-Beta1.1.Rdata")
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.4-Beta1.1.Rdata")
 compiled_data$Model <- "Social_Epsilon 0.0"
 entropy_data <- compiled_data
 rm(compiled_data)
 
-load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
-compiled_data$Model <- "Social_Epsilon0.1"
-entropy_data <- rbind(entropy_data, compiled_data)
-rm(compiled_data)
-
-load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.4-Beta1.1.Rdata")
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.4-Beta1.1-LongRun.Rdata")
 compiled_data$Model <- "Social_Epsilon0.4"
 entropy_data <- rbind(entropy_data, compiled_data)
 rm(compiled_data)
