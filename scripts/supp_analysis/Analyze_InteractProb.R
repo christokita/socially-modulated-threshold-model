@@ -1,34 +1,19 @@
 ################################################################################
 #
-# Analyzing the effect of the interaction parameter
+# Analyzing the simulated N star values
 #
 ################################################################################
 
 rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
-library(RColorBrewer)
-library(scales)
-library(viridis)
-library(ggridges)
 
 
 ####################
 # Load and process data
 ####################
-# Load entropy
-load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1-P0.5.Rdata")
-entropy_data <- compiled_data 
-entropy_data$Model <- "Ep0.1-P0.5"
+# Load DOL values
+load("output/AnalyticalResults/CalculateNstar-50_Sigma0-Epsilon0.1.Rdata")
 
-load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
-compiled_data$Model <- "Ep0.1-P1"
-entropy_data <- rbind(entropy_data, compiled_data)
-
-# Summarise
-entropy_data <- entropy_data %>% 
-  group_by(Model, n) %>% 
-  summarise(Mean = mean(Dind),
-            SE = sd(Dind) / sqrt(length(Dind)))
 
 ####################
 # Plot

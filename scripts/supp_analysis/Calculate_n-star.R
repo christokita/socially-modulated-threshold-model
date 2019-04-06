@@ -157,7 +157,10 @@ parallel_simulations <- sfLapply(1:length(betas), function(k) {
     to_return <- do.call("rbind", group_size_list)
     return(to_return)
   }) # end of group size loop
-  sys.sleep(1)
+  group_size_data <- do.call("rbind", group_size_data)
+  return(group_size_data)
+  rm(group_size_data)
+  Sys.sleep(1)
 })
 
 sfStop()
