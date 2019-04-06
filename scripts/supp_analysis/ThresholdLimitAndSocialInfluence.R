@@ -127,6 +127,7 @@ gg_threshvar
 ####################
 # Load normal threshold limit (epsilon = 0.4, beta = 1.1)
 ####################
+library(scales)
 # Normal threshold limit
 load("output/ThresholdTime/ThresholdLimits/ThreshMax-100.Rdata")
 
@@ -141,17 +142,17 @@ gg_threshtime_100 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) 
                      breaks = seq(0, 100, 50)) +
   theme_ctokita() +
   theme(axis.title.y = element_blank(),
-        axis.text.x = element_text(hjust = 0.8))
+        axis.text.x = element_text(hjust = 0.7))
 
 gg_threshtime_100
-ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Max-100.png", height = 26, width = 40, units = "mm", dpi = 400)
+ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Max-100.png", height = 26, width = 40, units = "mm", dpi = 500)
 
 
 # High threshold limit
 load("output/ThresholdTime/ThresholdLimits/ThreshMax-1000.Rdata")
 
 gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
-  geom_line(size = 0.1, alpha = 0.1, colour = "#8bbeda") +
+  geom_line(size = 0.1, alpha = 0.15, colour = "#8bbeda") +
   scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
                      breaks = seq(0, 50000, 10000),
                      labels = c("", "10,000", "", "30,000", "", "50,000"),
@@ -162,7 +163,7 @@ gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id))
                      label = comma) +
   theme_ctokita() +
   theme(axis.title.y = element_blank(),
-        axis.text.x = element_text(hjust = 0.8))
+        axis.text.x = element_text(hjust = 0.7))
 
 gg_threshtime_1000
-ggsave(gg_threshtime_1000, file = "output/ThresholdTime/ThresholdLimits/Max-1000.png", height = 26, width = 42, units = "mm")
+ggsave(gg_threshtime_1000, file = "output/ThresholdTime/ThresholdLimits/Max-1000.png", height = 26, width = 42, units = "mm", dpi = 500)

@@ -16,7 +16,7 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(60) #vector of number of individuals to simulate
+Ns             <- c(80) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 50000 #number of generations to run simulation 
 reps           <- 1 #number of replications per simulation (for ensemble)
@@ -28,7 +28,7 @@ InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
-thresh_max     <- 1000
+thresh_max     <- 100
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
