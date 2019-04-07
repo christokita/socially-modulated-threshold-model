@@ -34,8 +34,8 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.4 #relative weighting of social interactions for adjusting thresholds
-betas          <- seq(1, 1.25, 0.025) #probability of interacting with individual in same state relative to others
+epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
+betas          <- seq(1, 1.25, 0.01) #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -43,7 +43,7 @@ betas          <- seq(1, 1.25, 0.025) #probability of interacting with individua
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep-HighThreshLimit")
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
@@ -140,7 +140,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 1000)
+                                                   threshold_max = 100)
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }
