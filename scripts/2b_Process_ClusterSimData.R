@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(scales)
 
 
-directory_path <- "output/Rdata/n80-Sigma0-Epsilon0.4_BetaSweep-HighThreshLimit/"
+directory_path <- "output/Rdata/n80-Sigma0-Beta1.1_EpsSweep-HighThreshLimit/"
 output_path <- "output/Rdata/_ProcessedData/"
 run_info <- gsub("^.*(Sigma.*)/$", "\\1", directory_path, perl = TRUE)
 

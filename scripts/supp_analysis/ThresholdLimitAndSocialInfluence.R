@@ -12,6 +12,71 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
 
+# ------------------------------ DOL by epsilon----------------------
+####################
+# Load and process data
+####################
+load('output/Rdata/_ProcessedData/Entropy/Sigma0-Beta1.1_EpsSweep-HighThreshLimit.Rdata')
+high_thresh <- compiled_data %>% 
+  mutate(Model = "high_thresh") %>% 
+  group_by(Model, epsilon, beta) %>% 
+  summarise(Mean = mean(Dind),
+            SD = sd(Dind)) %>% 
+  as.data.frame()
+
+
+load("output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
+normal_thresh <- entropy %>% 
+  mutate(Model = "normal_thresh") %>% 
+  filter(beta == 1.1) %>% 
+  select(Model, epsilon, beta, Dind_mean, Dind_SD)
+names(normal_thresh) <- c("Model", "epsilon", "beta", "Mean", "SD")
+
+eps_values <- unique(normal_thresh$epsilon)
+
+entropy_data <- rbind(high_thresh, normal_thresh)
+entropy_data <- entropy_data %>% 
+  filter(epsilon %in% eps_values)
+
+####################
+# Plot entropy plots
+####################
+gg_comp <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color = Model)) +
+  geom_errorbar(aes(ymin = ifelse((Mean - SD) > 0, Mean - SD, 0), ymax = Mean + SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(aes(y = Mean),
+             size = 0.8) +
+  theme_classic() +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  scale_color_manual(name = "Thresh. limits",
+                     values = c("#a6cee3", "#1f78b4"),
+                     labels = c("[0, 1,000]", "[0, 100]")) +
+  # ggtitle(expression(paste(italic(epsilon), "= 0.4, ", italic(beta), "= 1.1"))) +
+  scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
+  theme(title = element_text(size = 6),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7, face = "italic"),
+        legend.position = c(0.3, 0.2),
+        legend.title = element_text(size = 6, 
+                                    face = "bold", 
+                                    hjust = 5),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(3, "mm"),
+        legend.background = element_blank(),
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        axis.line = element_line(size = 0.3, color = "black"),
+        aspect.ratio = 1)
+gg_comp
+
+ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.png", height = 45, width = 45, units = "mm")
+ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.svg", height = 45, width = 45, units = "mm")
+
+
+
+
 # ------------------------------ DOL by beta----------------------
 ####################
 # Load and process data
