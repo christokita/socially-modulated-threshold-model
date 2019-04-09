@@ -79,5 +79,5 @@ gg_nstar <- ggplot() +
 gg_nstar
 
 ggsave("output/AnalyticalResults/NstarCalculation.png", width = 45, heigh = 45, units = "mm", dpi = 400)
-
+ggsave("output/AnalyticalResults/NstarCalculation.svg", width = 45, heigh = 45, units = "mm")
 
