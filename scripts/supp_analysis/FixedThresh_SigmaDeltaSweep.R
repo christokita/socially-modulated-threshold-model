@@ -41,8 +41,10 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 # Prep for Parallelization
 ####################
 # Create directory for depositing data
-storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <-"FixedThreshold-SigmaDeltaSweep"
+# storage_path <- "/scratch/gpfs/ctokita/"
+# dir_name <-"FixedThreshold-SigmaDeltaSweep"
+storage_path <- "output/"
+dir_name <-"FixedThreshold-SigmaDeltaSweep/Rdata/"
 full_path <- paste0(storage_path, dir_name, "/")
 dir.create(full_path, showWarnings = FALSE)
 
@@ -54,11 +56,9 @@ files <- list.files(full_path)
 completed_runs <- data.frame(n = as.numeric(gsub(x = files, "^.*-n([0-9]+)\\.Rdata$", "\\1", perl = T)))
 completed_runs$D <- as.numeric(gsub(x = files, "^Delta([\\.0-9]+)-.*$", "\\1", perl = T))
 completed_runs$S <- as.numeric(gsub(x = files, "^.*-Sigma([\\.0-9]+)-.*$", "\\1", perl = T))
-parameter_values <- anti_join(parameter_values, completed_runs, by = c("n", "D", "S"))
+parameter_values_withN <- anti_join(parameter_values, completed_runs, by = c("n", "D", "S"))
 
-Ns <- unique(parameter_values$n) #finish off only those group sizes and parameter combos missing
-
-parameter_values <- parameter_values %>% 
+parameter_values <- parameter_values_withN %>% 
   select(D, S) %>% 
   unique()
 
@@ -81,11 +81,13 @@ sfClusterSetupRNGstream(seed = 323)
 # Run ensemble simulation
 ####################
 # LOOP 1: loop through threshold variation and deltas
-parallel_simulations <- sfLapply(1:nrow(parameter_values), function(k) {
+parallel_simulations <- sfLapply(1:nrow(parameter_values_noN), function(k) {
   # Set threshold variation
   ThreshSD <- ThreshM * parameter_values[k, "S"]
   # Set deltas
   deltas <- rep(parameter_values[k, "D"], m)
+  # Set group sizes needed for that parameter combo
+  Ns <- unique(parameter_values_withN$n[parameter_values_withN$D == parameter_values[k, "D"] & parameter_values_withN$S == parameter_values[k, "S"]])
   # LOOP 2: loop through group sizes
   for (i in 1:length(Ns)) {
     # Set group size
