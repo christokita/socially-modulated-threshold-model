@@ -41,10 +41,8 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 # Prep for Parallelization
 ####################
 # Create directory for depositing data
-# storage_path <- "/scratch/gpfs/ctokita/"
-# dir_name <-"FixedThreshold-SigmaDeltaSweep"
-storage_path <- "output/"
-dir_name <-"FixedThreshold-SigmaDeltaSweep/Rdata/"
+storage_path <- "/scratch/gpfs/ctokita/"
+dir_name <-"FixedThreshold-SigmaDeltaSweep"
 full_path <- paste0(storage_path, dir_name, "/")
 dir.create(full_path, showWarnings = FALSE)
 
@@ -61,6 +59,8 @@ parameter_values_withN <- anti_join(parameter_values, completed_runs, by = c("n"
 parameter_values <- parameter_values_withN %>% 
   select(D, S) %>% 
   unique()
+
+rm(Ns)
 
 # Prepare for parallel
 no_cores <- detectCores()

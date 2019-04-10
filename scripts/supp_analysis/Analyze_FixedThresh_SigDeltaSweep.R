@@ -70,7 +70,7 @@ entropy_map <- entropy_total %>%
   mutate(n = factor(n, levels = unique(entropy_total$n))) %>% 
   filter(delta == 0.8)
 
-pal <- brewer_pal("seq", "Greys")
+pal <- brewer_pal("seq", "Blues")
 pal <- pal(9)
 pal <- c("#f0f0f0", "#252525")
 
@@ -82,12 +82,12 @@ gg_deltamap <- ggplot(data = entropy_map, aes(x = n, y = sigma, fill = Mean, col
   scale_colour_gradientn(colours = pal,expression(paste("Division of\nlabor (", 'D'[indiv], ")")),
                        limits = c(0, 0.5)) +
   xlab("Group size (n)") +
-  scale_x_discrete(breaks = c(5, seq(10, 100, 10))) +
-  ylab(expression(paste("Threshold variation (", sigma[j], ")"))) +
+  scale_x_discrete(breaks = c(5, seq(20, 100, 20))) +
+  ylab(expression(paste("Threshold variation (", sigma, ")"))) +
   # facet_grid(~delta, labeller = label_parsed) +
   theme_ctokita() +
   theme(aspect.ratio = 1)
 
 gg_deltamap
-ggsave(gg_deltamap, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma_HeatMap.png", 
-       width = 140, height = 40, units = "mm", dpi = 400)
+ggsave(gg_deltamap, filename = "output/FixedThreshold-SigmaDeltaSweep/FixedThresholdDeltaSigma_HeatMap.svg", 
+      height = 45, units = "mm", dpi = 400)
