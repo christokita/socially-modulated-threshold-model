@@ -128,7 +128,7 @@ gg_solo <- ggplot(data = entropy, aes(x = n, colour = Model, fill = Model)) +
   theme_classic() +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
-  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   scale_color_manual(name = "Threshold",
                      values = c("#878787", "#4d4d4d")) +
   scale_fill_manual(name = "Threshold",

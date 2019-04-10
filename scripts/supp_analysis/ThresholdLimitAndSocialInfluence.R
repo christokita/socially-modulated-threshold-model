@@ -49,7 +49,7 @@ gg_comp <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color 
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "Thresh. limits",
                      values = c("#a6cee3", "#1f78b4"),

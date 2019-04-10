@@ -143,6 +143,7 @@ gg_interactions <- ggplot(interaction_data, aes(x = n, y = PercentNonRandom,
                      values = c("#878787", "#4d4d4d")) +
   scale_fill_manual(name = "Threshold type",
                     values = c("#ffffff", "#4d4d4d")) +
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab("% Non-random interactions") +
   # facet_grid(~Model) +
@@ -238,7 +239,7 @@ gg_mod <- ggplot(mod_data, aes(x = n, y = Modul_mean, colour = Model, fill = Mod
                     values = c("#ffffff", "#4d4d4d")) +
   scale_linetype_manual(name = "Threshold",
                         values = c("dotted", "solid")) +
-  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   scale_y_continuous(breaks = seq(0, 0.012, 0.002), limits = c(-0.0002, 0.012)) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab("Modularity") +
@@ -335,7 +336,7 @@ gg_assort <- ggplot(data = assort_data, aes(x = n, y = Assort_mean,
                     values = c("#ffffff", "#4d4d4d")) +
   scale_linetype_manual(name = "Threshold",
                         values = c("dotted", "solid")) +
-  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   scale_y_continuous(breaks = seq(-0.25, 0.05, 0.05), limits = c(-0.26, 0.05)) +
   xlab(expression(paste("Group Size (", italic(n), ")"))) +
   ylab("Assortativity") +

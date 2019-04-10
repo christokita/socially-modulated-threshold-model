@@ -40,7 +40,7 @@ for (bias in c("Homophily", "Heterophily")) {
   gg_beta <- ggplot(data = entropy_filt, aes(x = n, y = beta, fill = Dind_mean, colour = Dind_mean)) +
     geom_tile() +
     theme_bw() +
-    scale_x_continuous(breaks = seq(0, 100, 20), 
+    scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                        expand = c(0,0)) +
     scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
                        expand = c(0,0)) +
@@ -82,7 +82,7 @@ gg_beta_all <- ggplot() +
   theme_bw() +
   geom_hline(yintercept = 1, size = 0.3, linetype = "dashed") +
   geom_line(data = analytical_data, aes(x = n, y = beta), size = 0.6) +
-  scale_x_continuous(breaks = seq(0, 100, 20), 
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                      expand = c(0,0),
                      limits = c(2.5, 102.5)) +
   scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
@@ -170,7 +170,7 @@ gg_beta_all <- ggplot() +
   theme_bw() +
   geom_hline(yintercept = 1, size = 0.3, linetype = "dashed") +
   geom_line(data = analytical_data, aes(x = n, y = beta), size = 0.6) +
-  scale_x_continuous(breaks = seq(0, 100, 20), 
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                      expand = c(0,0)) +
   scale_y_continuous(breaks = seq(0.75, 1.25, 0.05), 
                      expand = c(0,0)) +
@@ -218,7 +218,7 @@ for (influence in c("Positive", "Negative")) {
   gg_eps <- ggplot(data = entropy_filt, aes(x = n, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
     geom_tile() +
     theme_bw() +
-    scale_x_continuous(breaks = seq(0, 100, 20), 
+    scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                        expand = c(0,0)) +
     scale_y_continuous(breaks = seq(-1, 1, 0.1), 
                        expand = c(0,0)) +
@@ -252,7 +252,7 @@ gg_eps_all <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, c
   geom_tile() +
   geom_hline(yintercept = 0, size = 0.3, linetype = "dashed") +
   theme_bw() +
-  scale_x_continuous(breaks = seq(0, 100, 20), 
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                      expand = c(0,0)) +
   scale_y_continuous(breaks = seq(-1, 1, 0.1), 
                      expand = c(0,0)) +
@@ -298,7 +298,7 @@ for (influence in c("Positive", "Negative")) {
   gg_eps <- ggplot(data = entropy_filt, aes(x = n, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
     geom_tile() +
     theme_bw() +
-    scale_x_continuous(breaks = seq(0, 100, 20), 
+    scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                        expand = c(0,0)) +
     scale_y_continuous(breaks = seq(-1, 1, 0.1), 
                        expand = c(0,0)) +
@@ -333,7 +333,7 @@ gg_eps_all <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, c
   geom_tile() +
   geom_hline(yintercept = 0, size = 0.3, linetype = "dashed") +
   theme_bw() +
-  scale_x_continuous(breaks = seq(0, 100, 20), 
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20)), 
                      expand = c(0,0)) +
   scale_y_continuous(breaks = seq(-1, 1, 0.1), 
                      expand = c(0,0)) +
