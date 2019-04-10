@@ -22,7 +22,8 @@ high_thresh <- compiled_data %>%
   group_by(Model, epsilon, beta) %>% 
   summarise(Mean = mean(Dind),
             SD = sd(Dind)) %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  mutate(epsilon = round(epsilon, digits = 3))
 
 
 load("output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
@@ -35,7 +36,7 @@ names(normal_thresh) <- c("Model", "epsilon", "beta", "Mean", "SD")
 eps_values <- unique(normal_thresh$epsilon)
 
 entropy_data <- rbind(high_thresh, normal_thresh)
-entropy_data <- entropy_data %>% 
+entropy_data <- entropy_data %>%
   filter(epsilon %in% eps_values)
 
 ####################
