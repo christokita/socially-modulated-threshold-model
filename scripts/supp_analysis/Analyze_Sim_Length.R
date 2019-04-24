@@ -15,7 +15,7 @@ library(scales)
 ####################
 # Load data
 ####################
-path <- "output/SimLength/CheckSimLength_Thresh50_Sigma0-Epsilon0.1-Beta1.1.Rdata"
+path <- "output/Rdata/CheckSimLength_Thresh50_Sigma0-Epsilon0.1-Beta1.1.Rdata"
 load(path)
 
 file_name <- gsub("^.*(Thresh[\\. 0-9]*.*)\\.Rdata$", "\\1", path, perl = T)
@@ -57,7 +57,7 @@ ggplot(data = sim_data, aes(x = t, y = Dind, group = n, col = n)) +
   geom_line() +
   theme_ctokita() +
   scale_color_manual(values = cols, guide = guide_legend(reverse = TRUE)) +
-  scale_x_continuous(breaks = seq(0, 200000, 50000), label = comma) +
+  scale_x_continuous(breaks = seq(0, 500000, 50000), label = comma) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   xlab(expression(paste("Time step (", italic(t), ")")))
 
