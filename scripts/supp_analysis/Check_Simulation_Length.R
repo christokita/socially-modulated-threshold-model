@@ -18,7 +18,7 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, seq(20, 30, 1), 40, 50, 100) #vector of number of individuals to simulate
+Ns             <- c(5, 10, 20, 26, 27, 28, 29, 30, 40, 50, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 200000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
@@ -95,6 +95,8 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     X_g <- matrix(data = rep(0, length(P_g)), ncol = ncol(P_g))
     # Create cumulative task performance matrix
     X_tot <- X_g
+    # Create window of task performance
+    X_window <- X_g
     # Create cumulative adjacency matrix
     g_tot <-  matrix(data = rep(0, n * n), ncol = n)
     colnames(g_tot) <- paste0("v-", 1:n)
@@ -135,8 +137,11 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
       X_tot <- X_tot + X_g
       # Capture stats if it is appropriate window
       if (t %in% times) {
+        X_window <- X_tot - X_window
         # Get DOL
-        window_entropy <- mutualEntropy(X_tot)
+        total_entropy <- mutualEntropy(X_tot)
+        window_entropy <- mutualEntropy(X_window)
+        colnames(window_entropy) <- paste0(colnames(window_entropy), "_window")
         # Get threshold information
         thresh_info <- matrix(data = c(sd(threshMat[, 1]),
                              max(threshMat[, 1]),
@@ -162,6 +167,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                            nrow = 1,
                            dimnames = list(NULL,
                                            c("n", "sim", "chunk", "t")))
+        all_info <- cbind(all_info, total_entropy)
         all_info <- cbind(all_info, window_entropy)
         all_info <- cbind(all_info, thresh_info)
         all_info <- cbind(all_info, stim_info)

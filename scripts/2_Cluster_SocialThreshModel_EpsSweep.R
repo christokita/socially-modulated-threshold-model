@@ -43,7 +43,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Beta", beta, "_EpsSweep-HighThreshLimit")
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Beta", beta, "_EpsSweep-NoThreshLimit") #CHANGE THRESH LIMIT
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
@@ -140,7 +140,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 1000)
+                                                   threshold_max = Inf)
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }

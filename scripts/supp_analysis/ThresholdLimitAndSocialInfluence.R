@@ -16,7 +16,7 @@ source("scripts/util/__Util__MASTER.R")
 ####################
 # Load and process data
 ####################
-load('output/Rdata/_ProcessedData/Entropy/Sigma0-Beta1.1_EpsSweep-HighThreshLimit.Rdata')
+load('output/Rdata/_ProcessedData/Entropy/Sigma0-Beta1.1_EpsSweep-NoThreshLimit.Rdata')
 high_thresh <- compiled_data %>% 
   mutate(Model = "high_thresh") %>% 
   group_by(Model, epsilon, beta) %>% 
@@ -53,7 +53,7 @@ gg_comp <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color 
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "Thresh. limits",
                      values = c("#a6cee3", "#1f78b4"),
-                     labels = c("[0, 1,000]", "[0, 100]")) +
+                     labels = c(expression(paste("[0, ", infinity, ")")), "[0, 100]")) +
   # ggtitle(expression(paste(italic(epsilon), "= 0.4, ", italic(beta), "= 1.1"))) +
   scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
   theme(title = element_text(size = 6),
