@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 Ns             <- c(5, 10, 20, 26, 27, 28, 29, 30, 40, 50, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 200000 #number of generations to run simulation 
+gens           <- 500000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 10 #number of simulations sent to single core 
 
@@ -137,11 +137,11 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
       X_tot <- X_tot + X_g
       # Capture stats if it is appropriate window
       if (t %in% times) {
-        X_window <- X_tot - X_window
+        # X_window <- X_tot - X_window
         # Get DOL
         total_entropy <- mutualEntropy(X_tot)
-        window_entropy <- mutualEntropy(X_window)
-        colnames(window_entropy) <- paste0(colnames(window_entropy), "_window")
+        # window_entropy <- mutualEntropy(X_window)
+        # colnames(window_entropy) <- paste0(colnames(window_entropy), "_window")
         # Get threshold information
         thresh_info <- matrix(data = c(sd(threshMat[, 1]),
                              max(threshMat[, 1]),
@@ -168,7 +168,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                            dimnames = list(NULL,
                                            c("n", "sim", "chunk", "t")))
         all_info <- cbind(all_info, total_entropy)
-        all_info <- cbind(all_info, window_entropy)
+        # all_info <- cbind(all_info, window_entropy)
         all_info <- cbind(all_info, thresh_info)
         all_info <- cbind(all_info, stim_info)
         if (!exists("sim_info")) {
@@ -193,5 +193,5 @@ sfStop()
 parallel_simulations <- do.call("rbind", parallel_simulations)
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-save(parallel_simulations, file =  paste0(storage_path, "CheckSimLength_Thresh", ThreshM[1], "_Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, ".Rdata"))
+save(parallel_simulations, file =  paste0(storage_path, "CheckSimLength_Long_Thresh", ThreshM[1], "_Sigma", ThreshSD[1], "-Epsilon", epsilon, "-Beta", beta, ".Rdata"))
 
