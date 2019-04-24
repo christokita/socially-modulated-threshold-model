@@ -9,32 +9,6 @@ source("scripts/util/__Util__MASTER.R")
 library(RColorBrewer)
 library(scales)
 
-####################
-# Load and process data
-####################
-# Load social networks
-files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", run, "/"), full.names = TRUE)
-soc_networks <- list()
-for (i in 1:length(files)) {
-  load(files[i])
-  soc_networks[[i]] <- listed_data
-}
-
-# Load threshold matrices
-files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", run, "/"), full.names = TRUE)
-thresh_data <- list()
-for (i in 1:length(files)) {
-  load(files[i])
-  thresh_data[[i]] <- listed_data
-}
-
-# Load activity profiles
-load(paste0("output/Rdata/_ProcessedData/TaskDist/", run, ".Rdata"))
-task_dist <- compiled_data
-task_dist$replicate <- task_dist$sim * task_dist$chunk
-rm(compiled_data)
-
-
 ##########################################################
 # Percentage of non-random interactions
 ##########################################################
