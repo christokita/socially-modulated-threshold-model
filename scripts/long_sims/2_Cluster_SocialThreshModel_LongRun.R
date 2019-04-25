@@ -20,9 +20,8 @@ library(snowfall)
 # Base parameters
 n              <- 80 #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 200000 #number of generations to run simulation 
+gens           <- 500000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
-chunk_size     <- 5 #number of simulations sent to single core 
 
 # Threshold Parameters
 ThreshM        <- rep(50, m) #population threshold means 
@@ -34,8 +33,8 @@ quitP          <- 0.2 #probability of quitting task once active
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.4 #relative weighting of social interactions for adjusting thresholds
-beta           <- 1.1 #probability of interacting with individual in same state relative to others
+epsilon        <- 0.5 #relative weighting of social interactions for adjusting thresholds
+beta           <- 1.05 #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -43,20 +42,14 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta, "-LongRun")
+dir_name <- paste0("LongSim-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "-Beta", beta)
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
-sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
-              "Thresh", "Thresh1Time", "Thresh2Time", "Graphs")
+sub_dirs <- c("TaskDist", "Entropy", "Stim", "Thresh", "Graphs")
 for (sub_dir in sub_dirs) {
   dir.create(paste0(full_path, "/", sub_dir), showWarnings = FALSE)
 }
 
-# Break up parameter replications into smaller batches\
-chunk_run  <- 1:(reps / chunk_size)
-run_in_parallel <- expand.grid(n = Ns, run = chunk_run)
-run_in_parallel <- run_in_parallel %>% 
-  arrange(n)
 
 # Prepare for parallel
 no_cores <- detectCores()
@@ -77,17 +70,8 @@ sfClusterSetupRNGstream(seed = 323)
 # Run ensemble simulation
 ####################
 # Loop through group size (and chucnks)
-parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
-  # Set group size 
-  n <- run_in_parallel[k, 1]
-  chunk <- run_in_parallel[k, 2]
-  # Prep lists for collection of simulation outputs from this group size
-  ens_taskDist    <- list()
-  ens_entropy     <- list()
-  ens_thresh      <- list()
-  ens_graphs      <- list()
-  # Run Simulations
-  for (sim in 1:chunk_size) {
+parallel_simulations <- sfLapply(1:reps, function(sim) {
+  
     ####################
     # Seed structures and intial matrices
     ####################
@@ -150,46 +134,20 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     ####################
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
-    entropy <- label_parallel_runs(matrix = entropy, n = n, simulation = sim, chunk = chunk)
     # Calculate total task distribution
     totalTaskDist <- X_tot / gens
-    totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
-    # Create thresh table
-    threshMat <- label_parallel_runs(matrix = threshMat, n = n, simulation = sim, chunk = chunk)
-    # Add total task distributions, entropy values, and graphs to lists
-    ens_taskDist[[sim]]    <- totalTaskDist
-    ens_entropy[[sim]]     <- entropy
-    ens_thresh[[sim]]      <- threshMat 
-    ens_graphs[[sim]]      <- g_tot / gens
-  }
-  # Bind and write
-  save_parallel_data(data = ens_taskDist, 
-                     path = full_path, 
-                     sub_directory = "TaskDist",
-                     n = n, 
-                     chunk = chunk)
-  save_parallel_data(data = ens_entropy, 
-                     path = full_path, 
-                     sub_directory = "Entropy",
-                     n = n, 
-                     chunk = chunk)
-  save_parallel_data(data = ens_thresh, 
-                     path = full_path, 
-                     sub_directory = "Thresh",
-                     n = n, 
-                     chunk = chunk)
-  save(ens_graphs, 
-       file = paste0(full_path,
-                     "/Graphs/", 
-                     str_pad(string = n, width = 3, pad = "0"), 
-                     "-", 
-                     str_pad(string = chunk, width = 2, pad = "0"), 
-                     ".Rdata"))
-  # Return all_clear
-  rm(ens_taskDist, ens_entropy, ens_thresh, ens_graphs)
-  return(paste0("DONE: n = ", n, 
-                ", Sims ", ((chunk-1) * chunk_size)+1, "-", chunk * chunk_size))
-  sys.sleep(1)
+    # Normalize interaciton matrix
+    g_tot <- g_tot / gens
+    
+    ####################
+    # Save data
+    ####################
+    save(entropy, file = paste0(full_path, "/Entropy/Sim_", sim, ".Rdata"))
+    save(totalTaskDist, file = paste0(full_path, "/TaskDist/Sim_", sim, ".Rdata"))
+    save(stimMat, file = paste0(full_path, "/Stim/Sim_", sim, ".Rdata"))
+    save(threshMat, file = paste0(full_path, "/Thresh/Sim_", sim, ".Rdata"))
+    save(g_tot, file = paste0(full_path, "/Graphs/Sim_", sim, ".Rdata"))
+    
 })
 
 sfStop()
