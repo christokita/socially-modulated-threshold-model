@@ -8,7 +8,7 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
 
-directory_path <- "output/Rdata/long_sims/LongSim-Sigma0-Epsilon0.5-Beta1.05/"
+directory_path <- "output/Rdata/long_sims/LongSim-Sigma0-Epsilon0.1-Beta1.075/"
 output_path <- "output/Rdata/_ProcessedData/_LongSims/"
 run_info <- gsub("^.*(Sigma.*)/$", "\\1", directory_path, perl = TRUE)
 
@@ -62,6 +62,22 @@ for (i in 1:length(files)) {
 taskdist_data <- do.call("rbind", taskdist_data)
 save(taskdist_data, file = paste0(output_path, "/TaskDist/", run_info, ".Rdata"))
 
+
+####################
+# Bind and save thresh data
+####################
+files <- list.files(paste0(directory_path, "Thresh"), full.names = T)
+thresh_data <- list()
+for (i in 1:length(files)) {
+  file <- files[i]
+  sim_number <- as.numeric(gsub(file, pattern = ".*Sim_([0-9]+).Rdata", replacement = "\\1", perl = T))
+  load(file)
+  threshMat <- as.data.frame(threshMat)
+  threshMat$sim <- sim_number
+  thresh_data[[i]] <- threshMat
+} 
+save(thresh_data, file = paste0(output_path, "/Thresh/", run_info, ".Rdata"))
+
 ####################
 # Bind and save task distributions
 ####################
@@ -90,5 +106,20 @@ for (i in 1:length(files)) {
   graphs_data[[i]] <- g_tot
 } 
 save(graphs_data, file = paste0(output_path, "/Graphs/", run_info, ".Rdata"))
+
+
+####################
+# Bind and save stim data
+####################
+files <- list.files(paste0(directory_path, "Stim"), full.names = T)
+stim_data <- list()
+for (i in 1:length(files)) {
+  file <- files[i]
+  sim_number <- as.numeric(gsub(file, pattern = ".*Sim_([0-9]+).Rdata", replacement = "\\1", perl = T))
+  load(file)
+  stim_data[[i]] <- stimMat
+} 
+save(stim_data, file = paste0(output_path, "/Stim/", run_info, ".Rdata"))
+
 
 
