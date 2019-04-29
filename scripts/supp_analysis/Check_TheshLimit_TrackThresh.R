@@ -28,7 +28,7 @@ InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
-thresh_max     <- 100
+thresh_max     <- Inf
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
