@@ -76,7 +76,7 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
         aspect.ratio = 1)
 gg_betaeps
 
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_n80_withLongSims.png", height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_betaeps, file = "output/LongSims/BeataEpsSweep_n80_withLongSims.png", height = 45, width = 45, units = "mm", dpi = 400)
 
 
 
@@ -219,6 +219,7 @@ gg_mod_beta <- ggplot(mod_data_beta, aes(x = parameter_value, y = Modul_mean, co
         legend.key.height = unit(0.5, "line"))
 gg_mod_beta
 
+ggsave(gg_mod_beta, file = "output/LongSims/modularity_plots.png", width = 45, height = 45, units = "mm", dpi = 400)
 
 #########################################################
 # Assortivity
@@ -362,35 +363,5 @@ gg_assort_beta <- ggplot(data = assort_data_beta, aes(x = parameter_value, y = A
         axis.title.y = element_text(vjust = -1.5))
 gg_assort_beta
 
-assort_data_eps <- assort_data %>% 
-  filter(parameter == "Epsilon")
-gg_assort_eps <- ggplot(data = assort_data_eps, aes(x = parameter_value, y = Assort_mean,
-                                                      colour = parameter, group = parameter, fill = parameter)) +
-  geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
-  geom_errorbar(aes(ymin = Assort_mean - Assort_SD, ymax = Assort_mean + Assort_SD),
-                width = 0,
-                size = 0.3) +
-  geom_point(size = 0.8, shape = 21) +
-  scale_color_manual(name = "Threshold",
-                     # values = c("#878787", "#4d4d4d")) +
-                     values = c("#4d4d4d")) +
-  scale_fill_manual(name = "Threshold",
-                    # values = c("#ffffff", "#4d4d4d")) +
-                    values = c("#4d4d4d")) +
-  scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
-  scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
-  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
-  ylab("Assortativity") +
-  theme_ctokita() +
-  theme(legend.position = "none",
-        axis.title.y = element_text(vjust = -1.5))
-gg_assort_eps
+ggsave(gg_assort_beta, file = "output/LongSims/assortativity_plots.png", width = 45, height = 45, units = "mm", dpi = 400)
 
-# Together
-gg_net_mod <- grid.arrange(gg_mod_beta, gg_mod_eps, nrow = 1)
-ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_parametersweep.svg", 
-       height = 23, width = 95, units = "mm")
-
-gg_net_assort <- grid.arrange(gg_assort_beta, gg_assort_eps, nrow = 1)
-ggsave(gg_net_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_parametersweep.svg", 
-       height = 23, width = 96, units = "mm")

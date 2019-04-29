@@ -267,11 +267,12 @@ gg_threshtime_100 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) 
                      limits = c(0, 100),
                      breaks = seq(0, 100, 50)) +
   theme_ctokita() +
-  theme(axis.title.y = element_blank(),
+  theme(#axis.title.y = element_blank(),
         axis.text.x = element_text(hjust = 0.7))
 
 gg_threshtime_100
 ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Max-100.png", height = 26, width = 40, units = "mm", dpi = 500)
+ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/ExampleforPPT.png", height = 34, width = 45, units = "mm", dpi = 500)
 
 
 # High threshold limit
