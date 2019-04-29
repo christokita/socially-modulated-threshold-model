@@ -44,6 +44,7 @@ entropy_data <- entropy_data %>%
 ####################
 gg_comp <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color = Model)) +
   geom_vline(xintercept = 0.5659957, size = 0.3, linetype = "dashed") + #analytical result for epsilon*
+  geom_vline(xintercept = 0, size = 0.3, linetype = "dashed") + #analytical result for epsilon*
   geom_errorbar(aes(ymin = ifelse((Mean - SD) > 0, Mean - SD, 0), ymax = Mean + SD),
                 width = 0,
                 size = 0.3) +
