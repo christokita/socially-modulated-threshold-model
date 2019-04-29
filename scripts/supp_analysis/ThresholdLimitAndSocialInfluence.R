@@ -43,6 +43,7 @@ entropy_data <- entropy_data %>%
 # Plot entropy plots
 ####################
 gg_comp <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color = Model)) +
+  geom_vline(xintercept = 0.5659957, size = 0.3, linetype = "dashed") + #analytical result for epsilon*
   geom_errorbar(aes(ymin = ifelse((Mean - SD) > 0, Mean - SD, 0), ymax = Mean + SD),
                 width = 0,
                 size = 0.3) +
@@ -276,7 +277,7 @@ ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Examplefo
 
 
 # High threshold limit
-load("output/ThresholdTime/ThresholdLimits/ThreshMax-1000.Rdata")
+load("output/ThresholdTime/ThresholdLimits/ThreshMax-Inf.Rdata")
 
 gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
   geom_line(size = 0.1, alpha = 0.15, colour = "#8bbeda") +
@@ -285,12 +286,12 @@ gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id))
                      labels = c("", "10,000", "", "30,000", "", "50,000"),
                      expand = c(0, 0)) +
   scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
-                     limits = c(0, 1000),
-                     breaks = seq(0, 1000, 500),
+                     limits = c(0, 1200),
+                     breaks = seq(0, 1200, 600),
                      label = comma) +
   theme_ctokita() +
   theme(axis.title.y = element_blank(),
         axis.text.x = element_text(hjust = 0.7))
 
 gg_threshtime_1000
-ggsave(gg_threshtime_1000, file = "output/ThresholdTime/ThresholdLimits/Max-1000.png", height = 26, width = 42, units = "mm", dpi = 500)
+ggsave(gg_threshtime_1000, file = "output/ThresholdTime/ThresholdLimits/Max-Inf.png", height = 26, width = 42, units = "mm", dpi = 500)
