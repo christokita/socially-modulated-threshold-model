@@ -10,6 +10,7 @@ rm(list = ls())
 # Source necessary scripts/libraries
 ####################
 source("scripts/util/__Util__MASTER.R")
+library(scales)
 
 ####################
 # calculate epsilon* and beta* for n = 80 with infinite threshold limit
@@ -19,11 +20,11 @@ source("scripts/util/__Util__MASTER.R")
 tau <- 0.2
 n <- 80
 m <- 2
-n_1 <- ( 1 / (1 + tau) ) * n
 delta <- 0.8
 beta <- seq(1, 1.25, 0.0001)
-
-zero_corner <- 0.02
+freq_activ <- delta
+# freq_activ <- 1 / (1+tau)
+n_1 <- freq_activ * n
 
 beta_star_value <- (delta * n) / (delta * n - m)
 
@@ -33,16 +34,41 @@ beta_star <- data.frame(epsilon = seq(0, 0.6, 0.01),
 eps_star <- data.frame(beta = beta, 
                        epsilon_inac = rep(NA, length(beta)), 
                        epsilon_ac = rep(NA, length(beta)),
+                       # epsilon_e11_e01_ratio = rep(NA, length(beta)),
                        epsilon_all = rep(NA, length(beta)))
 for (i in 1:nrow(eps_star)) {
-  E_01 <- n_1 * ( 1 / (beta[i] * (n_1 - 1) + (n - n_1)) ) # expected number of interaction partners performing task 1 if i is inactive
+  E_01 <- n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta[i] * (n_1 - 1) + (n - n_1)) )  # expected number of interaction partners performing task 1 if i is inactive
   E_11 <- 2*beta[i]*(n_1 - 1) / (beta[i] * (n_1 - 1) + (n - n_1)) # expected number of interaction partners performing task 1 if i is task 1
   eps_01 <- delta / E_01
   eps_11 <- delta / E_11
   eps_star$epsilon_inac[i] <- eps_01
   eps_star$epsilon_ac[i] <- eps_11
-  eps_star$epsilon_all[i] <- (eps_11 * (1/(1+tau))) + (1-(1/(1+tau))) * eps_01
+  eps_star$epsilon_all[i] <- delta / (freq_activ * E_11 + (1 - freq_activ) * E_01)
 }
+eps_star$epsilon_all[eps_star$beta == 1.1]
+
+# Calculate epsilon* for absolute loss of DOL (test?)
+n_1 <- delta/2 * n + 1
+n_2 <- delta/2 * n -1
+
+eps_star_absolute <- data.frame(beta = beta,
+                                epsilon_inac = rep(NA, length(beta)),
+                                epsilon_ac = rep(NA, length(beta)),
+                                # epsilon_e11_e01_ratio = rep(NA, length(beta)),
+                                epsilon_all = rep(NA, length(beta)))
+for (i in 1:nrow(eps_star_absolute)) {
+  E_01 <- n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta[i] * (n_1 - 1) + (n - n_1)) )  # expected number of interaction partners performing task 1 if i is inactive
+  E_02 <- n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta[i] * (n_2 - 1) + (n - n_2)) )  # expected number of interaction partners performing task 2 if i is inactive
+  E_11 <- 2*beta[i]*(n_1 - 1) / (beta[i] * (n_1 - 1) + (n - n_1)) # expected number of interaction partners performing task 1 if i is task 1
+  E_12 <- n_2 / (beta[i] * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta[i] * (n_2 - 1) + (n - n_2)) )  # expected number of interaction partners performing task 1 if i is task 1
+  eps_delta_inac <- delta / (E_01 - E_02)
+  eps_delta_ac <- delta / (E_11 - E_12)
+  eps_star_absolute$epsilon_inac[i] <- eps_delta_inac
+  eps_star_absolute$epsilon_ac[i] <- eps_delta_ac
+  eps_star_absolute$epsilon_all[i] <- delta * eps_delta_ac + (1 - delta) * eps_delta_inac
+  # eps_star_absolute$epsilon_all[i] <- delta / (freq_activ * (E_11 - E_12) + (1 - freq_activ) * (E_01 - E_02))
+}
+
 
 # Corner points for epsilon* polygon
 eps_corner1 <- data.frame(beta = 1, 
