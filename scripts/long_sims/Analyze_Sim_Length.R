@@ -15,7 +15,7 @@ library(scales)
 ####################
 # Load data
 ####################
-path <- "output/SimLength/CheckSimLength_Window_Thresh50_Sigma0-Epsilon0.1-Beta1.1.Rdata"
+path <- "output/SimLength/CheckSimLength_Long_Thresh50_Sigma0-Epsilon0.1-Beta1.1.Rdata"
 load(path)
 
 file_name <- gsub("^.*(Thresh[\\. 0-9]*.*)\\.Rdata$", "\\1", path, perl = T)
@@ -57,11 +57,12 @@ ggplot(data = sim_data, aes(x = t, y = Dind, group = n, col = n)) +
   geom_line() +
   theme_ctokita() +
   scale_color_manual(values = cols, guide = guide_legend(reverse = TRUE)) +
-  scale_x_continuous(breaks = seq(0, 500000, 50000), label = comma) +
+  scale_x_continuous(breaks = seq(0, 500000, 100000), label = comma) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   xlab(expression(paste("Time step (", italic(t), ")")))
 
-ggsave(file = paste0("output/SimLength/DOL/", file_name, ".svg"), width = 90, height = 45, units = "mm")
+ggsave(file = paste0("output/SimLength/DOL/", file_name, "_Long.svg"), width = 90, height = 45, units = "mm")
+ggsave(file = paste0("output/SimLength/DOL/", file_name, "_Long.png"), width = 90, height = 45, units = "mm")
 
 ####################
 # Plot - Stimulus Levels
