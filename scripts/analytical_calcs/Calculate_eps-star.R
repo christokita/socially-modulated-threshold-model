@@ -45,15 +45,23 @@ for (i in 1:nrow(eps_star)) {
   eps_star$epsilon_ac[i] <- eps_11
   eps_star$epsilon_all[i] <- delta / (freq_activ * E_11 + (1 - freq_activ) * E_01)
 }
-eps_star$epsilon_all[eps_star$beta == 1.1]
+eps_star$epsilon_all[eps_star$beta == 1.2]
 
 # Calculate epsilon* for absolute loss of DOL (test?)
-n_1 <- delta/2 * n + 1
-n_2 <- delta/2 * n -1
+#for beta = 1.1, eps = 0.55, there seems to be points where there are as little as 10 individuals performing a task
+n_1 <- delta/2 * n + 1 
+n_2 <- delta/2 * n - 1
 
 eps_star_absolute <- data.frame(beta = beta,
+                                E01 = rep(NA, length(beta)),
+                                E02 = rep(NA, length(beta)),
+                                E11 = rep(NA, length(beta)),
+                                E12 = rep(NA, length(beta)),
+                                E22 = rep(NA, length(beta)),
+                                E21 = rep(NA, length(beta)),
                                 epsilon_inac = rep(NA, length(beta)),
                                 epsilon_ac = rep(NA, length(beta)),
+                                epsilon_test = rep(NA, length(beta)),
                                 # epsilon_e11_e01_ratio = rep(NA, length(beta)),
                                 epsilon_all = rep(NA, length(beta)))
 for (i in 1:nrow(eps_star_absolute)) {
@@ -61,14 +69,44 @@ for (i in 1:nrow(eps_star_absolute)) {
   E_02 <- n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta[i] * (n_2 - 1) + (n - n_2)) )  # expected number of interaction partners performing task 2 if i is inactive
   E_11 <- 2*beta[i]*(n_1 - 1) / (beta[i] * (n_1 - 1) + (n - n_1)) # expected number of interaction partners performing task 1 if i is task 1
   E_12 <- n_2 / (beta[i] * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta[i] * (n_2 - 1) + (n - n_2)) )  # expected number of interaction partners performing task 1 if i is task 1
-  eps_delta_inac <- delta / (E_01 - E_02)
-  eps_delta_ac <- delta / (E_11 - E_12)
+  E_22 <- 2*beta[i]*(n_2 - 1) / (beta[i] * (n_2 - 1) + (n - n_2)) # expected number of interaction partners performing task 2 if i is task 2
+  E_21 <- n_1 / (beta[i] * (n_2 - 1) + (n - n_1)) + n_1 * ( (1) / (beta[i] * (n_1 - 1) + (n - n_1)) )  # expected number of interaction partners performing task 1 if i is task 2
+  eps_star_absolute$E01[i] <- E_01
+  eps_star_absolute$E02[i] <- E_02
+  eps_star_absolute$E11[i] <- E_11
+  eps_star_absolute$E12[i] <- E_12
+  eps_star_absolute$E22[i] <- E_22
+  eps_star_absolute$E21[i] <- E_21
+  eps_delta_inac <- (E_01 - E_02)
+  eps_delta_ac <-  (E_21 - E_22)
   eps_star_absolute$epsilon_inac[i] <- eps_delta_inac
   eps_star_absolute$epsilon_ac[i] <- eps_delta_ac
-  eps_star_absolute$epsilon_all[i] <- delta * eps_delta_ac + (1 - delta) * eps_delta_inac
+  eps_star_absolute$epsilon_test <- (delta-(2*(n_1/n))) / eps_delta_inac
   # eps_star_absolute$epsilon_all[i] <- delta / (freq_activ * (E_11 - E_12) + (1 - freq_activ) * (E_01 - E_02))
+  eps_star_absolute$epsilon_all[i] <- (delta-(2*(n_1/n))) / (delta*(eps_delta_ac) + (1-delta)*(eps_delta_inac))
 }
+eps_star_absolute$epsilon_all[eps_star_absolute$beta == 1.1]
 
+eps_star_look <- eps_star_absolute %>% 
+  select(-epsilon_inac, -epsilon_ac, -epsilon_all, -epsilon_test) %>% 
+  melt(id.vars = "beta")
+eps_star_look$value <- eps_star_look$value * 0.55
+
+ggplot(data = eps_star_look, aes(x = beta, y = value, group = variable, col = variable)) +
+  geom_hline(yintercept = (delta-(2*(n_2/n)))) +
+  geom_line() +
+  # scale_linetype_manual(values = c("solid", "solid", "solid", "dashed", "solid", "dotted")) +
+  scale_colour_manual(values = c("#6a3d9a", "#cab2d6", "#1f78b4", "#fb9a99", "#a6cee3", "#e31a1c"))
+
+ggplot(data = eps_star_absolute, aes(x = beta)) +
+  geom_hline(yintercept = (delta-(2*(n_2/n)))) +
+  geom_line(aes(y = epsilon_test), color = "blue")
+  
+
+
+####################
+# Plot analytical "heatmap" equivalent figure
+####################
 
 # Corner points for epsilon* polygon
 eps_corner1 <- data.frame(beta = 1, 
@@ -131,13 +169,14 @@ gg_analytical_betaeps <- ggplot() +
   # geom_polygon(data = eps_low_poly, aes(x = beta, y = epsilon_all, fill = DOL)) +
   geom_line(data = beta_star, aes(x = beta, y = epsilon), size = 0.3, linetype = "dashed") +
   geom_line(data = eps_star, aes(x = beta, y = epsilon_all), size = 0.3) +
+  geom_line(data = eps_star_absolute, aes(x = beta, y = epsilon_all), size = 0.3, linetype = "dotted") +
   # geom_hline(yintercept = zero_corner, size = 0.3) +
   # geom_line(data = beta_star_out, aes(x = beta, y = epsilon), size = 0.6, linetype = "dotted") +
   # geom_line(data = beta_star_in, aes(x = beta, y = epsilon), size = 0.6) +
   # geom_line(data = eps_star_out, aes(x = beta, y = epsilon_all), size = 0.6, linetype = "dotted") +
   # geom_line(data = eps_star_in, aes(x = beta, y = epsilon_all), size = 0.6) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05), expand = c(0, 0)) +
-  scale_y_continuous(limits = c(0, 0.6), breaks = seq(0, 0.6, 0.1), expand = c(0, 0)) +
+  # scale_y_continuous(limits = c(0, 0.6), breaks = seq(0, 0.6, 0.1), expand = c(0, 0)) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
   xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
