@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 n              <- 80 #group size
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+gens           <- 500000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
@@ -43,7 +43,7 @@ betas          <- seq(1, 1.25, 0.01) #probability of interacting with individual
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep")
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep-LongSimNoThreshLim")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
@@ -140,7 +140,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 100)
+                                                   threshold_max = Inf)
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }
