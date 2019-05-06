@@ -364,14 +364,23 @@ ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/svg/EpsilonSweep_Heterphi
 # Beta- Epsilon sweeps -----------------------------------------------------------------
  
 ####################
-# Plot: Beta-
+# Load
 ####################
-load("output/ParameterSpace/EpsilonBetaSweep_NoThreshLimit-n80.Rdata")
+load("output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
 pal <- brewer_pal("seq", "GnBu")
 pal <- pal(9)
 
+
+####################
+# Plot: Positive Homophily only
+####################
+
+entropy_filtered <- entropy %>% 
+  filter(beta >= 1, 
+         epsilon >= 0)
+
 # Graph
-gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
+gg_betaeps <- ggplot(data = entropy_filtered, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
   geom_tile() +
   theme_bw() +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05), 
@@ -397,9 +406,48 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
 
 
 gg_betaeps
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_NoThreshLimit_n80.png", height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BetaEpsSweep_n80.png", height = 45, width = 45, units = "mm", dpi = 400)
 
 
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n80.svg", height = 45, width = 45, units = "mm")
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n80_large.svg", height = 75, width = 75, units = "mm")
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BetaEpsSweep_n80.svg", height = 45, width = 45, units = "mm")
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BetaEpsSweep_n80_large.svg", height = 75, width = 75, units = "mm")
 
+
+####################
+# Plot: All combos
+####################
+
+# Filter data
+
+
+# Plot
+gg_betaeps_all <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
+  geom_tile() +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(0.75, 1.25, 0.25), 
+                     expand = c(0,0)) +
+  scale_y_continuous(breaks = seq(-0.6, 0.6, 0.6), 
+                     expand = c(0,0)) +
+  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                       limits = c(0, 1)) +
+  scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
+                         limits = c(0, 1)) +
+  xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
+  ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
+  theme(axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(5, "mm"),
+        legend.key.width = unit(2, "mm"),
+        legend.position = "none",
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        panel.border = element_rect(fill = NA, size = 0.3, color = "black"),
+        aspect.ratio = 1) +
+  geom_vline(xintercept = 1, size = 0.3, linetype = "dotted") +
+  geom_vline(xintercept = 1.032258, size = 0.3) + #beta star
+  geom_hline(yintercept = 0, size = 0.3, linetype = "dotted")
+gg_betaeps_all
+
+ggsave(gg_betaeps_all, file = "output/ParameterSpace/Plots/BetaEpsSweep_n80_allcombos.png", height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_betaeps_all, file = "output/ParameterSpace/Plots/svg/BetaEpsSweep_n80_allcombos.svg", height = 45, width = 45, units = "mm")
