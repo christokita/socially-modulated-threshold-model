@@ -45,12 +45,12 @@ for (i in 1:nrow(eps_star)) {
   eps_star$epsilon_ac[i] <- eps_11
   eps_star$epsilon_all[i] <- delta / (freq_activ * E_11 + (1 - freq_activ) * E_01)
 }
-eps_star$epsilon_all[eps_star$beta == 1.2]
+eps_star$epsilon_all[eps_star$beta == 1.1]
 
 # Calculate epsilon* for absolute loss of DOL (test?)
 #for beta = 1.1, eps = 0.55, there seems to be points where there are as little as 10 individuals performing a task
-n_1 <- delta/2 * n + 1 
-n_2 <- delta/2 * n - 1
+n_1 <- delta/2 * n  + 1
+n_2 <- delta/2 * n  - 1
 
 eps_star_absolute <- data.frame(beta = beta,
                                 E01 = rep(NA, length(beta)),
@@ -81,16 +81,18 @@ for (i in 1:nrow(eps_star_absolute)) {
   eps_delta_ac <-  (E_21 - E_22)
   eps_star_absolute$epsilon_inac[i] <- eps_delta_inac
   eps_star_absolute$epsilon_ac[i] <- eps_delta_ac
-  eps_star_absolute$epsilon_test <- (delta-(2*(n_1/n))) / eps_delta_inac
+  # eps_star_absolute$epsilon_test[i] <- delta / ( (delta* (E_11 - E_12) + (1-delta)*(E_01 - E_02)) / (delta*(E_22 - E_21) + (1-delta)*(E_02-E_01)) ) 
+  eps_star_absolute$epsilon_test[i] <- (delta*(E_21 - E_22) + (1-delta)*(E_01-E_02)
   # eps_star_absolute$epsilon_all[i] <- delta / (freq_activ * (E_11 - E_12) + (1 - freq_activ) * (E_01 - E_02))
   eps_star_absolute$epsilon_all[i] <- (delta-(2*(n_1/n))) / (delta*(eps_delta_ac) + (1-delta)*(eps_delta_inac))
 }
-eps_star_absolute$epsilon_all[eps_star_absolute$beta == 1.1]
+eps_star_absolute$epsilon_test[eps_star_absolute$beta == 1.1] #should be ~0.54
+eps_star_absolute$epsilon_test[eps_star_absolute$beta == 1.2] #should be ~0.6
 
 eps_star_look <- eps_star_absolute %>% 
   select(-epsilon_inac, -epsilon_ac, -epsilon_all, -epsilon_test) %>% 
   melt(id.vars = "beta")
-eps_star_look$value <- eps_star_look$value * 0.55
+eps_star_look$value <- eps_star_look$value * 0.8
 
 ggplot(data = eps_star_look, aes(x = beta, y = value, group = variable, col = variable)) +
   geom_hline(yintercept = (delta-(2*(n_2/n)))) +
