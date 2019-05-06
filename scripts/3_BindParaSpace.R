@@ -50,7 +50,7 @@ save(entropy, file = "output/ParameterSpace/GroupSizeBetaSweep_Sigma0-Epsilon-0.
 # Load Data: Beta-Epsilon
 ####################
 rm(list = ls())
-directory <- "output/Rdata/EpsilonBetaSweep_Sigma0-n80/"
+directory <- "output/Rdata/EpsilonBetaSweep_NoThreshLimit_Sigma0-n80/"
 # List files 
 files <- list.files(directory, full.names = TRUE)
 for (file in files) {
@@ -64,5 +64,5 @@ for (file in files) {
 
 entropy$epsilon <- round(entropy$epsilon, digits = 5) #the seq() funciton makes weird non-precise values (e.g., 0.3 isn't really 0.3)
 
-save(entropy, file = "output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
+save(entropy, file = "output/ParameterSpace/EpsilonBetaSweep_NoThreshLimit-n80.Rdata")
 

@@ -366,7 +366,7 @@ ggsave(gg_eps_all, file = "output/ParameterSpace/Plots/svg/EpsilonSweep_Heterphi
 ####################
 # Plot: Beta-
 ####################
-load("output/ParameterSpace/EpsilonBetaSweep-n80.Rdata")
+load("output/ParameterSpace/EpsilonBetaSweep_NoThreshLimit-n80.Rdata")
 pal <- brewer_pal("seq", "GnBu")
 pal <- pal(9)
 
@@ -397,7 +397,7 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
 
 
 gg_betaeps
-ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_n80.png", height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/BeataEpsSweep_NoThreshLimit_n80.png", height = 45, width = 45, units = "mm", dpi = 400)
 
 
 ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BeataEpsSweep_n80.svg", height = 45, width = 45, units = "mm")
