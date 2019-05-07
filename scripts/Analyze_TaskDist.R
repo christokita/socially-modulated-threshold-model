@@ -64,3 +64,29 @@ gg_cumsum <- ggplot(data = test, aes(x = Rank_task1Cum, y = Cumu_task1, group = 
 
 gg_cumsum
 
+####################
+# Load task tally data
+####################
+load("output/Rdata/_ProcessedData/TaskTally/Sigma0-Epsilon0.1-Beta1.1/080.Rdata")
+
+# Analyze frequency of task performance
+task_perf <- as.data.frame(do.call('rbind', listed_data)) %>% 
+  mutate(Task1Freq = Task1 / n,
+         Task2Freq = Task2 / n,
+         ID = paste0(sim, "-", chunk))
+
+# Plot over time
+task_avg <- task_perf %>% 
+  group_by(t) %>% 
+  summarise(Task1_mean = mean(Task1Freq),
+            Task1_sd = sd(Task1Freq))
+task_perf_look <- task_perf %>% 
+  filter(t > 50/0.8 & t > (50/0.8+100))
+gg_timetally <- ggplot(data = task_perf_look, aes(x = t, y = Task1Freq, group = ID)) +
+  geom_line(size = 0.4, alpha = 0.2) +
+  geom_vline(xintercept = 50/0.8) +
+  theme_ctokita()
+gg_timetally
+
+# Figure out range of task freq
+quantile(task_perf$Task1Freq, probs = seq(0, 1, 0.1))
