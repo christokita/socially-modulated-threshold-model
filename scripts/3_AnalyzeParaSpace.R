@@ -379,9 +379,20 @@ entropy_filtered <- entropy %>%
   filter(beta >= 1, 
          epsilon >= 0)
 
+load("output/AnalyticalResults/EpsStar-BetaStar_Calc.Rdata")
+
 # Graph
-gg_betaeps <- ggplot(data = entropy_filtered, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
-  geom_tile() +
+gg_betaeps <- ggplot() +
+  geom_tile(data = entropy_filtered, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
+  geom_line(data = eps_star, aes(x = beta, y = epsilon_all), 
+            size = 0.3, 
+            color = "grey40") +
+  geom_vline(xintercept = unique(beta_star$beta), 
+             size = 0.3, 
+             color = "grey40") + 
+  geom_hline(yintercept = 0, 
+             size = 0.3, 
+             color = "grey40") + 
   theme_bw() +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05), 
                      expand = c(0,0)) +
