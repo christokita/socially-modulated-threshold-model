@@ -43,119 +43,139 @@ for (i in 1:nrow(eps_star)) {
   eps_11 <- delta / E_11
   eps_star$epsilon_inac[i] <- eps_01
   eps_star$epsilon_ac[i] <- eps_11
-  eps_star$epsilon_all[i] <- delta / (freq_activ * E_11 + (1 - freq_activ) * E_01)
+  eps_star$epsilon_all[i] <- delta / E_01
 }
-eps_star$epsilon_all[eps_star$beta == 1.1]
+eps_star$epsilon_all[eps_star$beta == 1.02]
 
+ggplot(data = eps_star, aes(x = beta)) +
+  geom_line(aes(y = epsilon_all)) +
+  geom_line(aes(y = epsilon_ac), color = "grey80") +
+  theme_ctokita()
+
+save(eps_star, beta_star, file = "output/AnalyticalResults/EpsStar-BetaStar_Calc.Rdata")
+
+
+####################
+# calculate epsilon* and beta* for n = 80 with infinite threshold limit (Method 2)
+####################
 # Calculate epsilon* for absolute loss of DOL (test?)
-#for beta = 1.1, eps = 0.55, there seems to be points where there are as little as 10 individuals performing a task
-n_1 <- delta/2 * n  + 1
-n_2 <- delta/2 * n  - 1
 
-eps_star_absolute <- data.frame(beta = beta,
-                                E01 = rep(NA, length(beta)),
-                                E02 = rep(NA, length(beta)),
-                                E11 = rep(NA, length(beta)),
-                                E12 = rep(NA, length(beta)),
-                                E22 = rep(NA, length(beta)),
-                                E21 = rep(NA, length(beta)),
-                                epsilon_inac = rep(NA, length(beta)),
-                                epsilon_ac = rep(NA, length(beta)),
-                                epsilon_test = rep(NA, length(beta)),
-                                # epsilon_e11_e01_ratio = rep(NA, length(beta)),
-                                epsilon_all = rep(NA, length(beta)))
-for (i in 1:nrow(eps_star_absolute)) {
-  E_01 <- n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta[i] * (n_1 - 1) + (n - n_1)) )  # expected number of interaction partners performing task 1 if i is inactive
-  E_02 <- n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta[i] * (n_2 - 1) + (n - n_2)) )  # expected number of interaction partners performing task 2 if i is inactive
-  E_11 <- 2*beta[i]*(n_1 - 1) / (beta[i] * (n_1 - 1) + (n - n_1)) # expected number of interaction partners performing task 1 if i is task 1
-  E_12 <- n_2 / (beta[i] * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta[i] * (n_2 - 1) + (n - n_2)) )  # expected number of interaction partners performing task 1 if i is task 1
-  E_22 <- 2*beta[i]*(n_2 - 1) / (beta[i] * (n_2 - 1) + (n - n_2)) # expected number of interaction partners performing task 2 if i is task 2
-  E_21 <- n_1 / (beta[i] * (n_2 - 1) + (n - n_1)) + n_1 * ( (1) / (beta[i] * (n_1 - 1) + (n - n_1)) )  # expected number of interaction partners performing task 1 if i is task 2
-  eps_star_absolute$E01[i] <- E_01 * (1 - delta)
-  eps_star_absolute$E02[i] <- E_02 * (1 - delta)
-  eps_star_absolute$E11[i] <- E_11 * delta
-  eps_star_absolute$E12[i] <- E_12 * delta
-  eps_star_absolute$E22[i] <- E_22 * delta
-  eps_star_absolute$E21[i] <- E_21 * delta
-  eps_delta_inac <- (E_01 - E_02)
-  eps_delta_ac <-  (E_11 + E_21 - E_22 - E_12)
-  eps_star_absolute$epsilon_inac[i] <- eps_delta_inac
-  eps_star_absolute$epsilon_ac[i] <- eps_delta_ac
-  eps_star_absolute$epsilon_test[i] <- (delta-(2*(n_2/n))) / (delta * (E_21 - E_22) + (1-delta) * (E_01 - E_02) )
-  # eps_star_absolute$epsilon_test[i] <- delta*(E_11 + E_22) + (delta*(E_12 + E_21)) 
-  # eps_star_absolute$epsilon_all[i] <- delta / (freq_activ * (E_11 - E_12) + (1 - freq_activ) * (E_01 - E_02))
-  eps_star_absolute$epsilon_all[i] <- (delta-(2*(n_2/n))) / (delta*(eps_delta_ac) + (1-delta)*(eps_delta_inac))
-}
-eps_star_absolute$epsilon_test[eps_star_absolute$beta == 1.1] #should be ~0.54
-eps_star_absolute$epsilon_test[eps_star_absolute$beta == 1.15] #should be ~0.6
+# Establish formulas
+E01 <- function(n_1, n, beta) { n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
+E02 <- function(n_2, n, beta) { n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
+E11 <- function(n_1, n, beta) { 2 * beta * (n_1 - 1) / (beta * (n_1 - 1) + (n - n_1)) }
+E22 <- function(n_2, n, beta) { 2 * beta * (n_2 - 1) / (beta * (n_2 - 1) + (n - n_2)) }
+E12 <- function(n_1, n_2, n, beta) { n_2 / (beta * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
+E21 <- function(n_1, n_2, n, beta) { n_1 / (beta * (n_2 - 1) + (n - n_1)) + n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
 
-eps_star_look <- eps_star_absolute %>% 
-  select(-epsilon_inac, -epsilon_ac, -epsilon_all, -epsilon_test) %>% 
-  melt(id.vars = "beta")
-eps_star_look$value <- eps_star_look$value * 0.8
+theta1 <- function(n_1, n_2, n, beta, delta) { delta * (E12(n_1, n_2, n, beta) - E11(n_1, n, beta)) + (1 - delta) * (E02(n_2, n, beta) - E01(n_1, n, beta)) }
+theta2 <- function(n_1, n_2, n, beta, delta) { delta * (E21(n_1, n_2, n, beta) - E22(n_2, n, beta)) + (1 - delta) * (E01(n_1, n, beta) - E02(n_2, n, beta)) }
+theta1_inac <- function(n_1, n_2, n, beta, delta) { (E02(n_2, n, beta) - E01(n_1, n, beta)) }
 
-ggplot(data = eps_star_look, aes(x = beta, y = value, group = variable, col = variable)) +
-  geom_hline(yintercept = (delta-(2*(n_2/n)))) +
-  geom_line() +
-  # scale_linetype_manual(values = c("solid", "solid", "solid", "dashed", "solid", "dotted")) +
-  scale_colour_manual(values = c("#6a3d9a", "#cab2d6", "#1f78b4", "#fb9a99", "#a6cee3", "#e31a1c"))
+# Sweep by beta, keeping n fixed
+Ns <- seq(30, 100, 1)
+m <- 2
+a <- m
+betas <- seq(1, 1.25, 0.01)
+epsilons <- seq(0, 0.8, 0.01)
+delta <- 0.8
 
-ggplot(data = eps_star_absolute, aes(x = beta)) +
-  # geom_hline(yintercept = (delta-(2*(n_2/n)))) +
-  geom_line(aes(y = epsilon_test), color = "blue")
-  
+eps_star_sweep <- lapply(Ns, function(n) {
+  eps_star_beta <- lapply(betas, function(beta) {
+    # set n difference
+    n_1_equal <- delta/m*n 
+    n_2_equal <- n_1_equal
+    n_1_diff <- n_1_equal + 1
+    n_2_diff <- n_1_equal - 1
+    # Calculate expected threshold change per individual
+    # change0 <- theta1(n_1 = n_1_equal, n_2 = n_2_equal, n = n, beta = beta, delta = delta)
+    # change1 <- theta1(n_1 = n_1_diff, n_2 = n_2_diff, n = n, beta = beta, delta = delta)
+    change0 <- theta1_inac(n_1 = n_1_equal, n_2 = n_2_equal, n = n, beta = beta, delta = delta)
+    change1 <- theta1_inac(n_1 = n_1_diff, n_2 = n_2_diff, n = n, beta = beta, delta = delta)
+    theta_diff <- change1 - change0
+    # Calculate expected delta change per individual
+    delta_diff <- -a / n
+    # Return
+    to_return <- data.frame(beta = beta, 
+                            theta_diff = theta_diff,
+                            delta_diff,
+                            eps_star = delta_diff / theta_diff)
+    return(to_return)
+  })
+  eps_star_beta <- do.call('rbind', eps_star_beta) %>% 
+    mutate(n = n)
+})
+eps_star_sweep <- do.call('rbind', eps_star_sweep)
 
-# Look at group size
-Ns <- seq(0, n)
-beta <- 1.2
-epsilon <- 0.7
-theta_shift <- data.frame(n2 = Ns,
-                          d_delta2 = rep(NA, length(Ns)),
-                          d_theta2 = rep(NA, length(Ns)),
-                          d_thetadelt2 = rep(NA, length(Ns)),
-                          d_delta1 = rep(NA, length(Ns)),
-                          d_theta1 = rep(NA, length(Ns)),
-                          d_thetadelt1 = rep(NA, length(Ns)),
-                          rel_rate = rep(NA, length(Ns)))
-for (i in 1:length(Ns)) {
-  # Set variables
-  n2 <- Ns[i]
-  n1 <- delta*n - n2
-  # Calculate values
-  E01 <- n1/n + n1/(beta*(n1-1)+(n-n1))
-  E02 <- n2/n + n2/(beta*(n2-1)+(n-n2)) 
-  E21 <- n1/(beta*(n2-1)+(n-n2))  + n1/(beta*(n1-1)+(n-n1))
-  E22 <- 2*beta*(n2-1)/(beta*(n2-1)+(n-n2))
-  E12 <- n2/(beta*(n1-1)+(n-n1))  + n2/(beta*(n2-1)+(n-n2))
-  E11 <- 2*beta*(n1-1)/(beta*(n1-1)+(n-n1))
-  # Calculate expected change in theta
-  d_theta2 <- delta*epsilon*(E21-E22) + (1-delta)*epsilon*(E01-E02)
-  d_delta2 <- delta - m*n2/n
-  d_theta1 <- delta*epsilon*(E12-E11) + (1-delta)*epsilon*(E02-E01)
-  d_delta1 <- delta - m*n1/n
-  # Return
-  theta_shift$d_delta2[i] <- d_delta2
-  theta_shift$d_theta2[i] <- d_theta2
-  theta_shift$d_delta1[i] <- d_delta1
-  theta_shift$d_theta1[i] <- -d_theta2
-  # theta_shift$d_theta1[i] <- d_theta1
-  theta_shift$d_thetadelt2[i] <- as.numeric(d_theta2 > d_delta2)
-  theta_shift$d_thetadelt1[i] <- d_theta1 > d_delta1
-  theta_shift$rel_rate[i] <-  theta_shift$d_thetadelt2[i] / theta_shift$d_thetadelt1[i]
-}
+ggplot(eps_star_sweep, aes(y = beta, x = n, fill = eps_star)) +
+  geom_tile() +
+  theme_ctokita()
 
-ggplot(data = theta_shift, aes(x = n2)) +
-  geom_vline(xintercept = delta/m*n, color = "grey30", linetype = "dashed") +
-  geom_vline(xintercept = delta/m*n - 10, color = "grey30", linetype = "dotted") +
-  geom_hline(yintercept = 0) +
-  geom_line(aes(y = d_delta2), color = "lightblue") +
-  geom_line(aes(y = d_theta2), color = "blue") +
-  # geom_line(aes(y = d_delta1), color = "pink") +
-  # geom_line(aes(y = d_theta1), color = "red") +
-  # geom_line(aes(y = d_thetadelt2), color = "blue") +
-  # geom_line(aes(y = d_thetadelt1), color = "red") +
-  # geom_point(aes(y = d_thetadelt2), color = "red") +
-  theme_classic()
+
+####################
+# calculate epsilon* and beta* for n = 80 with infinite threshold limit (Method 3)
+####################
+# Calculate epsilon* for absolute loss of DOL (test?)
+# Establish formulas
+E01 <- function(n_1, n, beta) { n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
+E02 <- function(n_2, n, beta) { n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
+E11 <- function(n_1, n, beta) { 2 * beta * (n_1 - 1) / (beta * (n_1 - 1) + (n - n_1)) }
+E22 <- function(n_2, n, beta) { 2 * beta * (n_2 - 1) / (beta * (n_2 - 1) + (n - n_2)) }
+E12 <- function(n_1, n_2, n, beta) { n_2 / (beta * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
+E21 <- function(n_1, n_2, n, beta) { n_1 / (beta * (n_2 - 1) + (n - n_1)) + n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
+
+theta1 <- function(n_1, n_2, n, beta, delta) { delta * (E12(n_1, n_2, n, beta) - E11(n_1, n, beta)) + (1 - delta) * (E02(n_2, n, beta) - E01(n_1, n, beta)) }
+theta2 <- function(n_1, n_2, n, beta, delta) { delta * (E21(n_1, n_2, n, beta) - E22(n_2, n, beta)) + (1 - delta) * (E01(n_1, n, beta) - E02(n_2, n, beta)) }
+theta1_inac <- function(n_1, n_2, n, beta, delta) { (E02(n_2, n, beta) - E01(n_1, n, beta)) }
+
+# Sweep by beta, keeping n fixed
+# Ns <- seq(30, 100, 1)
+n <- 80
+m <- 2
+a <- m
+betas <- seq(1, 1.25, 0.01)
+epsilons <- seq(0, 0.8, 0.01)
+delta <- 0.8
+
+eps_star_sweep <- lapply(epsilons, function(epsilon) {
+  eps_star_beta <- lapply(betas, function(beta) {
+    # set n difference
+    n_1 <- delta/m*n  + 1
+    n_2 <- delta/m*n - 1
+    # n_1_diff <- n_1_equal + 1
+    # n_2_diff <- n_1_equal - 1
+    # Calculate expected threshold change per individual
+    d_theta1 <- theta1(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
+    d_theta2 <- theta1(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
+    d_inac <- theta1_inac(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
+    # Calculate average threshold change
+    avg_d_theta <- delta/2*d_theta1 + delta/2*d_theta1 + (1-delta)*d_inac
+    # Calculate delta change
+    d_delta1 <- delta - m * n_1/n
+    d_delta2 <- delta - m * n_2/n
+    avg_d_delta <- (d_delta1 + d_delta2) / 2
+    # Return
+    to_return <- data.frame(beta = beta, 
+                            d_theta1 = d_theta1 * epsilon,
+                            d_theta2 = d_theta2 * epsilon,
+                            d_inac = d_inac * epsilon,
+                            d_delta1 =  d_delta1,
+                            d_delta2 =  d_delta2,
+                            avg_d_theta = avg_d_theta * epsilon,
+                            avg_d_delta = avg_d_delta)
+    return(to_return)
+  })
+  eps_star_beta <- do.call('rbind', eps_star_beta) %>% 
+    mutate(epsilon = epsilon)
+})
+eps_star_sweep <- do.call('rbind', eps_star_sweep)
+
+eps_star_sweep <- eps_star_sweep %>% 
+  mutate(rel_thresh = abs(d_inac) - abs(avg_d_delta))
+
+ggplot(eps_star_sweep, aes(x = beta, y = epsilon, fill = rel_thresh)) +
+  geom_tile() +
+  theme_ctokita()
 
 ####################
 # Plot analytical "heatmap" equivalent figure
