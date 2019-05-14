@@ -54,9 +54,21 @@ for (sub_dir in sub_dirs) {
 
 # Break up parameter replications into smaller batches\
 chunk_run  <- 1:(reps / chunk_size)
-run_in_parallel <- expand.grid(beta = betas, run = chunk_run)
+run_in_parallel <- expand.grid(beta =  round(betas, digits = 3), run = chunk_run) #rounding to make sure numbers are what they appear
 run_in_parallel <- run_in_parallel %>% 
   arrange(beta)
+
+# Read files already simulated and filter out of needed parameters
+already_ran <- list.files(path = paste0(full_path, "/Entropy/"))
+ran_files <- lapply(already_ran, function(f) {
+  beta_val <- as.numeric(gsub("([\\.0-9]+)-[0-9]+\\.Rdata", "\\1", x = f, perl = TRUE))
+  chunk_num <- as.numeric(gsub("[\\.0-9]+-([0-9]+)\\.Rdata", "\\1", x = f, perl = TRUE))
+  to_return <- data.frame(beta = beta_val, run = chunk_num)
+  return(to_return)
+})
+ran_files <- do.call('rbind', ran_files)
+run_in_parallel <- run_in_parallel %>% 
+  anti_join(ran_files)
 
 # Prepare for parallel
 no_cores <- detectCores()
