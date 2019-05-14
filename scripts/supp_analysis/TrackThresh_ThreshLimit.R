@@ -28,11 +28,11 @@ InitialStim    <- rep(0, m) #intital vector of stimuli
 deltas         <- rep(0.8, m) #vector of stimuli increase rates  
 alpha          <- m #efficiency of task performance
 quitP          <- 0.2 #probability of quitting task once active
-thresh_max     <- Inf
+thresh_max     <- 100
 
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
-epsilon        <- 0.4 #relative weighting of social interactions for adjusting thresholds
+epsilon        <- 0.55 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
@@ -177,5 +177,5 @@ thresh_time <- thresh_time %>%
   mutate(t = 1:nrow(.)) %>% 
   gather(., Id, Threshold, -t)
 
-save(thresh_time, file = paste0("output/ThresholdTime/ThresholdLimits/ThreshMax-", thresh_max, ".Rdata"))
+save(thresh_time, file = paste0("output/ThresholdTime/ThresholdLimits/ThreshMax-", thresh_max, "_Eps", epsilon, ".Rdata"))
 
