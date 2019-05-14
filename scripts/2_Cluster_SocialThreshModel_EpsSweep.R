@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 n              <- 80 #group size
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+gens           <- 500000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
@@ -43,7 +43,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Beta", beta, "_EpsSweep-NoThreshLimit") #CHANGE THRESH LIMIT
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Beta", beta, "_EpsSweep-NoThreshLimit-LongRun") #CHANGE THRESH LIMIT, RUN TIME
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
