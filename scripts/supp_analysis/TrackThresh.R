@@ -174,37 +174,46 @@ for (i in 1:length(Ns)) {
 thresh_time1 <- do.call('rbind', thresh1time)
 thresh_time1 <- as.data.frame(thresh_time1)
 thresh_time1 <- thresh_time1 %>% 
-  mutate(t = 1:nrow(.)) %>% 
+  mutate(t = 0:(nrow(.)-1)) %>% 
   gather(., Id, Threshold, -t)
 
 thresh_time2 <- do.call('rbind', thresh2time)
 thresh_time2 <- as.data.frame(thresh_time2)
 thresh_time2 <- thresh_time2 %>% 
-  mutate(t = 1:nrow(.)) %>% 
+  mutate(t = 0:(nrow(.)-1)) %>% 
   gather(., Id, Threshold, -t)
+
+#Save
+save(thresh_time1, thresh_time2, file = paste0("output/ThresholdTime/Examples/n", n, "-eps", epsilon, "-beta", beta, ".Rdata"))
+
+####################
+# Analuyze data
+####################
+# Load
+load('output/ThresholdTime/Examples/n80-eps0.1-beta1.03.Rdata')
 
 # Plot time series
 gg_threshtime <- ggplot(thresh_time1, aes(x = t, y = Threshold, group = Id)) +
   geom_line(size = 0.1, alpha = 0.1, colour = "#1f78b4") +
   scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
-                     breaks = seq(0, 50000, 10000),
+                     breaks = c(1, seq(10000, 50000, 10000)),
                      labels = c("0", "", "", "", "", "50,000"),
                      expand = c(0, 0)) +
   scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
                      limits = c(0, 100),
                      breaks = seq(0, 100, 50)) +
   theme_ctokita() +
-  theme(#axis.title.y = element_blank(),
+  theme(axis.title = element_blank(),
     axis.text.x = element_text(hjust = 0.7))
 gg_threshtime
 
 ggsave(gg_threshtime, filename = paste0("output/ThresholdTime/Examples/TimeSeries_n", n, "-beta", beta, "-epsilon", epsilon, ".png"), 
-                                        width = 30, height = 45, units = "mm", dpi = 400)
+                                        width = 30, height = 23, units = "mm", dpi = 400)
 
 # Plot histogram
 thresh_data <- as.data.frame(threshMat)
 gg_threshdist <- ggplot(data = thresh_data, aes(x = Thresh1)) +
-  geom_bar() +
+  geom_histogram(binwidth = 5) +
   theme_ctokita() +
   coord_flip()
 gg_threshdist

@@ -9,4 +9,4 @@
 #SBATCH --mail-user=ctokita@princeton.edu
 
 cd SocialInteractionModel/
-Rscript scripts/2_Cluster_SocialThreshModel_EpsSweep.R
+Rscript scripts/2_Cluster_SocialThreshModel_EpsSweep-NoThreshLim.R

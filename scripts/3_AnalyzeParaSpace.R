@@ -435,10 +435,12 @@ ggsave(gg_betaeps, file = "output/ParameterSpace/Plots/svg/BetaEpsSweep_n80_larg
 gg_betaeps_all <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean, colour = Dind_mean)) +
   geom_tile() +
   theme_bw() +
-  scale_x_continuous(breaks = seq(0.75, 1.25, 0.25), 
-                     expand = c(0,0)) +
-  scale_y_continuous(breaks = seq(-0.6, 0.6, 0.6), 
-                     expand = c(0,0)) +
+  scale_x_continuous(breaks = seq(0.75, 1.25, 0.05), 
+                     expand = c(0,0),
+                     labels = c("0.75", rep("", length(seq(0.75, 1, 0.05))-2), "1.00",rep("", length(seq(0.75, 1, 0.05))-2), "1.25")) +
+  scale_y_continuous(breaks = seq(-0.6, 0.6, 0.1), 
+                     expand = c(0,0),
+                     labels = c("-0.6", rep("", length(seq(-0.6, 0, 0.1))-2), "0.0", rep("", length(seq(-0.6, 0, 0.1))-2), "0.6")) +
   scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
@@ -460,5 +462,5 @@ gg_betaeps_all <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_
   geom_hline(yintercept = 0, size = 0.3, linetype = "dotted")
 gg_betaeps_all
 
-ggsave(gg_betaeps_all, file = "output/ParameterSpace/Plots/BetaEpsSweep_n80_allcombos.png", height = 45, width = 45, units = "mm", dpi = 400)
-ggsave(gg_betaeps_all, file = "output/ParameterSpace/Plots/svg/BetaEpsSweep_n80_allcombos.svg", height = 45, width = 45, units = "mm")
+# ggsave(gg_betaeps_all, file = "output/ParameterSpace/Plots/BetaEpsSweep_n80_allcombos.png", height = 45, width = 45, units = "mm", dpi = 400)
+ggsave(gg_betaeps_all, file = "output/ParameterSpace/Plots/svg/BetaEpsSweep_n80_allcombos.svg", height = 75, width = 75, units = "mm")
