@@ -33,7 +33,7 @@ thresh_max     <- 100
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-beta           <- 1.03 #probability of interacting with individual in same state relative to others
+beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
 
 ####################
@@ -184,13 +184,13 @@ thresh_time2 <- thresh_time2 %>%
   gather(., Id, Threshold, -t)
 
 #Save
-save(thresh_time1, thresh_time2, file = paste0("output/ThresholdTime/Examples/n", n, "-eps", epsilon, "-beta", beta, ".Rdata"))
+save(thresh_time1, thresh_time2, X_tot, file = paste0("output/ThresholdTime/Examples/n", n, "-eps", epsilon, "-beta", beta, ".Rdata"))
 
 ####################
 # Analuyze data
 ####################
 # Load
-load('output/ThresholdTime/Examples/n80-eps0.1-beta1.03.Rdata')
+load('output/ThresholdTime/Examples/n80-eps0.1-beta1.1.Rdata')
 
 # Plot time series
 gg_threshtime <- ggplot(thresh_time1, aes(x = t, y = Threshold, group = Id)) +
@@ -208,12 +208,18 @@ gg_threshtime <- ggplot(thresh_time1, aes(x = t, y = Threshold, group = Id)) +
 gg_threshtime
 
 ggsave(gg_threshtime, filename = paste0("output/ThresholdTime/Examples/TimeSeries_n", n, "-beta", beta, "-epsilon", epsilon, ".png"), 
-                                        width = 30, height = 23, units = "mm", dpi = 400)
+                                        width = 31, height = 19.5, units = "mm", dpi = 400)
 
-# Plot histogram
-thresh_data <- as.data.frame(threshMat)
-gg_threshdist <- ggplot(data = thresh_data, aes(x = Thresh1)) +
-  geom_histogram(binwidth = 5) +
+# Plot histogram of task performance
+task_data <- as.data.frame(X_tot) / gens
+task_data$bias <- task_data$Task2 - task_data$Task1
+gg_taskdist <- ggplot(data = task_data, aes(x = Task1)) +
+  geom_histogram(bins = 25, size = 0.2, color = "white", fill = "#1f78b4") +
   theme_ctokita() +
-  coord_flip()
-gg_threshdist
+  scale_y_continuous(breaks = seq(0, 40, 20)) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(hjust = 0.7))
+gg_taskdist
+
+ggsave(gg_taskdist, filename = paste0("output/ThresholdTime/Examples/TaskDist_n", n, "-beta", beta, "-epsilon", epsilon, ".svg"), 
+       width = 30.5, height = 19.5, units = "mm", dpi = 400)
