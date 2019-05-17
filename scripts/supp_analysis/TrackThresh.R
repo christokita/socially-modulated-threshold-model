@@ -35,7 +35,7 @@ p              <- 1 #baseline probablity of initiating an interaction per time s
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
-set.seed(90041)
+set.seed(08540)
 
 ####################
 # Run ensemble simulation
@@ -217,7 +217,8 @@ task_data$bias <- task_data$Task2 - task_data$Task1
 gg_taskdist <- ggplot(data = task_data, aes(x = Task1)) +
   geom_histogram(bins = 25, size = 0.2, color = "white", fill = "#1f78b4") +
   theme_ctokita() +
-  scale_y_continuous(breaks = seq(0, 40, 20)) +
+  scale_y_continuous(breaks = seq(0, 40, 20),
+                     limits = c(0, 40)) +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(hjust = 0.7))
 gg_taskdist
