@@ -35,6 +35,7 @@ p              <- 1 #baseline probablity of initiating an interaction per time s
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
 beta           <- 1.1 #probability of interacting with individual in same state relative to others
 
+set.seed(90041)
 
 ####################
 # Run ensemble simulation
