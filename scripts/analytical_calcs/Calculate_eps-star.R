@@ -133,8 +133,8 @@ theta1_inac <- function(n_1, n_2, n, beta, delta) { (E02(n_2, n, beta) - E01(n_1
 n <- 80
 m <- 2
 a <- m
-betas <- seq(1, 1.25, 0.01)
-epsilons <- seq(0, 0.8, 0.01)
+betas <- seq(1, 1.25, 0.1)
+epsilons <- seq(0, 0.8, 0.05)
 delta <- 0.8
 
 eps_star_sweep <- lapply(epsilons, function(epsilon) {
@@ -142,14 +142,12 @@ eps_star_sweep <- lapply(epsilons, function(epsilon) {
     # set n difference
     n_1 <- delta/m*n  + 1
     n_2 <- delta/m*n - 1
-    # n_1_diff <- n_1_equal + 1
-    # n_2_diff <- n_1_equal - 1
     # Calculate expected threshold change per individual
     d_theta1 <- theta1(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
     d_theta2 <- theta1(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
     d_inac <- theta1_inac(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
     # Calculate average threshold change
-    avg_d_theta <- delta/2*d_theta1 + delta/2*d_theta1 + (1-delta)*d_inac
+    avg_d_theta <- delta/2*d_theta1 - delta/2*d_theta2 + (1-delta)*d_inac
     # Calculate delta change
     d_delta1 <- delta - m * n_1/n
     d_delta2 <- delta - m * n_2/n
@@ -168,14 +166,10 @@ eps_star_sweep <- lapply(epsilons, function(epsilon) {
   eps_star_beta <- do.call('rbind', eps_star_beta) %>% 
     mutate(epsilon = epsilon)
 })
-eps_star_sweep <- do.call('rbind', eps_star_sweep)
 
-eps_star_sweep <- eps_star_sweep %>% 
-  mutate(rel_thresh = abs(d_inac) - abs(avg_d_delta))
 
-ggplot(eps_star_sweep, aes(x = beta, y = epsilon, fill = rel_thresh)) +
-  geom_tile() +
-  theme_ctokita()
+
+
 
 ####################
 # Plot analytical "heatmap" equivalent figure

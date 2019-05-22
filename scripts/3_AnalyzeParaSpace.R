@@ -69,6 +69,7 @@ for (bias in c("Homophily", "Heterophily")) {
 }
 
 # Analytical results for group size above which full DOL should emerge (n*)
+# Not accounting for double interact
 analytical_data <- data.frame(beta = seq(1.001, 1.255, 0.0001), n = rep(NA, length(seq(1.001, 1.255, 0.0001))))
 for (i in 1:nrow(analytical_data)) {
   analytical_data[i, 2] <- (2 * analytical_data[i, 1]) / (0.8 * (analytical_data[i, 1] - 1))
@@ -157,12 +158,14 @@ for (bias in c("Homophily", "Heterophily")) {
 }
 
 # Analytical results for group size above which full DOL should emerge (n*)
+# Not accounting for double interact
 analytical_data <- data.frame(beta = seq(1.001, 1.255, 0.0001), n = rep(NA, length(seq(1.001, 1.255, 0.0001))))
 for (i in 1:nrow(analytical_data)) {
   analytical_data[i, 2] <- (2 * analytical_data[i, 1]) / (0.8 * (analytical_data[i, 1] - 1))
 }
 analytical_data <- analytical_data %>% 
   filter(n < 102.5)
+
 
 # As one plot
 gg_beta_all <- ggplot() +
