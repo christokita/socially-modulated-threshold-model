@@ -43,79 +43,86 @@ for (i in 1:nrow(eps_star)) {
   eps_11 <- delta / E_11
   eps_star$epsilon_inac[i] <- eps_01
   eps_star$epsilon_ac[i] <- eps_11
-  eps_star$epsilon_all[i] <- delta / E_01
+  eps_star$epsilon_all[i] <- delta / (tau/(1+tau) * E_01 + 1/(1+tau) * E_11)
 }
 eps_star$epsilon_all[eps_star$beta == 1.02]
 
 ggplot(data = eps_star, aes(x = beta)) +
   geom_line(aes(y = epsilon_all)) +
+  geom_line(aes(y = epsilon_inac), color = "lightblue") +
   geom_line(aes(y = epsilon_ac), color = "grey80") +
   theme_ctokita()
 
 save(eps_star, beta_star, file = "output/AnalyticalResults/EpsStar-BetaStar_Calc.Rdata")
 
-
 ####################
 # calculate epsilon* and beta* for n = 80 with infinite threshold limit (Method 2)
 ####################
-# Calculate epsilon* for absolute loss of DOL (test?)
+n <- 80
+delta <- 0.8
+alpha <- 2
+tau <- 0.2
+beta <- 1.1
+epsilon <- 0.55
+fracs_n1 <- seq(0, 0.8, 0.01)
 
 # Establish formulas
-E01 <- function(n_1, n, beta) { n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
-E02 <- function(n_2, n, beta) { n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
+E01 <- function(n_1, n, beta) { n_1 / n +  n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
+E02 <- function(n_2, n, beta) { n_2 / n +  n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
+
 E11 <- function(n_1, n, beta) { 2 * beta * (n_1 - 1) / (beta * (n_1 - 1) + (n - n_1)) }
 E22 <- function(n_2, n, beta) { 2 * beta * (n_2 - 1) / (beta * (n_2 - 1) + (n - n_2)) }
+
 E12 <- function(n_1, n_2, n, beta) { n_2 / (beta * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
-E21 <- function(n_1, n_2, n, beta) { n_1 / (beta * (n_2 - 1) + (n - n_1)) + n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
+E21 <- function(n_1, n_2, n, beta) { n_1 / (beta * (n_2 - 1) + (n - n_2)) + n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
 
-theta1 <- function(n_1, n_2, n, beta, delta) { delta * (E12(n_1, n_2, n, beta) - E11(n_1, n, beta)) + (1 - delta) * (E02(n_2, n, beta) - E01(n_1, n, beta)) }
-theta2 <- function(n_1, n_2, n, beta, delta) { delta * (E21(n_1, n_2, n, beta) - E22(n_2, n, beta)) + (1 - delta) * (E01(n_1, n, beta) - E02(n_2, n, beta)) }
-theta1_inac <- function(n_1, n_2, n, beta, delta) { (E02(n_2, n, beta) - E01(n_1, n, beta)) }
+theta1 <- function(n_1, n_2, n, beta, tau) { (1/(1+tau)) * (E12(n_1, n_2, n, beta) - E11(n_1, n, beta)) + (tau/(1+tau)) * (E02(n_2, n, beta) - E01(n_1, n, beta)) }
+theta2 <- function(n_1, n_2, n, beta, tau) { (1/(1+tau)) * (E21(n_1, n_2, n, beta) - E22(n_2, n, beta)) + (tau/(1+tau)) * (E01(n_1, n, beta) - E02(n_2, n, beta)) }
+theta1_inac <- function(n_1, n_2, n, beta) { (E02(n_2, n, beta) - E01(n_1, n, beta)) }
 
-# Sweep by beta, keeping n fixed
-Ns <- seq(30, 100, 1)
-m <- 2
-a <- m
-betas <- seq(1, 1.25, 0.01)
-epsilons <- seq(0, 0.8, 0.01)
-delta <- 0.8
-
-eps_star_sweep <- lapply(Ns, function(n) {
-  eps_star_beta <- lapply(betas, function(beta) {
-    # set n difference
-    n_1_equal <- delta/m*n 
-    n_2_equal <- n_1_equal
-    n_1_diff <- n_1_equal + 1
-    n_2_diff <- n_1_equal - 1
-    # Calculate expected threshold change per individual
-    # change0 <- theta1(n_1 = n_1_equal, n_2 = n_2_equal, n = n, beta = beta, delta = delta)
-    # change1 <- theta1(n_1 = n_1_diff, n_2 = n_2_diff, n = n, beta = beta, delta = delta)
-    change0 <- theta1_inac(n_1 = n_1_equal, n_2 = n_2_equal, n = n, beta = beta, delta = delta)
-    change1 <- theta1_inac(n_1 = n_1_diff, n_2 = n_2_diff, n = n, beta = beta, delta = delta)
-    theta_diff <- change1 - change0
-    # Calculate expected delta change per individual
-    delta_diff <- -a / n
-    # Return
-    to_return <- data.frame(beta = beta, 
-                            theta_diff = theta_diff,
-                            delta_diff,
-                            eps_star = delta_diff / theta_diff)
-    return(to_return)
-  })
-  eps_star_beta <- do.call('rbind', eps_star_beta) %>% 
-    mutate(n = n)
+# Calculate
+delta_eps <- lapply(fracs_n1, function(fraction) {
+  # set numbers
+  n1 <- n * fraction
+  n2 <- n * (0.8 - fraction)
+  # Calcualte deltas
+  delta1 <- delta - (alpha * fraction)
+  delta2 <- delta - (alpha * (0.8 - fraction))
+  # Calculate threhsold changes
+  E_theta1 <- epsilon * theta1(n_1 = n1, n_2 = n2, n = n, beta = beta, tau = tau)
+  E_theta2 <- epsilon * theta2(n_1 = n1, n_2 = n2, n = n, beta = beta, tau = tau)
+  E_theta1inac <- epsilon * theta1_inac(n_1 = n1, n_2 = n2, n = n, beta = beta)
+  # Return
+  to_return <- data.frame(frac_n1 = fraction,
+                          delta1 = delta1, 
+                          delta2 = delta2,
+                          E_theta1 = E_theta1,
+                          E_theta2 = E_theta2,
+                          E_theta1inac = E_theta1inac,
+                          Diff1 = abs(E_theta1) - abs(delta1),
+                          Diff2 = E_theta2 - delta2)
 })
-eps_star_sweep <- do.call('rbind', eps_star_sweep)
+delta_eps <- do.call('rbind', delta_eps)
 
-ggplot(eps_star_sweep, aes(y = beta, x = n, fill = eps_star)) +
-  geom_tile() +
+gg_deltaeps <- ggplot(data = delta_eps, aes(x = frac_n1)) +
+  geom_hline(yintercept = 0, size = 0.3) +
+  geom_vline(xintercept = 0.4, size = 0.3) +
+  geom_line(aes(y = delta1), linetype = "dotted", color = "#1f78b4") +
+  # geom_line(aes(y = delta2), linetype = "dotted", color = "#e31a1c") +
+  geom_line(aes(y = E_theta1), color = "#1f78b4") +
+  # geom_line(aes(y = E_theta2), color = "#e31a1c") +
+  # geom_line(aes(y = E_theta1inac), color = "#a6cee3") +
+  geom_line(aes(y = Diff1), linetype = "dashed", color = "#1f78b4") +
+  # geom_line(aes(y = Diff2), linetype = "dashed", color = "#e31a1c") +
   theme_ctokita()
 
+gg_deltaeps
 
 ####################
 # calculate epsilon* and beta* for n = 80 with infinite threshold limit (Method 3)
 ####################
 # Calculate epsilon* for absolute loss of DOL (test?)
+
 # Establish formulas
 E01 <- function(n_1, n, beta) { n_1 / (n_1 + (n - n_1)) +  n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
 E02 <- function(n_2, n, beta) { n_2 / (n_2 + (n - n_2)) +  n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
@@ -124,140 +131,8 @@ E22 <- function(n_2, n, beta) { 2 * beta * (n_2 - 1) / (beta * (n_2 - 1) + (n - 
 E12 <- function(n_1, n_2, n, beta) { n_2 / (beta * (n_1 - 1) + (n - n_1)) + n_2 * ( (1) / (beta * (n_2 - 1) + (n - n_2)) ) }
 E21 <- function(n_1, n_2, n, beta) { n_1 / (beta * (n_2 - 1) + (n - n_1)) + n_1 * ( (1) / (beta * (n_1 - 1) + (n - n_1)) ) }
 
-theta1 <- function(n_1, n_2, n, beta, delta) { delta * (E12(n_1, n_2, n, beta) - E11(n_1, n, beta)) + (1 - delta) * (E02(n_2, n, beta) - E01(n_1, n, beta)) }
-theta2 <- function(n_1, n_2, n, beta, delta) { delta * (E21(n_1, n_2, n, beta) - E22(n_2, n, beta)) + (1 - delta) * (E01(n_1, n, beta) - E02(n_2, n, beta)) }
+theta1 <- function(n_1, n_2, n, beta, delta) { (1/(1+tau)) * (E12(n_1, n_2, n, beta) - E11(n_1, n, beta)) + (tau/(1+tau)) * (E02(n_2, n, beta) - E01(n_1, n, beta)) }
+theta2 <- function(n_1, n_2, n, beta, delta) { (1/(1+tau)) * (E21(n_1, n_2, n, beta) - E22(n_2, n, beta)) + (tau/(1+tau)) * (E01(n_1, n, beta) - E02(n_2, n, beta)) }
 theta1_inac <- function(n_1, n_2, n, beta, delta) { (E02(n_2, n, beta) - E01(n_1, n, beta)) }
 
-# Sweep by beta, keeping n fixed
-# Ns <- seq(30, 100, 1)
-n <- 80
-m <- 2
-a <- m
-betas <- seq(1, 1.25, 0.1)
-epsilons <- seq(0, 0.8, 0.05)
-delta <- 0.8
 
-eps_star_sweep <- lapply(epsilons, function(epsilon) {
-  eps_star_beta <- lapply(betas, function(beta) {
-    # set n difference
-    n_1 <- delta/m*n  + 1
-    n_2 <- delta/m*n - 1
-    # Calculate expected threshold change per individual
-    d_theta1 <- theta1(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
-    d_theta2 <- theta1(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
-    d_inac <- theta1_inac(n_1 = n_1, n_2 = n_2, n = n, beta = beta, delta = delta)
-    # Calculate average threshold change
-    avg_d_theta <- delta/2*d_theta1 - delta/2*d_theta2 + (1-delta)*d_inac
-    # Calculate delta change
-    d_delta1 <- delta - m * n_1/n
-    d_delta2 <- delta - m * n_2/n
-    avg_d_delta <- (d_delta1 + d_delta2) / 2
-    # Return
-    to_return <- data.frame(beta = beta, 
-                            d_theta1 = d_theta1 * epsilon,
-                            d_theta2 = d_theta2 * epsilon,
-                            d_inac = d_inac * epsilon,
-                            d_delta1 =  d_delta1,
-                            d_delta2 =  d_delta2,
-                            avg_d_theta = avg_d_theta * epsilon,
-                            avg_d_delta = avg_d_delta)
-    return(to_return)
-  })
-  eps_star_beta <- do.call('rbind', eps_star_beta) %>% 
-    mutate(epsilon = epsilon)
-})
-
-
-
-
-
-####################
-# Plot analytical "heatmap" equivalent figure
-####################
-
-# Corner points for epsilon* polygon
-eps_corner1 <- data.frame(beta = 1, 
-                            epsilon_inac = NA, 
-                            epsilon_ac = NA,
-                            epsilon_all = 0.60)
-eps_corner2 <- data.frame(beta = 1.25, 
-                            epsilon_inac = NA, 
-                            epsilon_ac = NA,
-                            epsilon_all = 0.60)
-eps_poly <- eps_corner1 %>% 
-  rbind(eps_star) %>% 
-  rbind(eps_corner2)
-eps_poly$DOL <- 0
-
-# Polygon for zero DOL near zero epsilon
-eps_low_poly <- data.frame(beta = c(1, 1, 1.25, 1.25), 
-                           epsilon_inac = NA, 
-                           epsilon_ac = NA,
-                           epsilon_all = c(0, zero_corner, zero_corner, 0),
-                           DOL = 0)
-
-# Coner points for beta* points
-beta_corner1 <- data.frame(epsilon = 0,
-                           beta = 1)
-beta_corner2 <- data.frame(epsilon = 0.60,
-                           beta = 1)
-beta_poly <- beta_corner1 %>% 
-  rbind(beta_star) %>% 
-  rbind(beta_corner2) %>% 
-  mutate(Id = "BetaStar")
-beta_poly$DOL <- 0
-
-# DOL polygon
-DOL_poly <- data.frame(beta = c(unique(beta_star$beta),
-                                eps_star$beta[eps_star$beta >= unique(beta_star$beta)],
-                                1.25),
-                       epsilon = c(0, eps_star$epsilon_all[eps_star$beta >= unique(beta_star$beta)], 0))
-DOL_poly$DOL <- 1
-
-# Filter epsilon* and beta* lines 
-intersection_point <- max(eps_star$epsilon_all[eps_star$beta <= beta_star_value])
-eps_star_out <- eps_star %>% 
-  filter(beta < beta_star_value)
-eps_star_in <- eps_star %>% 
-  filter(beta >= beta_star_value)
-beta_star_out <- beta_star %>%
-  filter(epsilon > intersection_point)
-beta_star_in <- beta_star %>%
-  filter(epsilon <= intersection_point)
-
-# Plot
-pal <- brewer_pal("seq", "GnBu")
-pal <- pal(9)
-
-gg_analytical_betaeps <- ggplot() +
-  geom_polygon(data = eps_poly, aes(x = beta, y = epsilon_all, fill = DOL)) +
-  geom_polygon(data = beta_poly, aes(x = beta, y = epsilon, fill = DOL)) +
-  geom_polygon(data = DOL_poly, aes(x = beta, y = epsilon, fill = DOL)) +
-  # geom_polygon(data = eps_low_poly, aes(x = beta, y = epsilon_all, fill = DOL)) +
-  geom_line(data = beta_star, aes(x = beta, y = epsilon), size = 0.3, linetype = "dashed") +
-  geom_line(data = eps_star, aes(x = beta, y = epsilon_all), size = 0.3) +
-  geom_line(data = eps_star_absolute, aes(x = beta, y = epsilon_all), size = 0.3, linetype = "dotted") +
-  # geom_hline(yintercept = zero_corner, size = 0.3) +
-  # geom_line(data = beta_star_out, aes(x = beta, y = epsilon), size = 0.6, linetype = "dotted") +
-  # geom_line(data = beta_star_in, aes(x = beta, y = epsilon), size = 0.6) +
-  # geom_line(data = eps_star_out, aes(x = beta, y = epsilon_all), size = 0.6, linetype = "dotted") +
-  # geom_line(data = eps_star_in, aes(x = beta, y = epsilon_all), size = 0.6) +
-  scale_x_continuous(breaks = seq(1, 1.25, 0.05), expand = c(0, 0)) +
-  # scale_y_continuous(limits = c(0, 0.6), breaks = seq(0, 0.6, 0.1), expand = c(0, 0)) +
-  scale_fill_gradientn(colours = pal, name = "Behavioral\nspecialization",
-                       limits = c(0, 1)) +
-  xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
-  ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        aspect.ratio = 1,
-        axis.text = element_text(color = "black", size = 6),
-        axis.title = element_text(size = 7),
-        axis.ticks = element_line(size = 0.3, color = "black"),
-        panel.border = element_rect(colour = "black", fill = NA, size = 0.3),
-        legend.position = "none")
-gg_analytical_betaeps
-
-ggsave(gg_analytical_betaeps, file ="output/AnalyticalResults/BetaEps_AnalyticalSpace.png", width = 45, height = 45, units = "mm", dpi = 300)
-ggsave(gg_analytical_betaeps, file ="output/AnalyticalResults/BetaEps_AnalyticalSpace.svg", width = 45, height = 45, units = "mm")
