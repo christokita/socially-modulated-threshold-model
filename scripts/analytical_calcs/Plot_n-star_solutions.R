@@ -6,7 +6,7 @@
 rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
-betas <- seq(1, 2, 0.001)
+betas <- seq(1, 1.25, 0.0001)
 delta <- 0.8
 
 nstar <- lapply(betas, function(beta) {
@@ -26,7 +26,7 @@ gg_nstar_comp <- ggplot(nstar_melt, aes(x = beta, group = variable, color = vari
   geom_line(aes(y = value), size = 0.3) +
   ylab("n*") +
   xlab(expression(paste("Interaction bias (", beta, ")"))) +
-  scale_y_continuous(limits = c(0, 30)) +
+  scale_y_continuous(limits = c(0, 80)) +
   scale_color_manual(name = "Solution", values = c("#0d75ff", "#d60036"), labels = c("Simplified", "Full")) +
   theme_ctokita() +
   theme(aspect.ratio = 1,
