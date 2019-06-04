@@ -12,6 +12,72 @@ rm(list = ls())
 source("scripts/util/__Util__MASTER.R")
 
 
+# ------------------------------ DOL by epsilon - LONG RUN----------------------
+####################
+# Load and process data
+####################
+load('output/Rdata/_ProcessedData/Entropy/Sigma0-Beta1.1_EpsSweep-NoThreshLimit-LongRun.Rdata')
+high_thresh <- compiled_data %>% 
+  mutate(Model = "high_thresh") %>% 
+  group_by(Model, epsilon, beta) %>% 
+  summarise(Mean = mean(Dind),
+            SD = sd(Dind)) %>% 
+  as.data.frame() %>% 
+  mutate(epsilon = round(epsilon, digits = 3))
+
+
+load('output/Rdata/_ProcessedData/Entropy/Sigma0-Beta1.1_EpsSweep-LongRun.Rdata')
+normal_thresh <- compiled_data %>% 
+  mutate(Model = "normal_thresh") %>% 
+  group_by(Model, epsilon, beta) %>% 
+  summarise(Mean = mean(Dind),
+            SD = sd(Dind)) %>% 
+  as.data.frame() %>% 
+  mutate(epsilon = round(epsilon, digits = 3))
+
+entropy_data <- rbind(high_thresh, normal_thresh)
+
+
+####################
+# Plot entropy plots
+####################
+gg_comp_long <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color = Model)) +
+  # geom_vline(xintercept = 0.5659957, size = 0.3, linetype = "dashed") + #analytical result for epsilon* 
+  geom_vline(xintercept = 0.4969125, size = 0.3, linetype = "dashed", color = "grey40") + #analytical result for epsilon*
+  geom_vline(xintercept = 0, size = 0.3, linetype = "dashed", color = "grey40") + #analytical result for epsilon*
+  geom_errorbar(aes(ymin = ifelse((Mean - SD) > 0, Mean - SD, 0), ymax = Mean + SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(aes(y = Mean),
+             size = 0.8) +
+  theme_classic() +
+  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  scale_color_manual(name = "Thresh. limits",
+                     values = c("#a6cee3", "#1f78b4"),
+                     labels = c(expression(paste("[0, ", infinity, ")")), "[0, 100]")) +
+  # ggtitle(expression(paste(italic(epsilon), "= 0.4, ", italic(beta), "= 1.1"))) +
+  scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
+  theme(title = element_text(size = 6),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(size = 7, face = "italic"),
+        legend.position = c(0.3, 0.2),
+        legend.title = element_text(size = 6, 
+                                    face = "bold", 
+                                    hjust = 5),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(2, "mm"),
+        legend.key.width = unit(3, "mm"),
+        legend.background = element_blank(),
+        axis.ticks = element_line(size = 0.3, color = "black"),
+        axis.line = element_line(size = 0.3, color = "black"),
+        aspect.ratio = 1)
+gg_comp_long
+
+ggsave(gg_comp_long, file = "output/SpecializationPlots/ThresholdLimitComparison_long.png", height = 45, width = 45, units = "mm")
+ggsave(gg_comp_long, file = "output/SpecializationPlots/ThresholdLimitComparison_long.svg", height = 45, width = 45, units = "mm")
+
+
 # ------------------------------ DOL by epsilon----------------------
 ####################
 # Load and process data
@@ -77,8 +143,6 @@ gg_comp
 
 ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.png", height = 45, width = 45, units = "mm")
 ggsave(gg_comp, file = "output/SpecializationPlots/ThresholdLimitComparison.svg", height = 45, width = 45, units = "mm")
-
-
 
 
 # ------------------------------ DOL by beta----------------------
