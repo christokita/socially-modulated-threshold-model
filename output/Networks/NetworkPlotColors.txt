@@ -1,0 +1,5 @@
+color codes for network figures from socially-modulated threshold model
+
+Thresh bias - 100: #0571b0
+Threshd bias 0:#E3E3E6
+thresh bias 100:#ca0020
