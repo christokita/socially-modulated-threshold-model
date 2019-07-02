@@ -107,14 +107,11 @@ for (i in 1:length(Ns)) {
     # Run simulation
     for (t in 1:gens) {
       # Update stimuli
-      for (j in 1:ncol(stimMat)) {
-        # update stim
-        stimMat[t + 1, j] <- globalStimUpdate(stimulus = stimMat[t, j],
-                                              delta = deltas[j], 
-                                              alpha = alpha, 
-                                              Ni = sum(X_g[ , j]), 
-                                              n = n)
-      }
+      stimMat <- update_stim(stim_matrix = stimMat, 
+                             deltas = deltas, 
+                             alpha = alpha, 
+                             state_matrix = X_g, 
+                             time_step = t)
       # Calculate task demand based on global stimuli
       P_g <- calcThresholdDetermMat(TimeStep = t + 1, # first row is generation 0
                                     ThresholdMatrix = threshMat, 
