@@ -17,7 +17,7 @@ seed_stimuls <- function(intitial_stim, gens) {
                  nrow = (gens + 1))
   # Fix Names
   colnames(stim) <- paste0(rep("s", length(intitial_stim)), 1:length(intitial_stim))
-  rownames(stim) <- paste0("Gen", 0:gens)
+  rownames(stim) <- paste0("t", 0:gens)
   # Return
   return(stim)
 }
@@ -35,6 +35,6 @@ update_stim <- function(stim_matrix, deltas, alpha, state_matrix, time_step) {
   new_values <- stim_values + deltas - (alpha * (active_count/ n))
   new_values[new_values < 0] <- 0
   # Insert
-  stim_matrix[time_step + 1, ] <- new_values
+  stim_matrix[time_step + 1, ] <- new_values #inserts stimulus into current time step (stimMat starts with row 1 = time step 0)
   return(stim_matrix)
 }
