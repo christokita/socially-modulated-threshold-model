@@ -327,6 +327,122 @@ ggsave(gg_assort, filename = "Output/Networks/NetworkMetrics/AssortmentCoeff.svg
        height = 46, width = 46, units = "mm")
 
 
+
+##########################################################
+# Clustering
+##########################################################
+library(igraph)
+library(tnet)
+
+runs <- c("Sigma0.05-Epsilon0-Beta1.1",
+          "Sigma0-Epsilon0.1-Beta1.1")
+run_names <- c("Fixed", "Social")
+
+###################
+# Clustering coeff based on interactions above ranom  = 1 and all else  = 0
+###################
+# Note: tried normal clustering coeff before
+
+network_clust <- lapply(1:length(runs), function(run) {
+  print(runs[run])
+  # Load social networks
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Graphs/", runs[run], "/"), full.names = TRUE)
+  soc_networks <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    soc_networks[[file]] <- listed_data
+  }
+  # Load threshold matrices
+  files <- list.files(paste0("output/Rdata/_ProcessedData/Thresh/", runs[run], "/"), full.names = TRUE)
+  thresh_data <- list()
+  for (file in 1:length(files)) {
+    load(files[file])
+    thresh_data[[file]] <- listed_data
+  }
+  # Loop through individual graphs
+  interaction_info <- lapply(1:length(soc_networks), function(i) {
+    print(i * 5)
+    # Get graphs
+    graphs <- soc_networks[[i]]
+    replicates <- length(graphs)
+    # For each each compute interaction matrix
+    # Get graph and make adjacency matrix
+    size_graph <- lapply(1:length(graphs), function(j) {
+      # Get graph and calculate baseline probability of interaction
+      this_graph <- graphs[[j]]
+      diag(this_graph) <- 0
+      #Calculate baseline probability of interaction
+      # dimensions <- dim(this_graph)
+      # not_chosen <- 1 - (( 1 / (dimensions[1] - 1)))
+      # expected_random <-  1 - not_chosen^2
+      # # make all interactions above random = 1
+      # this_graph[this_graph > expected_random] <- 1
+      # this_graph[this_graph <= expected_random] <- 0
+      # g <- graph_from_adjacency_matrix(this_graph)
+      # # Calculate clustering
+      # clust <- transitivity(graph = g, type = "global")
+      # to_return <- data.frame(n = nrow(this_graph), ClusterCoeff = clust)
+      
+      # using Opsahl 2009 method
+      g <- graph_from_adjacency_matrix(this_graph, weighted = T)
+      e_list <- as.data.frame(get.edgelist(g))
+      e_list <- e_list %>% 
+        mutate(V1 = as.character(V1),
+               V2 = as.character(V2)) %>% 
+        mutate(V1 = as.numeric(gsub("v-", "", V1)),
+               V2 = as.numeric(gsub("v-", "", V2)))
+      e_list$weight <- E(g)$weight
+      clust <- clustering_w(e_list)
+      to_return <- data.frame(n = nrow(this_graph), ClusterCoeff = clust)
+      # return
+      return(to_return)
+    })
+    #Calculate baseline probability of interaction
+    size_graph <- do.call("rbind", size_graph)
+  })
+  # Bind and return
+  interaction_info <- do.call("rbind", interaction_info)
+  interaction_info$Model <- run_names[run]
+  return(interaction_info)
+})
+
+# Bind
+clust_data <- do.call('rbind', network_clust)
+clust_data <- clust_data %>%
+  group_by(Model, n) %>%
+  summarise(Clust_mean = mean(ClusterCoeff),
+            Clust_SD = sd(ClusterCoeff),
+            Clust_SE = sd(ClusterCoeff)/length(ClusterCoeff))
+
+# Plot
+gg_clust <- ggplot(data = clust_data, aes(x = n, y = Clust_mean,
+                                            colour = Model, group = Model, fill = Model)) +
+  geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = Clust_mean - Clust_SD, ymax = Clust_mean + Clust_SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     values = c("#878787", "#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    values = c("#ffffff", "#4d4d4d")) +
+  scale_linetype_manual(name = "Threshold",
+                        values = c("dotted", "solid")) +
+  scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
+  # scale_y_continuous(breaks = seq(-0.25, 0.05, 0.05), limits = c(-0.26, 0.05)) +
+  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  ylab("Clustering Coeff.") +
+  theme_ctokita() +
+  theme(aspect.ratio = 1,
+        legend.position = "none",
+        legend.key.height = unit(0.5, "line"))
+
+gg_clust
+
+
+
+
+
 ###################
 # Weighted correlation (analogous to assortivity?)
 ###################

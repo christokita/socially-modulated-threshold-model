@@ -21,7 +21,7 @@ library(snowfall)
 ####################
 # Initial paramters: Free to change
 # Base parameters
-Ns             <- c(5, 10, 20) #vector of number of individuals to simulate
+Ns             <- c(20) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
 gens           <- 10000 #number of generations to run simulation 
 reps           <- 20 #number of replications per simulation (for ensemble)
@@ -94,3 +94,34 @@ test <- lapply(improveSpec, function(i) {
 test <- do.call("rbind", test)
 qplot(data = as.data.frame(test), x =Thresh1, y = Thresh2)
 table(duplicated(test))
+
+
+
+####################
+# Simple test
+####################
+library(snowfall)
+library(parallel)
+
+no_cores <- detectCores()
+sfInit(parallel = TRUE, cpus = no_cores)
+sfClusterSetupRNGstream(seed = 90041)
+
+test <- sfLapply(1:no_cores, function(k) {
+  samples <- sample(x = seq(1, 1000), size = 10, replace = T)
+  norm <- rnorm(10)
+  to_return <- data.frame(Samples = samples, Norm_dist = norm)
+  return(to_return)
+})
+
+
+
+sfStop()
+
+look <- do.call("rbind", test)
+
+# First run
+look1 <- look
+
+#Second run 
+look2 <- look
