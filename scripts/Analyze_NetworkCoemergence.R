@@ -39,7 +39,7 @@ gg_entropy_betas <- ggplot(data = betas, aes(x = beta)) +
   theme(axis.title.y = element_text(vjust = -1.5))
 gg_entropy_betas
 
-ggsave(gg_entropy_betas, file = "output/SpecializationPlots/BetaSweep-n80-DiffEpsValues.png", 
+ggsave(gg_entropy_betas, file = "output/SpecializationPlots/BetaSweep-n80-ForNetworkPlot.png", 
        height = 23, width = 45, units = "mm")
 
 
@@ -72,16 +72,53 @@ gg_entropy_eps <- ggplot(data = epsilons, aes(x = epsilon)) +
   theme(axis.title.y = element_text(vjust = -1.5))
 gg_entropy_eps
 
-ggsave(gg_entropy_eps, file = "output/SpecializationPlots/EpsSweep-n80-DiffBetaValues.png", 
+ggsave(gg_entropy_eps, file = "output/SpecializationPlots/EpsSweep-n80-ForNetworkPlot.png", 
        height = 23, width = 45, units = "mm")
+
+####################
+# Plot group size
+####################
+# Load data and summarise
+load("output/Rdata/_ProcessedData/Entropy/Sigma0-Epsilon0.1-Beta1.1.Rdata")
+
+groupsizes <- compiled_data %>% 
+  group_by(n) %>% 
+  summarise(Mean = mean(Dind),
+            SD = sd(Dind))
+
+gg_entropy_gs <- ggplot(data = groupsizes, aes(x = n)) +
+  geom_errorbar(aes(ymin = ifelse((Mean - SD) > 0 , Mean - SD, 0), ymax = Mean + SD),
+                width = 0,
+                size = 0.3, 
+                color = "#4d4d4d") +
+  geom_point(aes(y = Mean),
+             size = 0.8,
+             color = "#4d4d4d") +
+  theme_classic() +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
+  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_y_continuous(limits = c(0, 1), 
+                     breaks = seq(0, 1, 0.5)) +
+  theme_ctokita() +
+  theme(axis.title.y = element_text(vjust = -1.5))
+gg_entropy_gs
+
+ggsave(gg_entropy_gs, file = "output/SpecializationPlots/GroupSizeSweep-Beta1.1Eps0.1-ForNetworkPlot.svg", 
+       height = 23, width = 45, units = "mm")
+
 
 ####################
 # Plot together
 ####################
 library(gridExtra)
-gg_entropy_togther <- grid.arrange(gg_entropy_betas, gg_entropy_eps, nrow = 1)
-ggsave(gg_entropy_togther, filename = "Output/SpecializationPlots/DOL_parametersweepForNetFig.svg", 
+gg_entropy_betaeps <- grid.arrange(gg_entropy_betas, gg_entropy_eps, nrow = 1)
+ggsave(gg_entropy_betaeps, filename = "Output/SpecializationPlots/DOL_betaepssweepForNetFig.svg", 
        height = 23, width = 93.75, units = "mm")
+
+gg_entropy_togther <- grid.arrange(gg_entropy_betas, gg_entropy_eps, gg_entropy_gs, nrow = 1)
+ggsave(gg_entropy_togther, filename = "Output/SpecializationPlots/DOL_parametersweepForNetFig.svg", 
+       height = 23, width = 1.5*93.75, units = "mm")
 
 
 
@@ -95,8 +132,9 @@ source("scripts/util/__Util__MASTER.R")
 
 p <- 1 #prob of interact
 runs <- c("Sigma0-Epsilon0.1_BetaSweep",
-          "Sigma0-Beta1.1_EpsSweep")
-run_names <- c("Beta", "Epsilon")
+          "Sigma0-Beta1.1_EpsSweep",
+          "Sigma0-Epsilon0.1-Beta1.1")
+run_names <- c("Beta", "Epsilon", "GroupSize")
 
 modularity <- lapply(1:length(runs), function(run) {
   # Load social networks
@@ -199,6 +237,32 @@ gg_mod_eps <- ggplot(mod_data_eps, aes(x = parameter_value, y = Modul_mean, colo
         legend.key.height = unit(0.5, "line"))
 gg_mod_eps
 
+
+mod_data_gs <- mod_data %>% 
+  filter(parameter == "GroupSize")
+gg_mod_gs <- ggplot(mod_data_gs, aes(x = parameter_value, y = Modul_mean, colour = parameter, fill = parameter)) +
+  # geom_line(size = 0.4) +
+  geom_errorbar(aes(ymin = ifelse(Modul_mean - Modul_SD < 0, 0, Modul_mean - Modul_SD), ymax = Modul_mean + Modul_SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     # values = c("#878787", "#4d4d4d")) +
+                     values = c("#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    # values = c("#ffffff", "#4d4d4d")) +
+                    values = c("#4d4d4d")) +
+  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
+  ylab("Modularity") +
+  theme_ctokita() +
+  theme(legend.position = "none",
+        legend.key.height = unit(0.5, "line"))
+gg_mod_gs
+
+
+
 # ggsave(gg_mod, filename = "Output/Networks/NetworkMetrics/Modularity_betasweep.svg", 
 #        height = 23, width = 46, units = "mm")
 
@@ -209,8 +273,9 @@ source("scripts/util/__Util__MASTER.R")
 
 p <- 1 #prob of interact
 runs <- c("Sigma0-Epsilon0.1_BetaSweep",
-          "Sigma0-Beta1.1_EpsSweep")
-run_names <- c("Beta", "Epsilon")
+          "Sigma0-Beta1.1_EpsSweep",
+          "Sigma0-Epsilon0.1-Beta1.1")
+run_names <- c("Beta", "Epsilon", "GroupSize")
 
 ###################
 # Assortment coefficient from Newman 2003
@@ -322,11 +387,41 @@ gg_assort_eps <- ggplot(data = assort_data_eps, aes(x = parameter_value, y = Ass
         axis.title.y = element_text(vjust = -1.5))
 gg_assort_eps
 
-# Together
-gg_net_mod <- grid.arrange(gg_mod_beta, gg_mod_eps, nrow = 1)
-ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_parametersweep.svg", 
-       height = 23, width = 95, units = "mm")
+assort_data_gs <- assort_data %>% 
+  filter(parameter == "GroupSize")
+gg_assort_gs <- ggplot(data = assort_data_gs, aes(x = parameter_value, y = Assort_mean,
+                                                    colour = parameter, group = parameter, fill = parameter)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.3, linetype = "dotted") +
+  geom_errorbar(aes(ymin = Assort_mean - Assort_SD, ymax = Assort_mean + Assort_SD),
+                width = 0,
+                size = 0.3) +
+  geom_point(size = 0.8, shape = 21) +
+  scale_color_manual(name = "Threshold",
+                     # values = c("#878787", "#4d4d4d")) +
+                     values = c("#4d4d4d")) +
+  scale_fill_manual(name = "Threshold",
+                    # values = c("#ffffff", "#4d4d4d")) +
+                    values = c("#4d4d4d")) +
+  scale_x_continuous(breaks = seq(0, 100, 20)) +
+  # scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
+  ylab("Assortativity") +
+  theme_ctokita() +
+  theme(legend.position = "none",
+        axis.title.y = element_text(vjust = -1.5))
+gg_assort_gs
 
-gg_net_assort <- grid.arrange(gg_assort_beta, gg_assort_eps, nrow = 1)
+# Together
+gg_net_mod_betaeps <- grid.arrange(gg_mod_beta, gg_mod_eps, nrow = 1)
+ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_betaepssweep.svg", 
+       height = 23, width = 95, units = "mm")
+gg_net_mod <- grid.arrange(gg_mod_beta, gg_mod_eps, gg_mod_gs, nrow = 1)
+ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_parametersweep.svg", 
+       height = 23, width = 1.5*95, units = "mm")
+
+gg_net_assort_betaeps <- grid.arrange(gg_assort_beta, gg_assort_eps, nrow = 1)
+ggsave(gg_net_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_betaepssweep.svg", 
+       height = 23, width = 96, units = "mm")
+gg_net_assort <- grid.arrange(gg_assort_beta, gg_assort_eps, gg_assort_gs, nrow = 1)
 ggsave(gg_net_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_parametersweep.svg", 
        height = 23, width = 96, units = "mm")
