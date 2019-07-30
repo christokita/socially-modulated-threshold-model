@@ -118,7 +118,7 @@ ggsave(gg_entropy_betaeps, filename = "Output/SpecializationPlots/DOL_betaepsswe
 
 gg_entropy_togther <- grid.arrange(gg_entropy_betas, gg_entropy_eps, gg_entropy_gs, nrow = 1)
 ggsave(gg_entropy_togther, filename = "Output/SpecializationPlots/DOL_parametersweepForNetFig.svg", 
-       height = 23, width = 1.5*93.75, units = "mm")
+       height = 23.1, width = 1.515*93.75, units = "mm")
 
 
 
@@ -417,11 +417,11 @@ ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_betaeps
        height = 23, width = 95, units = "mm")
 gg_net_mod <- grid.arrange(gg_mod_beta, gg_mod_eps, gg_mod_gs, nrow = 1)
 ggsave(gg_net_mod, filename = "Output/Networks/NetworkMetrics/Modularity_parametersweep.svg", 
-       height = 23, width = 1.5*95, units = "mm")
+       height = 23.1, width = 1.515*95, units = "mm")
 
 gg_net_assort_betaeps <- grid.arrange(gg_assort_beta, gg_assort_eps, nrow = 1)
 ggsave(gg_net_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_betaepssweep.svg", 
        height = 23, width = 96, units = "mm")
 gg_net_assort <- grid.arrange(gg_assort_beta, gg_assort_eps, gg_assort_gs, nrow = 1)
 ggsave(gg_net_assort, filename = "Output/Networks/NetworkMetrics/Assortativity_parametersweep.svg", 
-       height = 23, width = 96, units = "mm")
+       height = 23.1, width = 1.475*96, units = "mm")
