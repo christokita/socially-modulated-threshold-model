@@ -253,7 +253,7 @@ gg_mod_gs <- ggplot(mod_data_gs, aes(x = parameter_value, y = Modul_mean, colour
                     # values = c("#ffffff", "#4d4d4d")) +
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
-  scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
+  scale_y_continuous(breaks = seq(0, 0.02, 0.01), limits = c(-0.0002, 0.02)) +
   xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab("Modularity") +
   theme_ctokita() +
