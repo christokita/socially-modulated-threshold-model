@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Analyzing behavior
+# Analyzing behavior by looking at frequency of "specialists" and "generalists"
 #
 ################################################################################
 

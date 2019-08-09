@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Comparing various specialization plots
+# Comparing rank correlation and DOL entropy metrics
 #
 ################################################################################
 

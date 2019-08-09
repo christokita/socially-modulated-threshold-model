@@ -1,6 +1,7 @@
 ################################################################################
 #
-# Analyze beta-epsilon sweep data
+# Analyze social network structure co-emergence across different values
+# of beta and epsilon
 #
 ################################################################################
 

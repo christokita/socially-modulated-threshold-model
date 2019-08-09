@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Comparing various specialization plots
+# Comparing DOL for fixed threshold model across different sigma values
 #
 ################################################################################
 

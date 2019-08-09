@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Install Missing Packages on Node
+# Install Missing Packages on Node (if running in parallel on cluster)
 #
 ################################################################################
 source("scripts/util/__Util_MiscFunctions.R")

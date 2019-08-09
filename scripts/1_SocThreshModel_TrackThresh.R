@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Social interaction model: set for running on Della cluster
+# Social interaction model: non-parallelized simulation to also track thresholds
 #
 ################################################################################
 

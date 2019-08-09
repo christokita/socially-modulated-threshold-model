@@ -1,6 +1,7 @@
 ################################################################################
 #
-# Social interaction model: set for running on Della cluster
+# Social interaction model: sweep across group sizes (but preferable to just do one size), tracks threshold values and other metrics
+# designed for running in parallel on cluster
 #
 ################################################################################
 
