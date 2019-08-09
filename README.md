@@ -6,7 +6,7 @@ Theoretical simulation scripts and data for:
 
 Tokita CK & Tarnita CE. Social influence and biased interactions can drive emergent behavioral specialization and modular social networks across systems. (Submitted)
 
-This is the living repository of this code. For the public release/archive of the code used in the paper please see [URL]
+This is the living repository of this code. For the public release/archive of the code used in the paper please see [![DOI](https://zenodo.org/badge/108687450.svg)](https://zenodo.org/badge/latestdoi/108687450)
 
 ## Components of this repository
 
