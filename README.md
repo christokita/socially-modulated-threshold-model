@@ -12,8 +12,9 @@ This is the living repository of this code. For the public release/archive of th
 
 This directory has three main files:
 
-* **scripts**: contains all scripts for simulation, analysis, and plotting of the computational model and analytical model
+* **scripts**: contains all scripts for simulation, analysis, and plotting of the computational model and analytical model.
 * **output**: contains all subsequent derived data from simulations as well as any graphs produced from analysis of the simulation data.
+* **SLURM_scripts**: contains all scripts for running R code/simulations on Princeton Della Clusters.
 
 Scripts are numbered numerically for organization. The scripts folder has the following structure:
 * **util** folder contains all custom-made functions used throughout the simualtion. This then, in essence, contains the model itself.
