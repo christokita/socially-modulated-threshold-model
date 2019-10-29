@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 200000 #number of generations to run simulation 
+gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 

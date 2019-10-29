@@ -21,7 +21,7 @@ library(snowfall)
 # Base parameters
 n              <- 80 #group size
 m              <- 2 #number of tasks
-gens           <- 500000 #number of generations to run simulation 
+gens           <- 50000 #number of generations to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
