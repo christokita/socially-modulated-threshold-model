@@ -121,7 +121,7 @@ for (i in 1:length(Ns)) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 2 * ThreshM[1])
+                                                   threshold_max = 100)
       # Capture threshold values
       thresh1time[[t + 1]] <- threshMat[,1]
       thresh2time[[t + 1]] <- threshMat[,2]

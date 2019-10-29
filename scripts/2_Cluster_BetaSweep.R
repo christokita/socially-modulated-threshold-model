@@ -44,7 +44,7 @@ betas          <- seq(1, 1.25, 0.01) #probability of interacting with individual
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep-LongSimNoThreshLim")
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy", "TaskTally", "Stim", 
@@ -153,7 +153,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = Inf)
+                                                   threshold_max = 100)
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }

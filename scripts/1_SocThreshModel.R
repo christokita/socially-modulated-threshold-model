@@ -104,7 +104,7 @@ for (i in 1:length(Ns)) {
                                                    threshold_matrix = threshMat,
                                                    state_matrix = X_g,
                                                    epsilon = epsilon,
-                                                   threshold_max = 2 * ThreshM[1])
+                                                   threshold_max = 100)
       # Update total task performance profile
       X_tot <- X_tot + X_g
     }
