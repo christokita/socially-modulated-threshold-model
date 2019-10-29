@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 n              <- 80 #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 500000 #number of generations to run simulation 
+Tsteps         <- 500000 #number of time steps to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
@@ -79,7 +79,7 @@ parallel_simulations <- sfLapply(1:reps, function(sim) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                            gens = gens)
+                            Tsteps = Tsteps)
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
@@ -98,7 +98,7 @@ parallel_simulations <- sfLapply(1:reps, function(sim) {
     # Simulate individual run
     ####################
     # Run simulation
-    for (t in 1:gens) { 
+    for (t in 1:Tsteps) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       stimMat <- update_stim(stim_matrix = stimMat, 
@@ -135,9 +135,9 @@ parallel_simulations <- sfLapply(1:reps, function(sim) {
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     # Calculate total task distribution
-    totalTaskDist <- X_tot / gens
+    totalTaskDist <- X_tot / Tsteps
     # Normalize interaciton matrix
-    g_tot <- g_tot / gens
+    g_tot <- g_tot / Tsteps
     
     ####################
     # Save data

@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 Ns             <- seq(5, 100, 5) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation
+Tsteps         <- 50000 #number of time steps to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
@@ -106,7 +106,7 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values_noN), function(k) {
       P_g <- matrix(data = rep(0, n * m), ncol = m)
       # Seed task (external) stimuli
       stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                              gens = gens)
+                              Tsteps = Tsteps)
       # Seed internal thresholds
       threshMat <- seed_thresholds(n = n, 
                                    m = m, 
@@ -125,7 +125,7 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values_noN), function(k) {
       # Simulate individual run
       ####################
       # Run simulation
-      for (t in 1:gens) { 
+      for (t in 1:Tsteps) { 
         # Current timestep is actually t+1 in this formulation, because first row is timestep 0
         # Update stimuli
         stimMat <- update_stim(stim_matrix = stimMat, 
@@ -166,7 +166,7 @@ parallel_simulations <- sfLapply(1:nrow(parameter_values_noN), function(k) {
       entropy$sigma <- ThreshSD[1] / ThreshM[1]
       entropy$delta <- deltas[1]
       # Calculate total task distribution
-      total_task_dist <- as.data.frame(X_tot / gens)
+      total_task_dist <- as.data.frame(X_tot / Tsteps)
       total_task_dist$n <- n
       total_task_dist$replicate <- sim
       total_task_dist$sigma <- ThreshSD[1] / ThreshM[1]

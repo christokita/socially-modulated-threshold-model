@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 Ns             <- c(5, 10, 20, 26, 27, 28, 29, 30, 40, 50, 100) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 500000 #number of generations to run simulation 
+Tsteps         <- 500000 #number of time steps to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 10 #number of simulations sent to single core 
 
@@ -41,7 +41,7 @@ beta           <- 1.1 #probability of interacting with individual in same state 
 
 # Where to check time values
 avg_window <- 100
-times <- c(1000, seq(5000, gens, 5000))
+times <- c(1000, seq(5000, Tsteps, 5000))
 
 ####################
 # Prep for Parallelization
@@ -85,7 +85,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                            gens = gens)
+                            Tsteps = Tsteps)
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
@@ -106,7 +106,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     # Simulate individual run
     ####################
     # Run simulation
-    for (t in 1:gens) { 
+    for (t in 1:Tsteps) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       stimMat <- update_stim(stim_matrix = stimMat, 

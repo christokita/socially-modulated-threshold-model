@@ -8,16 +8,16 @@
 ####################
 # Seed Stimuls
 ####################
-seed_stimuls <- function(intitial_stim, gens) {
+seed_stimuls <- function(intitial_stim, Tsteps) {
   # Calculate number of blank spots to make
-  rep_length <- (length(intitial_stim)) * gens #intiial row does not count as gen
+  rep_length <- (length(intitial_stim)) * Tsteps #intiial row does not count as gen
   # Build matrix
   stim <- matrix(data = c(intitial_stim, rep(NA, rep_length)),
                  byrow = TRUE, 
-                 nrow = (gens + 1))
+                 nrow = (Tsteps + 1))
   # Fix Names
   colnames(stim) <- paste0(rep("s", length(intitial_stim)), 1:length(intitial_stim))
-  rownames(stim) <- paste0("t", 0:gens)
+  rownames(stim) <- paste0("t", 0:Tsteps)
   # Return
   return(stim)
 }

@@ -21,7 +21,7 @@ library(snowfall)
 # Base parameters
 n              <- 80 #group size
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+Tsteps         <- 50000 #number of time steps to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
@@ -110,7 +110,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                            gens = gens)
+                            Tsteps = Tsteps)
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
@@ -129,7 +129,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     # Simulate individual run
     ####################
     # Run simulation
-    for (t in 1:gens) { 
+    for (t in 1:Tsteps) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       stimMat <- update_stim(stim_matrix = stimMat, 
@@ -167,7 +167,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     entropy <- label_parallel_runs_parmeters(matrix = entropy, beta = beta, epsilon = epsilon, simulation = sim, chunk = chunk)
     # Calculate total task distribution
-    totalTaskDist <- X_tot / gens
+    totalTaskDist <- X_tot / Tsteps
     totalTaskDist <- label_parallel_runs_parmeters(matrix = totalTaskDist, beta = beta, epsilon = epsilon, simulation = sim, chunk = chunk)
     # Create thresh table
     threshMat <- label_parallel_runs_parmeters(matrix = threshMat, beta = beta, epsilon = epsilon, simulation = sim, chunk = chunk)
@@ -175,7 +175,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     ens_taskDist[[sim]]    <- totalTaskDist
     ens_entropy[[sim]]     <- entropy
     ens_thresh[[sim]]      <- threshMat 
-    ens_graphs[[sim]]      <- g_tot / gens
+    ens_graphs[[sim]]      <- g_tot / Tsteps
   }
   # Bind and write
   save_parallel_data_parameter(data = ens_taskDist, 

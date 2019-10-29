@@ -20,7 +20,7 @@ library(snowfall)
 # Base parameters
 n              <- 80 #number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+Tsteps         <- 50000 #number of time steps to run simulation
 reps           <- 100 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
@@ -92,7 +92,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                            gens = gens)
+                            Tsteps = Tsteps)
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
@@ -111,7 +111,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     # Simulate individual run
     ####################
     # Run simulation
-    for (t in 1:gens) { 
+    for (t in 1:Tsteps) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       stimMat <- update_stim(stim_matrix = stimMat, 

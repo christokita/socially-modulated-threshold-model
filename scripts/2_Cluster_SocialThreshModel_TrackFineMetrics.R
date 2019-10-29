@@ -21,7 +21,7 @@ library(snowfall)
 # Base parameters
 Ns             <- seq(60) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+Tsteps         <- 50000 #number of time steps to run simulation 
 reps           <- 10 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
 
@@ -101,7 +101,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                            gens = gens)
+                            Tsteps = Tsteps)
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
@@ -126,7 +126,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     # Simulate individual run
     ####################
     # Run simulation
-    for (t in 1:gens) { 
+    for (t in 1:Tsteps) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       stimMat <- update_stim(stim_matrix = stimMat, 
@@ -178,7 +178,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     entropy <- label_parallel_runs(matrix = entropy, n = n, simulation = sim, chunk = chunk)
     # Calculate total task distribution
-    totalTaskDist <- X_tot / gens
+    totalTaskDist <- X_tot / Tsteps
     totalTaskDist <- label_parallel_runs(matrix = totalTaskDist, n = n, simulation = sim, chunk = chunk)
     # Create tasktally table
     stimMat <- cbind(stimMat, 0:(nrow(stimMat) - 1))
@@ -187,8 +187,8 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     # Create thresh table
     threshMat <- label_parallel_runs(matrix = threshMat, n = n, simulation = sim, chunk = chunk)
     # Thresh tracking matrices
-    thresh1time <- summarise_threshold_tracking(tracked_threshold = thresh1time, n = n, time_steps = gens, chunk = chunk, simulation = sim)
-    thresh2time <- summarise_threshold_tracking(tracked_threshold = thresh2time, n = n, time_steps = gens, chunk = chunk, simulation = sim)
+    thresh1time <- summarise_threshold_tracking(tracked_threshold = thresh1time, n = n, time_steps = Tsteps, chunk = chunk, simulation = sim)
+    thresh2time <- summarise_threshold_tracking(tracked_threshold = thresh2time, n = n, time_steps = Tsteps, chunk = chunk, simulation = sim)
     # Add total task distributions, entropy values, and graphs to lists
     ens_taskDist[[sim]]    <- totalTaskDist
     ens_entropy[[sim]]     <- entropy
@@ -197,7 +197,7 @@ parallel_simulations <- sfLapply(1:nrow(run_in_parallel), function(k) {
     ens_thresh[[sim]]      <- threshMat 
     ens_thresh1Time[[sim]] <- thresh1time
     ens_thresh2Time[[sim]] <- thresh2time
-    ens_graphs[[sim]]      <- g_tot / gens
+    ens_graphs[[sim]]      <- g_tot / Tsteps
   }
   # Bind and write
   save_parallel_data(data = ens_taskDist, 

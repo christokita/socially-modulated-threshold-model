@@ -13,7 +13,7 @@ source("scripts/util/__Util__MASTER.R")
 # Base parameters
 Ns             <- c(5, 10, 20, 30, 50, 70) #vector of number of individuals to simulate
 m              <- 2 #number of tasks
-gens           <- 50000 #number of generations to run simulation 
+Tsteps         <- 50000 #number of time steps to run simulation 
 reps           <- 20 #number of replications per simulation (for ensemble)
 
 # Threshold Parameters
@@ -59,7 +59,7 @@ for (i in 1:length(Ns)) {
     P_g <- matrix(data = rep(0, n * m), ncol = m)
     # Seed task (external) stimuli
     stimMat <- seed_stimuls(intitial_stim = InitialStim, 
-                            gens = gens)
+                            Tsteps = Tsteps)
     # Seed internal thresholds
     threshMat <- seed_thresholds(n = n, 
                                  m = m, 
@@ -78,7 +78,7 @@ for (i in 1:length(Ns)) {
     # Simulate individual run
     ####################
     # Run simulation
-    for (t in 1:gens) { 
+    for (t in 1:Tsteps) { 
       # Current timestep is actually t+1 in this formulation, because first row is timestep 0
       # Update stimuli
       stimMat <- update_stim(stim_matrix = stimMat, 
@@ -115,7 +115,7 @@ for (i in 1:length(Ns)) {
     # Calculate Entropy
     entropy <- mutualEntropy(TotalStateMat = X_tot)
     # Calculate total task distribution
-    totalTaskDist <- X_tot / gens
+    totalTaskDist <- X_tot / Tsteps
     # Create tasktally table
     stimMat <- cbind(stimMat, 0:(nrow(stimMat) - 1))
     colnames(stimMat)[ncol(stimMat)] <- "t"
@@ -124,7 +124,7 @@ for (i in 1:length(Ns)) {
     ens_entropy[[sim]]     <- entropy
     ens_stim[[sim]]        <- stimMat
     ens_thresh[[sim]]      <- threshMat 
-    ens_graphs[[sim]]      <- g_tot / gens
+    ens_graphs[[sim]]      <- g_tot / Tsteps
   }
   # Add to list of lists
   groups_taskDist[[i]]    <- ens_taskDist
