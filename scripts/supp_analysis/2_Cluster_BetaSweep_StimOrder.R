@@ -27,8 +27,8 @@ update_task_performance <- function(task_probs, state_matrix, quit_prob) {
     # Inactive workers randomly sample one stimulus
     if (sum(state_matrix[row, ]) == 0) {
       # Sample task probability
-      #tasks_order <- sample(x = tasks, size = length(tasks), replace = FALSE)
-      tasks_order <- tasks
+      #tasks_order <- sample(x = tasks, size = length(tasks), replace = FALSE) #random order
+      tasks_order <- tasks #fixed order
       # Loop through tasks and go with first one that results in activity
       for (task in tasks_order) {
         prob <- task_probs[row, task]
