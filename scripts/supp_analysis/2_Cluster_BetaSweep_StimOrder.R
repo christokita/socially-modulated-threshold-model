@@ -82,6 +82,7 @@ betas          <- seq(1, 1.25, 0.01) #probability of interacting with individual
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
+storage_path <- "output/test/"
 dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep_stimorder")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
@@ -105,8 +106,10 @@ ran_files <- lapply(already_ran, function(f) {
   return(to_return)
 })
 ran_files <- do.call('rbind', ran_files)
-run_in_parallel <- run_in_parallel %>% 
-  anti_join(ran_files)
+if (!is.null(ran_files)) {
+  run_in_parallel <- run_in_parallel %>% 
+    anti_join(ran_files)
+}
 
 # Prepare for parallel
 no_cores <- detectCores()

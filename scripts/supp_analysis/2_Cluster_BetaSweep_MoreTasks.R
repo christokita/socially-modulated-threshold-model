@@ -69,8 +69,11 @@ ran_files <- lapply(already_ran, function(f) {
   return(to_return)
 })
 ran_files <- do.call('rbind', ran_files)
-run_in_parallel <- run_in_parallel %>% 
-  anti_join(ran_files)
+if (!is.null(ran_files)) {
+  run_in_parallel <- run_in_parallel %>% 
+    anti_join(ran_files)
+}
+
 
 # Prepare for parallel
 no_cores <- detectCores()
