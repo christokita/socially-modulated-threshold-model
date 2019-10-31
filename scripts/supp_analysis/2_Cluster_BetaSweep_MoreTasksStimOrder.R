@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Social interaction model: sweep across beta values with set order of simtulus encounter
+# Social interaction model: sweep across beta values with more than two tasks
 # designed for running in parallel on cluster
 #
 # **This script only focuses on measuring resulint DOL and task distributions**
@@ -57,7 +57,7 @@ update_task_performance <- function(task_probs, state_matrix, quit_prob) {
 # Initial paramters: Free to change
 # Base parameters
 n              <- 80 #group size
-m              <- 2 #number of tasks
+m              <- 3 #number of tasks
 Tsteps         <- 50000 #number of time steps to run simulation 
 reps           <- 100 #number of replications per simulation (for ensemble)
 chunk_size     <- 5 #number of simulations sent to single core 
@@ -81,7 +81,7 @@ betas          <- seq(1, 1.25, 0.01) #probability of interacting with individual
 ####################
 # Create directory for depositing data
 storage_path <- "/scratch/gpfs/ctokita/"
-dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep_stimorder")
+dir_name <- paste0("n", n,  "-Sigma", (ThreshSD/ThreshM)[1], "-Epsilon", epsilon, "_BetaSweep_m3")
 full_path <- paste0(storage_path, dir_name)
 dir.create(full_path)
 sub_dirs <- c("TaskDist", "Entropy")
@@ -108,6 +108,7 @@ if (!is.null(ran_files)) {
   run_in_parallel <- run_in_parallel %>% 
     anti_join(ran_files)
 }
+
 
 # Prepare for parallel
 no_cores <- detectCores()
