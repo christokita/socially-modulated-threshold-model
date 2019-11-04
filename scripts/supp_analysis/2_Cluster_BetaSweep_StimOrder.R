@@ -73,7 +73,7 @@ quitP          <- 0.2 #probability of quitting task once active
 # Social Network Parameters
 p              <- 1 #baseline probablity of initiating an interaction per time step
 epsilon        <- 0.1 #relative weighting of social interactions for adjusting thresholds
-betas          <- seq(1, 1.25, 0.01) #probability of interacting with individual in same state relative to others
+betas          <- seq(1, 1.25, 0.025) #probability of interacting with individual in same state relative to others
 
 
 ####################
