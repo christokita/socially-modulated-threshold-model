@@ -23,7 +23,7 @@ m2color <- "#4d4d4d"
 m3color <- "#fec44f"
 m5color <- "#ec7014"
 subplt_height <- 21
-subplt_legendpos <- c(0.75, 0.4)
+subplt_legendpos <- c(0.72, 0.35)
 
 
 ####################
@@ -169,12 +169,11 @@ gg_m2revisletter <- ggplot(data = m2, aes(x = beta, color = TaskNumber, shape = 
                      values = c(16, 1), 
                      labels = c("m = 2", "m = 2, fixed order")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
-  scale_y_continuous(breaks = seq(0, 1, 1)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.5)) +
   theme_ctokita() +
   plot_settings() +
-  theme(axis.title.y = element_blank(),
-        legend.position = c(0.72, 0.2))
-ggsave(gg_m2revisletter, filename = "output/TaskNumber/DOL_m2taskorder.png", width = 45, height = 45, units = "mm", dpi = 400)
+  theme(legend.position = c(0.72, 0.2))
+ggsave(gg_m2revisletter, filename = "output/TaskNumber/DOL_m2taskorder.png", width = 45, height = 45, units = "mm", dpi = 300)
 
 
 ####################
