@@ -107,7 +107,7 @@ gg_tasknumber <- ggplot(data = tasknumber, aes(x = beta, color = TaskNumber)) +
              size = 0.8) +
   theme_classic() +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m2color, m3color, m5color), 
                      labels = c("m = 2", "m = 3", "m = 5")) +
@@ -135,7 +135,7 @@ gg_m2taskorder <- ggplot(data = m2, aes(x = beta, color = TaskNumber, shape = Ta
              size = 0.8) +
   theme_classic() +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m2color, m2color), 
                      labels = c("m = 2", "m = 2, fixed order")) +
@@ -161,7 +161,7 @@ gg_m2revisletter <- ggplot(data = m2, aes(x = beta, color = TaskNumber, shape = 
              position = position_dodge(width = 0.015)) +
   theme_classic() +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m2color, m2color), 
                      labels = c("m = 2", "m = 2, fixed order")) +
@@ -192,7 +192,7 @@ gg_m3taskorder <- ggplot(data = m3, aes(x = beta, color = TaskNumber, shape = Ta
              size = 0.8) +
   theme_classic() +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m3color, m3color), 
                      labels = c("m = 3", "m = 3, fixed order")) +
@@ -223,7 +223,7 @@ gg_m5taskorder <- ggplot(data = m5, aes(x = beta, color = TaskNumber, shape = Ta
              size = 0.8) +
   theme_classic() +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m5color, m5color), 
                      labels = c("m = 5", "m = 5, fixed order")) +

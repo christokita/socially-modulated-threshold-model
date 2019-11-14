@@ -49,7 +49,7 @@ gg_dol <- ggplot(data = entropy, aes(x = n, colour = Model, fill = Model)) +
              position = position_dodge(width = 1.5),
              size = 1, shape = 21) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   scale_color_manual(name = "Threshold",
@@ -184,7 +184,7 @@ gg_interactions <- ggplot(interaction_data, aes(x = n, y = PercentNonRandom,
   scale_fill_manual(name = "Threshold type",
                     values = c("#ffffff", "#4d4d4d")) +
   scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab("% Non-random interactions") +
   # facet_grid(~Model) +
   theme_ctokita() +
@@ -281,7 +281,7 @@ gg_mod <- ggplot(mod_data, aes(x = n, y = Modul_mean, colour = Model, fill = Mod
                         values = c("dotted", "solid")) +
   scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   scale_y_continuous(breaks = seq(0, 0.012, 0.002), limits = c(-0.0002, 0.012)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab("Modularity") +
   theme_ctokita() +
   theme(aspect.ratio = 1,
@@ -378,7 +378,7 @@ gg_assort <- ggplot(data = assort_data, aes(x = n, y = Assort_mean,
                         values = c("dotted", "solid")) +
   scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   scale_y_continuous(breaks = seq(-0.25, 0.05, 0.05), limits = c(-0.26, 0.05)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab("Assortativity") +
   theme_ctokita() +
   theme(aspect.ratio = 1,
@@ -496,7 +496,7 @@ gg_clust <- ggplot(data = clust_data, aes(x = n, y = Clust_mean,
                         values = c("dotted", "solid")) +
   scale_x_continuous(breaks = c(5, seq(20, 100, 20))) +
   # scale_y_continuous(breaks = seq(-0.25, 0.05, 0.05), limits = c(-0.26, 0.05)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab("Clustering Coeff.") +
   theme_ctokita() +
   theme(aspect.ratio = 1,
@@ -599,7 +599,7 @@ gg_clust
 #                         values = c("dotted", "solid")) +
 #   scale_x_continuous(breaks = seq(0, 100, 20)) +
 #   scale_y_continuous(breaks = seq(-0.25, 0.05, 0.05), limits = c(-0.26, 0.05)) +
-#   xlab(expression(paste("Group Size (", italic(n), ")"))) +
+#   xlab(expression(paste("Group size (", italic(n), ")"))) +
 #   ylab("Assortativity") +
 #   theme_ctokita() +
 #   theme(aspect.ratio = 1,

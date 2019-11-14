@@ -48,7 +48,7 @@ for (bias in c("Homophily", "Heterophily")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    xlab(expression(paste("Group size (", italic(n), ")"))) +
     ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
@@ -92,7 +92,7 @@ gg_beta_all <- ggplot() +
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
@@ -137,7 +137,7 @@ for (bias in c("Homophily", "Heterophily")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    xlab(expression(paste("Group size (", italic(n), ")"))) +
     ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
@@ -181,7 +181,7 @@ gg_beta_all <- ggplot() +
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste( "Interaction bias (", italic(beta), ")"))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
@@ -229,7 +229,7 @@ for (influence in c("Positive", "Negative")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    xlab(expression(paste("Group size (", italic(n), ")"))) +
     ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
@@ -263,7 +263,7 @@ gg_eps_all <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, c
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
@@ -309,7 +309,7 @@ for (influence in c("Positive", "Negative")) {
                          limits = c(0, 1)) +
     scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                            limits = c(0, 1)) +
-    xlab(expression(paste("Group Size (", italic(n), ")"))) +
+    xlab(expression(paste("Group size (", italic(n), ")"))) +
     ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
     theme(axis.text = element_text(colour = "black", size = 6),
           axis.title = element_text(size = 7),
@@ -344,7 +344,7 @@ gg_eps_all <- ggplot(data = entropy, aes(x = n, y = epsilon, fill = Dind_mean, c
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
@@ -405,7 +405,7 @@ gg_betaeps <- ggplot() +
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
   ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
@@ -448,7 +448,7 @@ gg_betaeps_all <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
   ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),

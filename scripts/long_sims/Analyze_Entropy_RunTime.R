@@ -123,7 +123,7 @@ gg_solo <- ggplot(data = entropy, aes(x = n, colour = Model, fill = Model)) +
              position = position_dodge(width = 1.5),
              size = 1, shape = 21) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(name = "Threshold",
@@ -192,7 +192,7 @@ gg_entropy <- ggplot(data = entropy, aes(x = n, colour = Model)) +
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size (", italic(n), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_color_manual(values = pal, 
