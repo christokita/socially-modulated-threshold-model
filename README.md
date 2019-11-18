@@ -1,5 +1,5 @@
 # Socially-Modulated Threshold Model
-Agent-based model investigating how social interactions can modify response thresholds and result in behavioral specialization and social network structuring
+Agent-based model investigating how social interactions can modify response thresholds and result in behavioral specialization (division of labor) and social network structuring
 
 ## Overview
 Theoretical simulation scripts and data for:
