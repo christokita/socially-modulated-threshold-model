@@ -138,10 +138,10 @@ gg_m2taskorder <- ggplot(data = m2, aes(x = beta, color = TaskNumber, shape = Ta
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m2color, m2color), 
-                     labels = c("m = 2", "m = 2, fixed order")) +
+                     labels = c("m = 2, rand. order", "m = 2, fixed order")) +
   scale_shape_manual(name = "", 
-                     values = c(16, 1), 
-                     labels = c("m = 2", "m = 2, fixed order")) +
+                     values = c(1, 4),
+                     labels = c("m = 2, rand. order", "m = 2, fixed order")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   scale_y_continuous(breaks = seq(0, 1, 1)) +
   theme_ctokita() +
@@ -154,20 +154,18 @@ ggsave(gg_m2taskorder, filename = "output/TaskNumber/DOL_m2taskorder.svg", width
 gg_m2revisletter <- ggplot(data = m2, aes(x = beta, color = TaskNumber, shape = TaskNumber)) +
   geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD),
                 width = 0,
-                size = 0.3,
-                position = position_dodge(width = 0.015)) +
+                size = 0.3) +
   geom_point(aes(y = Mean),
-             size = 0.8,
-             position = position_dodge(width = 0.015)) +
+             size = 0.8) +
   theme_classic() +
   xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m2color, m2color), 
-                     labels = c("m = 2", "m = 2, fixed order")) +
+                     labels = c("m = 2, rand. order", "m = 2, fixed order")) +
   scale_shape_manual(name = "", 
-                     values = c(16, 1), 
-                     labels = c("m = 2", "m = 2, fixed order")) +
+                     values = c(1, 4), 
+                     labels = c("m = 2, rand. order", "m = 2, fixed order")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   scale_y_continuous(breaks = seq(0, 1, 0.5)) +
   theme_ctokita() +
@@ -195,10 +193,10 @@ gg_m3taskorder <- ggplot(data = m3, aes(x = beta, color = TaskNumber, shape = Ta
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m3color, m3color), 
-                     labels = c("m = 3", "m = 3, fixed order")) +
+                     labels = c("m = 3, rand. order", "m = 3, fixed order")) +
   scale_shape_manual(name = "", 
-                     values = c(16, 1), 
-                     labels = c("m = 3", "m = 3, fixed order")) +
+                     values = c(1, 4), 
+                     labels = c("m = 3, rand. order", "m = 3, fixed order")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   scale_y_continuous(breaks = seq(0, 1, 1)) +
   theme_ctokita() +
@@ -226,10 +224,10 @@ gg_m5taskorder <- ggplot(data = m5, aes(x = beta, color = TaskNumber, shape = Ta
   ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
   scale_color_manual(name = "", 
                      values = c(m5color, m5color), 
-                     labels = c("m = 5", "m = 5, fixed order")) +
+                     labels = c("m = 5, rand. order", "m = 5, fixed order")) +
   scale_shape_manual(name = "", 
-                     values = c(16, 1), 
-                     labels = c("m = 5", "m = 5, fixed order")) +
+                     values = c(1, 4), 
+                     labels = c("m = 5, rand. order", "m = 5, fixed order")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   scale_y_continuous(breaks = seq(0, 1, 1)) +
   theme_ctokita() +
