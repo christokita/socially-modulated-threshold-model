@@ -5,7 +5,7 @@ Agent-based model investigating how social interactions can modify response thre
 ## Overview
 Scripts of the computational model and subsequent simulation data for:
 
-Tokita CK & Tarnita CE. Social influence and interaction bias can drive emergent behavioural specialization and modular social networks across systems. (In revision)
+>Tokita CK & Tarnita CE. Social influence and interaction bias can drive emergent behavioural specialization and modular social networks across systems. (In revision)
 
 This is the living repository of this code. For the public release/archive of the code used in the paper please see [release v1.2.0](https://github.com/christokita/socially-modulated-thresholds/releases/tag/v1.2.0) of this repository.
 
