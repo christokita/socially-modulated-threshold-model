@@ -62,7 +62,7 @@ gg_behavvar<- ggplot(data = filter_data,
                      aes(x = Task1, y = n, fill = Model, group = n)) +
   theme_invisible() +
   geom_density_ridges2(size = 0.1, stat = "binline", bins = 100) +
-  xlab(expression(paste("Task 1 performance freq (", italic(x[i1]), ")"))) +
+  xlab(expression(paste("Task 1 performance frequency (", italic(x[i1]), ")"))) +
   ylab(expression(paste("Group Size (", italic(n), ")"))) +
   scale_x_continuous(breaks = seq(-1, 1, 0.2), 
                      # limits = c(0, 1),

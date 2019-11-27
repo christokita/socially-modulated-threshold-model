@@ -544,7 +544,7 @@ gg_clust
 #       diag(this_graph) <- 0
 #       thresh <- as.data.frame(thresh_data[[i]][j])
 #       thresh$ThreshBias <- thresh$Thresh1 - thresh$Thresh2 
-#       # Multiply to get bias weighted by interaction frequenchy
+#       # Multiply to get bias weighted by interaction frequency
 #       social_interaction <- data.frame(ThreshBias = NULL, InteractBias = NULL, InteractWeight = NULL)
 #       for (ind in 1:nrow(this_graph)) {
 #         # Calculate bias and weighted interaction
