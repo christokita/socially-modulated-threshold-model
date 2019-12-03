@@ -66,8 +66,8 @@ gg_threshvar <- ggplot(data = filter_data,
                        aes(x = Thresh1, y = n, fill = Model, group = n)) +
   theme_invisible() +
   geom_density_ridges(size = 0.1, stat = "binline", bins = 100) +
-  xlab(expression(paste("Task 1 threshold (", italic(theta[i1]), ")"))) +
-  ylab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Task 1 threshold ", italic(theta[i1])))) +
+  ylab(expression(paste("Group Size ", italic(n)))) +
   scale_x_continuous(breaks = seq(0, 100, 25), 
                      # limits = c(0, 1),
                      expand = c(0.03, 0)) +

@@ -25,7 +25,7 @@ nstar_melt <- nstar %>%
 gg_nstar_comp <- ggplot(nstar_melt, aes(x = beta, group = variable, color = variable)) +
   geom_line(aes(y = value), size = 0.3) +
   ylab("n*") +
-  xlab(expression(paste("Interaction bias (", beta, ")"))) +
+  xlab(expression(paste("Interaction bias ", italic(beta)))) +
   scale_x_continuous(breaks = seq(1, 5, 0.5)) +
   scale_y_continuous(limits = c(0, 100)) +
   scale_color_manual(name = "Solution", values = c("#0d75ff", "#d60036"), labels = c("Simplified", "Full")) +

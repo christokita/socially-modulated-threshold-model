@@ -62,8 +62,8 @@ gg_behavvar<- ggplot(data = filter_data,
                      aes(x = Task1, y = n, fill = Model, group = n)) +
   theme_invisible() +
   geom_density_ridges2(size = 0.1, stat = "binline", bins = 100) +
-  xlab(expression(paste("Task 1 performance frequency (", italic(x[i1]), ")"))) +
-  ylab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Task 1 performance frequency ", italic(x[i1])))) +
+  ylab(expression(paste("Group Size ", italic(n)))) +
   scale_x_continuous(breaks = seq(-1, 1, 0.2), 
                      # limits = c(0, 1),
                      expand = c(0.03, 0)) +
@@ -119,7 +119,7 @@ gg_type_freq <- ggplot(behav_summary, aes(x = n, y = Mean_Count, colour = Type))
   scale_colour_manual(name = "Individual type", 
                       values = c("#a6cee3", "#1f78b4")) +
   ylab("Number of individuals") +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group Size ", italic(n)))) +
   scale_x_continuous(breaks = seq(20, 100, 20)) +
   scale_y_continuous(breaks = seq(0, 100, 20), limits = c(0, 100)) +
   theme_ctokita() +

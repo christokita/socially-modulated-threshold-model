@@ -64,8 +64,8 @@ gg_entropy_eps <- ggplot(data = epsilons, aes(x = epsilon)) +
              size = 0.8,
              color = "#4d4d4d") +
   theme_classic() +
-  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Social influence ", italic(epsilon)))) +
+  ylab(expression(paste("DOL ", italic(D[indiv])))) +
   scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
   scale_y_continuous(limits = c(0, 1), 
                      breaks = seq(0, 1, 0.5)) +
@@ -96,8 +96,8 @@ gg_entropy_gs <- ggplot(data = groupsizes, aes(x = n)) +
              size = 0.8,
              color = "#4d4d4d") +
   theme_classic() +
-  xlab(expression(paste("Group size (", italic(n), ")"))) +
-  ylab(expression(paste("DOL (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Group size ", italic(n)))) +
+  ylab(expression(paste("DOL ", italic(D[indiv])))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_y_continuous(limits = c(0, 1), 
                      breaks = seq(0, 1, 0.5)) +
@@ -208,7 +208,7 @@ gg_mod_beta <- ggplot(mod_data_beta, aes(x = parameter_value, y = Modul_mean, co
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(1, 1.5, 0.05)) +
   scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
-  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias ", italic(beta)))) +
   ylab("Modularity") +
   theme_ctokita() +
   theme(legend.position = "none",
@@ -231,7 +231,7 @@ gg_mod_eps <- ggplot(mod_data_eps, aes(x = parameter_value, y = Modul_mean, colo
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
   scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
-  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
+  xlab(expression(paste("Social influence ", italic(epsilon)))) +
   ylab("Modularity") +
   theme_ctokita() +
   theme(legend.position = "none",
@@ -255,7 +255,7 @@ gg_mod_gs <- ggplot(mod_data_gs, aes(x = parameter_value, y = Modul_mean, colour
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_y_continuous(breaks = seq(0, 0.02, 0.01), limits = c(-0.0002, 0.02)) +
-  xlab(expression(paste("Group size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size ", italic(n)))) +
   ylab("Modularity") +
   theme_ctokita() +
   theme(legend.position = "none",
@@ -357,7 +357,7 @@ gg_assort_beta <- ggplot(data = assort_data_beta, aes(x = parameter_value, y = A
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
-  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias ", italic(beta)))) +
   ylab("Assortativity") +
   theme_ctokita() +
   theme(legend.position = "none",
@@ -381,7 +381,7 @@ gg_assort_eps <- ggplot(data = assort_data_eps, aes(x = parameter_value, y = Ass
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 0.6, 0.1)) +
   scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
-  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
+  xlab(expression(paste("Social influence ", italic(epsilon)))) +
   ylab("Assortativity") +
   theme_ctokita() +
   theme(legend.position = "none",
@@ -405,7 +405,7 @@ gg_assort_gs <- ggplot(data = assort_data_gs, aes(x = parameter_value, y = Assor
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   # scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
-  xlab(expression(paste("Group size (", italic(n), ")"))) +
+  xlab(expression(paste("Group size ", italic(n)))) +
   ylab("Assortativity") +
   theme_ctokita() +
   theme(legend.position = "none",

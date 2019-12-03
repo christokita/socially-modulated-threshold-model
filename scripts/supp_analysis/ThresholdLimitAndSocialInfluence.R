@@ -51,8 +51,8 @@ gg_comp_long <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, c
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
-  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Social influence ", italic(epsilon)))) +
+  ylab(expression(paste("Division of labor ", italic(D[indiv])))) +
   scale_color_manual(name = "Thresh. limits",
                      values = c("#a6cee3", "#1f78b4"),
                      labels = c(expression(paste("[0, ", infinity, ")")), "[0, 100]")) +
@@ -118,8 +118,8 @@ gg_comp <- ggplot(entropy_data, aes(x = epsilon, y = Mean, group = Model, color 
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Social influence (", italic(epsilon), ")"))) +
-  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Social influence ", italic(epsilon)))) +
+  ylab(expression(paste("Division of labor ", italic(D[indiv])))) +
   scale_color_manual(name = "Thresh. limits",
                      values = c("#a6cee3", "#1f78b4"),
                      labels = c(expression(paste("[0, ", infinity, ")")), "[0, 100]")) +
@@ -177,8 +177,8 @@ gg_comp <- ggplot(entropy_data, aes(x = beta, y = Mean, group = Model, color = M
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
-  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Group Size ", italic(n)))) +
+  ylab(expression(paste("Division of labor ", italic(D[indiv])))) +
   scale_color_manual(name = "Thresh. limits",
                      values = c("#a6cee3", "#1f78b4"),
                      labels = c("[0, 1,000]", "[0, 100]")) +
@@ -234,8 +234,8 @@ gg_comp <- ggplot(entropy_data, aes(x = n, y = Mean, group = Model, color = Mode
   geom_point(aes(y = Mean),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
-  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
+  xlab(expression(paste("Group Size ", italic(n)))) +
+  ylab(expression(paste("Division of labor ", italic(D[indiv])))) +
   scale_color_manual(name = "Thresh. limits",
                      values = c("#a6cee3", "#1f78b4"),
                      labels = c("[0, 1,000]", "[0, 100]")) +
@@ -297,8 +297,8 @@ gg_threshvar <- ggplot(data = all_thresh,
                        aes(x = Thresh1, y = n, fill = n, group = n)) +
   theme_invisible() +
   geom_density_ridges(size = 0.1, stat = "binline", bins = 100) +
-  xlab(expression(paste("Task 1 threshold (", italic(theta[i1]), ")"))) +
-  ylab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Task 1 threshold ", italic(theta[i1])))) +
+  ylab(expression(paste("Group Size ", italic(n)))) +
   # scale_x_continuous(breaks = seq(0, 100, 25), 
   #                    # limits = c(0, 1),
   #                    expand = c(0.03, 0)) +
@@ -322,15 +322,15 @@ gg_threshvar
 ####################
 library(scales)
 # Normal threshold limit
-load("output/ThresholdTime/ThresholdLimits/ThreshMax-100.Rdata")
+load("output/ThresholdTime/ThresholdLimits/ThreshMax-100_Eps0.4.Rdata")
 
 gg_threshtime_100 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
   geom_line(size = 0.1, alpha = 0.1, colour = "#1f78b4") +
-  scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
+  scale_x_continuous(name = expression(paste("Time step ", italic(t))),
                      breaks = seq(0, 50000, 10000),
                      labels = c("", "10,000", "", "30,000", "", "50,000"),
                      expand = c(0, 0)) +
-  scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
+  scale_y_continuous(name = expression(paste("Task 1 threshold ", italic(theta[i1,t]))),
                      limits = c(0, 100),
                      breaks = seq(0, 100, 50)) +
   theme_ctokita() +
@@ -343,15 +343,15 @@ ggsave(gg_threshtime_100, file = "output/ThresholdTime/ThresholdLimits/Examplefo
 
 
 # High threshold limit
-load("output/ThresholdTime/ThresholdLimits/ThreshMax-Inf.Rdata")
+load("output/ThresholdTime/ThresholdLimits/ThreshMax-Inf_Eps0.4.Rdata")
 
 gg_threshtime_1000 <- ggplot(thresh_time, aes(x = t, y = Threshold, group = Id)) +
   geom_line(size = 0.1, alpha = 0.15, colour = "#8bbeda") +
-  scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
+  scale_x_continuous(name = expression(paste("Time step ", italic(t))),
                      breaks = seq(0, 50000, 10000),
                      labels = c("", "10,000", "", "30,000", "", "50,000"),
                      expand = c(0, 0)) +
-  scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
+  scale_y_continuous(name = expression(paste("Task 1 threshold ", italic(theta[i1,t]))),
                      limits = c(0, 1200),
                      breaks = seq(0, 1200, 600),
                      label = comma) +

@@ -62,8 +62,8 @@ gg_betaeps <- ggplot(data = entropy, aes(x = beta, y = epsilon, fill = Dind_mean
                        limits = c(0, 1)) +
   scale_colour_gradientn(colours = pal, name = "Behavioral\nspecialization",
                          limits = c(0, 1)) +
-  xlab(expression(paste("Interaction Bias (", italic(beta), ")"))) +
-  ylab(expression(paste( "Social influence (", italic(epsilon), ")"))) +
+  xlab(expression(paste("Interaction Bias ", italic(beta)))) +
+  ylab(expression(paste( "Social influence ", italic(epsilon)))) +
   theme(axis.text = element_text(colour = "black", size = 6),
         axis.title = element_text(size = 7),
         legend.title = element_text(size = 7),
@@ -212,7 +212,7 @@ gg_mod_beta <- ggplot(mod_data_beta, aes(x = parameter_value, y = Modul_mean, co
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(1, 1.5, 0.05)) +
   scale_y_continuous(breaks = seq(0, 0.03, 0.01), limits = c(-0.0002, 0.031)) +
-  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias ", italic(beta)))) +
   ylab("Modularity") +
   theme_ctokita() +
   theme(legend.position = "none",
@@ -356,7 +356,7 @@ gg_assort_beta <- ggplot(data = assort_data_beta, aes(x = parameter_value, y = A
                     values = c("#4d4d4d")) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   scale_y_continuous(breaks = seq(-0.04, 0.1, 0.02), limits = c(-0.02, 0.062)) +
-  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias ", italic(beta)))) +
   ylab("Assortativity") +
   theme_ctokita() +
   theme(legend.position = "none",

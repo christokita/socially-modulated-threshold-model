@@ -71,7 +71,7 @@ gg_nstar <- ggplot() +
              aes(x = beta, y = N_star),
              size = 0.4,
              colour = "#e31a1c") +
-  xlab(expression(paste("Interaction bias (", italic(beta), ")"))) +
+  xlab(expression(paste("Interaction bias ", italic(beta)))) +
   ylab(expression(paste("n"^"*"))) +
   scale_x_continuous(breaks = seq(1, 1.25, 0.05)) +
   theme_ctokita() +

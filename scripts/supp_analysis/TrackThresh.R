@@ -196,11 +196,11 @@ load('output/ThresholdTime/Examples/n80-eps0.1-beta1.1.Rdata')
 # Plot time series
 gg_threshtime <- ggplot(thresh_time1, aes(x = t, y = Threshold, group = Id)) +
   geom_line(size = 0.1, alpha = 0.1, colour = "#1f78b4") +
-  scale_x_continuous(name = expression(paste("Time step (", italic(t), ")")),
+  scale_x_continuous(name = expression(paste("Time step ", italic(t))),
                      breaks = c(1, seq(10000, 50000, 10000)),
                      labels = c("0", "", "", "", "", "50,000"),
                      expand = c(0, 0)) +
-  scale_y_continuous(name = expression(paste("Task 1 threshold (", italic(theta[i1,t]), ")")),
+  scale_y_continuous(name = expression(paste("Task 1 threshold ", italic(theta[i1,t]))),
                      limits = c(0, 100),
                      breaks = seq(0, 100, 50)) +
   theme_ctokita() +

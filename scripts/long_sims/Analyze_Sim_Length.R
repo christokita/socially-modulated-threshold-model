@@ -58,8 +58,8 @@ ggplot(data = sim_data, aes(x = t, y = Dind, group = n, col = n)) +
   theme_ctokita() +
   scale_color_manual(values = cols, guide = guide_legend(reverse = TRUE)) +
   scale_x_continuous(breaks = seq(0, 500000, 100000), label = comma) +
-  ylab(expression(paste("Division of labor (", italic(D[indiv]), ")"))) +
-  xlab(expression(paste("Time step (", italic(t), ")")))
+  ylab(expression(paste("Division of labor ", italic(D[indiv])))) +
+  xlab(expression(paste("Time step ", italic(t))))
 
 ggsave(file = paste0("output/SimLength/DOL/", file_name, "_Long.svg"), width = 90, height = 45, units = "mm")
 ggsave(file = paste0("output/SimLength/DOL/", file_name, "_Long.png"), width = 90, height = 45, units = "mm")

@@ -56,7 +56,7 @@ gg_deltas <- ggplot(data = entropy_total, aes(x = n, y = Mean, colour = sigma, g
   # scale_color_manual(name = expression(paste("Threshold\nvariation (", sigma, ")")),
   #                    values = pal) +
   xlab("Group size (n)") +
-  ylab(expression(paste("Division of labor (", 'D'[indiv], ")"))) +
+  ylab(expression(paste("Division of labor ", 'D'[indiv]))) +
   facet_grid(~delta_label, labeller = label_parsed) +
   theme_ctokita()
 
@@ -72,18 +72,18 @@ entropy_map <- entropy_total %>%
 
 pal <- brewer_pal("seq", "Blues")
 pal <- pal(9)
-pal <- c("#f0f0f0", "#252525")
+# pal <- c("#f0f0f0", "#252525")
 
 
 gg_deltamap <- ggplot(data = entropy_map, aes(x = n, y = sigma, fill = Mean, colour = Mean)) +
   geom_tile() +
-  scale_fill_gradientn(colours = pal, name = expression(paste("Division of\nlabor (", 'D'[indiv], ")")),
+  scale_fill_gradientn(colours = pal, name = expression(paste("Division of\nlabor ", 'D'[indiv])),
                          limits = c(0, 0.5)) +
-  scale_colour_gradientn(colours = pal,expression(paste("Division of\nlabor (", 'D'[indiv], ")")),
+  scale_colour_gradientn(colours = pal, name = expression(paste("Division of\nlabor ", 'D'[indiv])),
                        limits = c(0, 0.5)) +
   xlab("Group size (n)") +
   scale_x_discrete(breaks = c(5, seq(20, 100, 20))) +
-  ylab(expression(paste("Threshold variation (", sigma, ")"))) +
+  ylab(expression(paste("Threshold variation ", sigma))) +
   # facet_grid(~delta, labeller = label_parsed) +
   theme_ctokita() +
   theme(aspect.ratio = 1)

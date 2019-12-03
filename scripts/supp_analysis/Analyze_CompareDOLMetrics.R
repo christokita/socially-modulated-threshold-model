@@ -37,7 +37,7 @@ gg_spec <- ggplot(data = rank_corr, aes(x = n)) +
   geom_point(aes(y = MeanSpec),
              size = 0.8) +
   theme_classic() +
-  xlab(expression(paste("Group Size (", italic(n), ")"))) +
+  xlab(expression(paste("Group Size ", italic(n)))) +
   ylab(expression(paste("Specialization (rank corr.)"))) +
   scale_x_continuous(breaks = seq(0, 100, 20)) +
   scale_y_continuous(limits = c(-0.2, 1),
