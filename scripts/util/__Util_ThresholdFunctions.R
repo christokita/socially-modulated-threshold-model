@@ -49,10 +49,10 @@ calc_determ_thresh <- function(time_step, threshold_matrix, stimulus_matrix) {
 ####################
 adjust_thresh_social <- function(social_network, threshold_matrix, state_matrix, epsilon) {
   # Calculate "sum" of task states/probs of neighbors
-  active_neighbors <- t(social_network) %*% state_matrix #active neighbors by category
-  total_neighbors <- rowSums(active_neighbors) #total active neighbors
-  # Calculate interacting individuals NOT performing that task
-  not_sums <- total_neighbors - active_neighbors
+  active_neighbors <- social_network %*% state_matrix #active neighbors by category
+  total_active_neighbors <- rowSums(active_neighbors) #total active neighbors
+  # Calculate interacting individuals that are active but NOT performing that task
+  not_sums <- total_active_neighbors - active_neighbors
   # Calculate net threshold effect
   net_effect <- not_sums - active_neighbors
   net_effect <- net_effect * epsilon
@@ -69,10 +69,10 @@ adjust_thresh_social <- function(social_network, threshold_matrix, state_matrix,
 ####################
 adjust_thresholds_social_capped <- function(social_network, threshold_matrix, state_matrix, epsilon, threshold_max) {
   # Calculate "sum" of task states/probs of neighbors
-  active_neighbors <- t(social_network) %*% state_matrix #active neighbors by category
-  total_neighbors <- rowSums(active_neighbors) #total active neighbors
-  # Calculate interacting individuals NOT performing that task
-  not_sums <- total_neighbors - active_neighbors
+  active_neighbors <- social_network %*% state_matrix #active neighbors by category
+  total_active_neighbors <- rowSums(active_neighbors) #total active neighbors
+  # Calculate interacting individuals that are active but NOT performing that task
+  not_sums <- total_active_neighbors - active_neighbors
   # Calculate net threshold effect
   net_effect <- not_sums - active_neighbors
   net_effect <- net_effect * epsilon
